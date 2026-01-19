@@ -35,7 +35,7 @@ console.log(windowOffset)
   
   const content = {
     Home: Language === "AMH" ? "መነሻ" : "Home",
-    About: Language === "AMH" ? "ስለ እኛ" : "About",
+    About: Language === "AMH" ? "ስለ እኛ" : "About Us",
     Services: Language === "AMH" ? "አገልግሎቶች" : "Services",
     Laws: Language === "AMH" ? "ሕጎች" : "Laws",
     Contact: Language === "AMH" ? "አድራሻ" : "Contact",
