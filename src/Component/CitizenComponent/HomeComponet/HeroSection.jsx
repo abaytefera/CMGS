@@ -2,6 +2,7 @@ import { faChevronRight, faSearch, faBullhorn } from "@fortawesome/free-solid-sv
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
 
@@ -33,24 +34,24 @@ const HeroSection = () => {
 
         <div className="mt-8 flex justify-center gap-6 flex-wrap">
        
-          <a
-            href="/submit-complaint"
+          <Link
+            to="/submit-complaint"
             className="px-6 py-3 bg-green-600 space-x-3 text-white flex items-center rounded-md shadow-lg hover:bg-green-700 transition transform hover:scale-105"
           >
             <FontAwesomeIcon icon={faBullhorn} className="text-xl" />
             <span className="font-bold">{content.submitBtn}</span>
             <FontAwesomeIcon icon={faChevronRight} className="text-sm" />
-          </a>
+          </Link>
 
        
-          <a
-            href="/track-complaint"
+          <Link
+            to="/TrackComplaintPage"
             className="px-6 py-3 bg-[#467976] space-x-3 text-white flex items-center rounded-md shadow-lg hover:bg-teal-700 transition transform hover:scale-105"
           >
             <FontAwesomeIcon icon={faSearch} className="text-xl" />
             <span className="font-bold">{content.trackBtn}</span>
             <FontAwesomeIcon icon={faChevronRight} className="text-sm" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

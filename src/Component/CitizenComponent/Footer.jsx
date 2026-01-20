@@ -18,7 +18,7 @@ const Footer = () => {
     quickLinks: Language === "AMH" ? "ፈጣን ሊንኮች" : "Quick Links",
     home: Language === "AMH" ? "መነሻ" : "Home",
     about: Language === "AMH" ? "ስለ እኛ" : "About Us",
-    services: Language === "AMH" ? "አገልግሎቶች" : "Services",
+  Contact: Language === "AMH" ? "አድራሻ" : "Contact",
     contactInfo: Language === "AMH" ? "የመገናኛ መረጃ" : "Contact Information",
     locations: Language === "AMH" ? "የቢሮ አድራሻዎች" : "Office Locations",
     mainOffice: Language === "AMH" ? "ዋና ቢሮ፡ አዲስ አበባ" : "Main Office: Addis Ababa",
@@ -43,7 +43,7 @@ const Footer = () => {
           <ul className="space-y-2 text-center md:text-left">
             <li><Link to="/" className="hover:text-green-400 transition">{content.home}</Link></li>
             <li><Link to="/about" className="hover:text-green-400 transition">{content.about}</Link></li>
-            <li><Link to="/services" className="hover:text-green-400 transition">{content.services}</Link></li>
+            <li><Link to="/ContactPage" className="hover:text-green-400 transition">{content. Contact}</Link></li>
           </ul>
         </div>
 

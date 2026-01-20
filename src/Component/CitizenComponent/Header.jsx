@@ -19,10 +19,7 @@ const Header = () => {
  window.removeEventListener('scroll',scrollHandle);
     }
   },[])
-  useEffect(()=>{
-console.log(windowOffset)
 
-  },[windowOffset])
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const toggleLanguge = (e) => {
@@ -36,7 +33,7 @@ console.log(windowOffset)
     Home: Language === "AMH" ? "መነሻ" : "Home",
     About: Language === "AMH" ? "ስለ እኛ" : "About Us",
     Services: Language === "AMH" ? "አገልግሎቶች" : "Services",
-    Laws: Language === "AMH" ? "ሕጎች" : "Laws",
+    GiveFeedback: Language === "AMH" ? "አስተያየት ለመስጠት" : " Give Feedback",
     Contact: Language === "AMH" ? "አድራሻ" : "Contact",
     Login: Language === "AMH" ? "የሰራተኛ መግቢያ" : "Staff Login",
     LangLabel: Language === "AMH" ? "ቋንቋ ይቀይሩ" : "Language Change",
@@ -56,9 +53,8 @@ console.log(windowOffset)
           <nav className="hidden md:flex space-x-6 items-center">
             <Link to="/" className="text-white hover:text-green-600">{content.Home}</Link>
             <Link to="/about" className="text-white hover:text-green-600">{content.About}</Link>
-            <Link to="/services" className="text-white hover:text-green-600">{content.Services}</Link>
-            <Link to="/laws" className="text-white hover:text-green-600">{content.Laws}</Link>
-            <Link to="/contact" className="text-white hover:text-green-600">{content.Contact}</Link>
+            <Link to="/FeedbackPage" className="text-white hover:text-green-600">{content.GiveFeedback}</Link>
+            <Link to="/ContactPage" className="text-white hover:text-green-600">{content.Contact}</Link>
           </nav>
 
           <div className="flex max-md:hidden gap-3 items-center">
@@ -104,9 +100,8 @@ console.log(windowOffset)
           <nav className="flex flex-col space-y-2 px-4 py-4">
             <Link to="/" className="text-gray-700 hover:text-green-600 border-b pb-1">{content.Home}</Link>
             <Link to="/about" className="text-gray-700 hover:text-green-600 border-b pb-1">{content.About}</Link>
-            <Link to="/services" className="text-gray-700 hover:text-green-600 border-b pb-1">{content.Services}</Link>
-            <Link to="/laws" className="text-gray-700 hover:text-green-600 border-b pb-1">{content.Laws}</Link>
-            <Link to="/contact" className="text-gray-700 hover:text-green-600 border-b pb-1">{content.Contact}</Link>
+            <Link to="/FeedbackPage" className="text-gray-700 hover:text-green-600 border-b pb-1">{content.GiveFeedback}</Link>
+            <Link to="/ContactPage" className="text-gray-700 hover:text-green-600 border-b pb-1">{content.Contact}</Link>
             
             <div className="flex flex-col gap-4 pt-2">
               <div className="flex items-center gap-2">
