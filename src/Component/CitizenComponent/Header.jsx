@@ -78,7 +78,7 @@ const Header = () => {
             </div>
             
             <Link
-              href="/login"
+              to="/login"
               className="bg-green-600 px-4 py-2 rounded-md text-white shadow hover:bg-green-700 transition"
             >
               {content.Login}

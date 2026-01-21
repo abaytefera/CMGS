@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from "react-redux";
 import { MapPin, Phone, Mail } from 'lucide-react';
 import ContactMethod from '../../Component/CitizenComponent/ContactPageComponent/ContactMethod';
 import OfficeMap from '../../Component/CitizenComponent/ContactPageComponent/OfficeMap';
 import Header from '../../Component/CitizenComponent/Header';
 import Footer from '../../Component/CitizenComponent/Footer';
+import HeaderHome from '../../Component/CitizenComponent/HomeComponet/HeaderHome';
 
 const ContactPage = () => {
   const { Language } = useSelector((state) => state.webState);
-
+ useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const t = {
     title: Language === "AMH" ? "ከባለሥልጣን መሥሪያ ቤታችን ጋር ይገናኙ" : "Contact Our Authority",
@@ -35,7 +38,7 @@ const ContactPage = () => {
 
   return (
     <div className=''>
-      <Header />
+    <Header></Header>
       <div className="max-w-7xl mx-auto pt-40 px-4 pb-12">
         
         <div className="mb-12 text-center lg:text-left">

@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useState } from "react"; 
 import { useSelector } from "react-redux";
 import { faBuilding, faPhone, faUser ,faCheckDouble} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StatusHistory from "./StatusHistory";
 import { motion } from "framer-motion";
-import { Link } from "lucide-react";
+import { Link } from "react-router-dom"; 
 
 const ComplaintDetails = () => {
   const { Language } = useSelector((state) => state.webState);
-
+  
+ 
+  const [rating, setRating] = useState(5); 
 
   const t = {
     header: Language === "AMH" ? "የአቤቱታው ሁኔታ" : "Complaint Status",
@@ -27,144 +29,115 @@ const ComplaintDetails = () => {
     office: Language === "AMH" ? "ቢሮ / ክፍል" : "Office",
     mainOffice: Language === "AMH" ? "ዋናው ቢሮ" : "Main Office",
     phone: Language === "AMH" ? "ስልክ" : "Phone",
+    feedback: Language === "AMH" ? "አስተያየት ይስጡ" : "Give Feedback",
     resolvedNote: Language === "AMH" 
       ? "ጉዳዩ ተፈትቷል፤ እንዲሁም የተበከለው አካባቢ እንዲጸዳ ተደርጓል።" 
       : "The issue has been resolved and the affected area has been cleaned."
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 mt-10 border border-gray-100">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">{t.header}</h2>
+   
+    <div className="bg-[#080d14] border border-white/10 rounded-[2.5rem] shadow-2xl p-8 mt-10 text-slate-300">
+      <h2 className="text-2xl font-black mb-6 text-white border-b border-white/5 pb-4 uppercase italic tracking-tighter">
+        {t.header}
+      </h2>
 
-     
-      <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-8 flex items-center justify-between">
+      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5 mb-8 flex items-center justify-between">
         <div>
-          <p className="font-bold text-green-700 text-lg flex items-center gap-2">
-            <span className="bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">✓</span>
+          <p className="font-black text-emerald-400 text-lg flex items-center gap-2">
+            <span className="bg-emerald-500 text-[#080d14] rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">✓</span>
             {t.found}
           </p>
-          <p className="text-sm text-gray-600 font-medium">{t.refNum}: CGMS-00125</p>
+          <p className="text-sm text-slate-400 font-bold mt-1 tracking-widest uppercase">{t.refNum}: CGMS-00125</p>
         </div>
       </div>
 
- 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm mb-8 bg-gray-50 p-6 rounded-xl">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm mb-8 bg-white/5 p-6 rounded-[2rem] border border-white/5">
         <div>
-          <strong className="text-gray-500 block mb-1">{t.category}:</strong>
-          <span className="font-bold text-gray-800">{t.waste}</span>
+          <strong className="text-slate-500 block mb-1 uppercase text-[10px] tracking-widest">{t.category}:</strong>
+          <span className="font-bold text-white">{t.waste}</span>
         </div>
         <div>
-          <strong className="text-gray-500 block mb-1">{t.date}:</strong>
-          <span className="font-bold text-gray-800">{Language === "AMH" ? "ሚያዝያ 14, 2016" : "April 22, 2024"}</span>
+          <strong className="text-slate-500 block mb-1 uppercase text-[10px] tracking-widest">{t.date}:</strong>
+          <span className="font-bold text-white">{Language === "AMH" ? "ሚያዝያ 14, 2016" : "April 22, 2024"}</span>
         </div>
         <div>
-          <strong className="text-gray-500 block mb-1">{t.status}:</strong>
-          <span className="font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full text-xs uppercase">{t.resolved}</span>
+          <strong className="text-slate-500 block mb-1 uppercase text-[10px] tracking-widest">{t.status}:</strong>
+          <span className="font-black text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full text-[10px] uppercase tracking-tighter">{t.resolved}</span>
         </div>
         <div>
-          <strong className="text-gray-500 block mb-1">{t.priority}:</strong>
-          <span className="font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full text-xs uppercase">{t.high}</span>
+          <strong className="text-slate-500 block mb-1 uppercase text-[10px] tracking-widest">{t.priority}:</strong>
+          <span className="font-black text-orange-400 bg-orange-500/10 px-3 py-1 rounded-full text-[10px] uppercase tracking-tighter">{t.high}</span>
         </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8 mb-8">
-      
-        <div className="border border-gray-200 rounded-xl p-5 shadow-sm">
-          <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-            <FontAwesomeIcon icon={faUser} className="text-green-600" />
+        <div className="bg-white/5 border border-white/10 rounded-[2rem] p-6 shadow-sm">
+          <h3 className="font-black text-white mb-4 flex items-center gap-2 uppercase text-xs tracking-widest">
+            <FontAwesomeIcon icon={faUser} className="text-emerald-500" />
             {t.citizenDetails}
           </h3>
-          <p className="font-bold text-gray-900 mb-1">ዮሐንስ ደበበ</p>
-          <p className="text-xs text-gray-500 italic mb-4">{t.notDisplayed}</p>
-          <p className="text-gray-700 text-sm leading-relaxed bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+          <p className="font-black text-white text-lg mb-1 tracking-tight">ዮሐንስ ደበበ</p>
+          <p className="text-[10px] text-slate-500 italic mb-4 uppercase font-bold tracking-widest">{t.notDisplayed}</p>
+          <p className="text-slate-300 text-sm leading-relaxed bg-black/40 p-4 rounded-2xl border-l-4 border-emerald-500 italic">
             {Language === "AMH" 
               ? "በሰፈራችን የሚገኙ የሕዝብ የቆሻሻ ማጠራቀሚያዎች ሞልተው በመፍሰሳቸው ከፍተኛ ሽታ እና ቆሻሻ እያስከተሉ ይገኛል።" 
               : "The public trash bins in our neighborhood were overflowing causing bad odor and litter."}
           </p>
         </div>
 
-    
         <div className="space-y-4">
-          <div className="flex items-center gap-4 bg-white p-3 rounded-xl border border-gray-50 hover:shadow-md transition">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-              <FontAwesomeIcon icon={faUser} className="text-blue-600" />
+          {[
+            { label: t.assignedTo, val: Language === "AMH" ? "ማይክል ደቡብ" : "Michael South", icon: faUser, color: "text-blue-400", bg: "bg-blue-500/10" },
+            { label: t.office, val: t.mainOffice, icon: faBuilding, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+            { label: t.phone, val: "+251 455 666", icon: faPhone, color: "text-purple-400", bg: "bg-purple-500/10", isLink: true }
+          ].map((item, idx) => (
+            <div key={idx} className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5 hover:bg-white/10 transition-all">
+              <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center`}>
+                <FontAwesomeIcon icon={item.icon} className={item.color} />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase font-black text-slate-500 tracking-[0.2em]">{item.label}</p>
+                {item.isLink ? (
+                  <a href={`tel:${item.val}`} className="font-black text-blue-400 hover:underline">{item.val}</a>
+                ) : (
+                  <p className="font-black text-white">{item.val}</p>
+                )}
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">{t.assignedTo}</p>
-              <p className="font-bold text-gray-800">{Language === "AMH" ? "ማይክል ደቡብ" : "Michael South"}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 bg-white p-3 rounded-xl border border-gray-50 hover:shadow-md transition">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-              <FontAwesomeIcon icon={faBuilding} className="text-green-600" />
-            </div>
-            <div>
-              <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">{t.office}</p>
-              <p className="font-bold text-gray-800">{t.mainOffice}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 bg-white p-3 rounded-xl border border-gray-50 hover:shadow-md transition">
-            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-              <FontAwesomeIcon icon={faPhone} className="text-purple-600" />
-            </div>
-            <div>
-              <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">{t.phone}</p>
-              <a href="tel:+251455666" className="font-bold text-blue-600 hover:underline">
-                +251 455 666
-              </a>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-   
       <StatusHistory />
 
-     <motion.div 
-  initial={{ opacity: 0, scale: 0.9 }}
-  animate={{ opacity: 1, scale: 1 }}
-  className="mt-8 bg-green-600 rounded-xl p-5 shadow-lg shadow-green-100 text-white relative overflow-hidden"
->
-  {/* Subtle Background Pattern Icon */}
-  <FontAwesomeIcon 
-    icon={faCheckDouble} 
-    className="absolute -right-4 -bottom-4 text-white opacity-10 text-7xl rotate-12" 
-  />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-8 bg-emerald-600 rounded-[2rem] p-6 shadow-2xl shadow-emerald-900/20 text-white relative overflow-hidden"
+      >
+        <FontAwesomeIcon icon={faCheckDouble} className="absolute -right-6 -bottom-6 text-white opacity-10 text-8xl rotate-12" />
+        <h4 className="font-black mb-2 text-xl flex items-center gap-3 uppercase italic tracking-tighter">
+          <div className="bg-white/20 w-10 h-10 rounded-xl flex items-center justify-center">
+            <FontAwesomeIcon icon={faCheckDouble} className="text-white text-sm" />
+          </div>
+          <span>{t.resolved}</span>
+        </h4>
+        <p className="text-sm font-medium opacity-90 leading-relaxed pl-14">
+          {t.resolvedNote}
+        </p>
+      </motion.div>
 
-  <h4 className="font-bold mb-1 text-lg flex items-center gap-3">
-    <motion.div
-      animate={{ 
-        y: [0, -4, 0],
-      }}
-      transition={{ 
-        duration: 2, 
-        repeat: Infinity, 
-        ease: "easeInOut" 
-      }}
-      className="bg-white/20 w-8 h-8 rounded-lg flex items-center justify-center"
-    >
-      <FontAwesomeIcon icon={faCheckDouble} className="text-white text-sm" />
-    </motion.div>
-    <span>{t.resolved}</span>
-  </h4>
-
-  <p className="text-sm opacity-90 leading-relaxed pl-11">
-    {t.resolvedNote}
-  </p>
-</motion.div>
-<Link to={'/FeedbackPage'}
-            type="submit"
-            disabled={!rating}
-            className={`w-full py-4 rounded-xl font-bold text-white shadow-lg transition-all transform active:scale-[0.98] ${
-              rating 
-                ? "bg-blue-600 hover:bg-blue-700 shadow-blue-200" 
-                : "bg-slate-300 cursor-not-allowed"
-            }`}
-          >
-            Give Feedback
-          </Link>
+      {/* ስህተቱ የተስተካከለበት Link ክፍል */}
+      <Link to={'/FeedbackPage'}
+        className={`mt-8 w-full py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] text-white shadow-2xl transition-all flex items-center justify-center gap-2 ${
+          rating 
+            ? "bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 active:scale-[0.98]" 
+            : "bg-slate-800 cursor-not-allowed text-slate-500"
+        }`}
+      >
+        {t.feedback}
+      </Link>
     </div>
   );
 };

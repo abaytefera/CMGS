@@ -7,10 +7,13 @@ import { persistStore,persistReducer,FLUSH,
   PURGE,
   REGISTER} from "redux-persist";
 import storage from 'redux-persist/lib/storage';
+import { APi } from "./CenteralAPI.jsx";
 
-
+import authReducer from "./auth.jsx"
 const rootReducer=combineReducers({
-    'webState':webState
+    'webState':webState,
+   'auth': authReducer,
+     [APi.reducerPath]:APi.reducer
 })
 const persisConfig= {key:'root',storage: storage.default ? storage.default : storage,whitelist:['webState']};
 const presisReducer=persistReducer(persisConfig,rootReducer)
@@ -25,7 +28,7 @@ export const store=configureStore({
  
    return getDefaultMiddleware({serializableCheck:false,
     ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-   }).concat();
+   }).concat(APi.middleware);
 
   }
 })

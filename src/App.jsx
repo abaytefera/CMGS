@@ -8,12 +8,26 @@ import { HiLogin } from 'react-icons/hi'
 import { BrowserRouter , Routes, Route } from "react-router-dom";
 import SubmitComplaint from './Pages/CitizenPages/SubmitComplaint'
 import ComplaintSubmittedPage from './Pages/CitizenPages/ComplaintSubmittedPage'
+
 import TrackComplaintPage from './Pages/CitizenPages/TrackComplaintPage'
 import FeedbackPage from './Pages/CitizenPages/FeedbackPage'
 import ContactPage from './Pages/CitizenPages/ContactPage'
-
-
-
+import DashboardPage1 from './Pages/AuthenticationPage/OfficerPage/DashboardPage1'
+import LoginPage from './Pages/CitizenPages/LoginPage'
+import ComplaintListPage from './Pages/AuthenticationPage/ComplaintListPage'
+import ComplaintDetails from './Pages/AuthenticationPage/OfficerPage/ComplaintDetails'
+import SupervisorDashboard from './Pages/AuthenticationPage/SupervisorPage/SupervisorDashboard'
+import AssignComplaintPage from './Pages/AuthenticationPage/SupervisorPage/AssignComplaintPage'
+import NotAssignedComplaintListPage from './Pages/AuthenticationPage/NotAssignedComplaintListPage'
+import  AdminDashboard  from './Pages/AuthenticationPage/AdminDashboardPage/AdminDashboard' 
+import UserManagementPage from './Pages/AuthenticationPage/UserManagementPage/UserManagementPage'
+import DepartmentManagement from './Pages/AuthenticationPage/DepartmentManagementPage/DepartmentManagement'
+import CategoryManagement from './Pages/AuthenticationPage/CategoryManagementPage/CategoryManagement'
+import SystemSettings from './Pages/AuthenticationPage/SystemSettingsPage/SystemSettings'
+import ChangePasswordPage from './Pages/AuthenticationPage/ChangePasswordPage/ChangePasswordPage'
+import WorkProfile from './Pages/AuthenticationPage/WorkProfilepage'
+import ManagementDashboard from './Pages/AuthenticationPage/ManagementDashboardPage/ManagementDashboard'
+import ReportsPage from './Pages/AuthenticationPage/ReportsPage/ReportsPage'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -23,12 +37,28 @@ function App() {
     <Routes>
       <Route path='/' Component={Home}> </Route>
       <Route path='/about' Component={AboutServices}></Route>
+         <Route path='/login' Component={LoginPage}></Route>
       <Route path='/submit-complaint' Component={SubmitComplaint}></Route>
       <Route path='/ComplaintSubmittedPage' Component={ComplaintSubmittedPage}></Route>
          <Route path='/TrackComplaintPage' Component={TrackComplaintPage}></Route>
          <Route path='/FeedbackPage' Component={FeedbackPage}></Route>
           <Route path='/ContactPage' Component={ContactPage}></Route>
-        
+           <Route path='/Dashboard1' Component={DashboardPage1}></Route>
+             <Route path='/Complaintlist/:listType' Component={ComplaintListPage}></Route>
+              <Route path='/DetailList/:id' element={<ComplaintDetails />} />
+             <Route path='/Dashboard2' element={<SupervisorDashboard/>}></Route>
+              <Route path='/AssignComplain/:id' element={<AssignComplaintPage/>}></Route>
+                 <Route path='/NotAssignComplainList/:listType' element={<NotAssignedComplaintListPage/>}></Route>
+                   <Route path='Dashboard3' element={<AdminDashboard/>}></Route>
+                     <Route path='/userMg' element={<UserManagementPage/>}></Route>
+                      <Route path='/DepartmentMg' element={<DepartmentManagement/>}></Route>
+                       <Route path='/CatagoryMg' element={<CategoryManagement/>}></Route>
+                    <Route path='/SystemMg' element={<SystemSettings/>}></Route>
+                     <Route path='/passwordChange' element={<ChangePasswordPage/>}></Route>
+                           <Route path='/Profile' element={<WorkProfile/>}></Route>
+                     <Route path='/Dashboard4' element={<ManagementDashboard/>}></Route>
+                       <Route path='/Report' element={<ReportsPage/>}></Route>
+      
          
 </Routes>
 </BrowserRouter>

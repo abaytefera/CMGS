@@ -11,7 +11,13 @@ import {
 const StatusHistory = () => {
   const { Language } = useSelector((state) => state.webState);
 
- 
+   const statusMap = { 
+    "Submitted": 0, 
+    "Under Review": 1, 
+    "In Progress": 2, 
+    "Resolved": 3 
+  };
+  const currentStep = statusMap[status] || 0;
   const steps = [
     { 
       label: Language === "AMH" ? "ተልኳል" : "Submitted", 
@@ -39,7 +45,7 @@ const StatusHistory = () => {
     },
   ];
 
-  const currentStep = 3; 
+ 
 
   return (
     <div className="mb-8 p-6 bg-white rounded-2xl shadow-sm border border-gray-100">

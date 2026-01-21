@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import React, { useEffect } from "react";
 
 import HeaderHome from "../../Component/CitizenComponent/HomeComponet/HeaderHome";

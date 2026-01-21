@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector } from "react-redux";
-import { Star } from 'lucide-react';
+import { Star, Loader2 } from 'lucide-react'; 
+import { useSendFeedbackMutation } from '../../../Redux/citizenApi';
 
 const Feedback = () => {
   const { Language } = useSelector((state) => state.webState);
@@ -8,7 +9,9 @@ const Feedback = () => {
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState("");
 
- 
+  // RTK Query Mutation
+  const [sendFeedback, { isLoading }] = useSendFeedbackMutation();
+
   const t = {
     title: Language === "AMH" ? "አስተያየትዎን ያጋሩ" : "Share Your Feedback",
     subtitle: Language === "AMH" ? "የአካባቢ ጥበቃ አገልግሎታችንን ለማሻሻል ይረዱን" : "Help us improve our environmental services",
@@ -24,10 +27,20 @@ const Feedback = () => {
     successMsg: Language === "AMH" ? "ስለ አስተያየትዎ እናመሰግናለን!" : "Thank you for your feedback!"
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ rating, comment });
-    alert(t.successMsg);
+    
+    try {
+      // Execute RTK Query Mutation
+      await sendFeedback({ rating, comment }).unwrap();
+      
+      alert(t.successMsg);
+      // Reset form after successful submission
+      setRating(0);
+      setComment("");
+    } catch (err) {
+      alert(err?.data?.message || "Failed to send feedback. Please try again.");
+    }
   };
 
   return (
@@ -57,7 +70,8 @@ const Feedback = () => {
                 <button
                   key={star}
                   type="button"
-                  className="transition-transform active:scale-90 hover:scale-110"
+                  disabled={isLoading}
+                  className="transition-transform active:scale-90 hover:scale-110 disabled:opacity-50"
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHover(star)}
                   onMouseLeave={() => setHover(0)}
@@ -87,7 +101,8 @@ const Feedback = () => {
             <textarea
               id="comment"
               rows="4"
-              className="w-full px-4 py-3 rounded-2xl border-2 border-slate-100 focus:border-green-500 focus:ring-4 focus:ring-green-50 outline-none transition-all resize-none text-slate-600 placeholder:text-slate-300"
+              disabled={isLoading}
+              className="w-full px-4 py-3 rounded-2xl border-2 border-slate-100 focus:border-green-500 focus:ring-4 focus:ring-green-50 outline-none transition-all resize-none text-slate-600 placeholder:text-slate-300 disabled:bg-slate-50"
               placeholder={t.placeholder}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
@@ -97,13 +112,14 @@ const Feedback = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={!rating}
-            className={`w-full py-4 rounded-2xl font-bold text-white shadow-xl transition-all transform active:scale-95 ${
+            disabled={!rating || isLoading}
+            className={`w-full py-4 rounded-2xl font-bold text-white shadow-xl transition-all transform active:scale-95 flex items-center justify-center gap-2 ${
               rating 
                 ? "bg-green-600 hover:bg-green-700 shadow-green-100" 
                 : "bg-slate-300 cursor-not-allowed shadow-none"
-            }`}
+            } ${isLoading ? "opacity-80" : ""}`}
           >
+            {isLoading && <Loader2 className="animate-spin" size={20} />}
             {t.submitBtn}
           </button>
         </form>
