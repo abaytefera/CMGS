@@ -4,16 +4,41 @@ export const reportApi = APi.injectEndpoints({
   endpoints: (builder) => ({
     // GET Filtered Reports
     getReports: builder.query({
-      // The 'params' argument will contain { period, department, location }
+      // Corrected endpoint for report data/exports
       query: (params) => ({
-        url: '/reports',
+        url: '/reports/export',
         method: 'GET',
-        params: params, // Automatically adds ?key=value to the URL
+        params: params, 
       }),
       providesTags: ['Complaints'],
-      transformResponse: (res) => res || { data: [], totalCount: 0 },
+      // Standardized to unwrap 'data' and handle counts from your JSON response
+      transformResponse: (res) => res?.data || { results: [], count: 0 },
+    }),
+
+    // Added Export to Excel (Keeping names consistent with your query style)
+    exportToExcel: builder.mutation({
+      query: (params) => ({
+        url: '/reports/excel',
+        method: 'GET',
+        params: params,
+        responseHandler: (response) => response.blob(), // Handles binary file data
+      }),
+    }),
+
+    // Added Export to PDF
+    exportToPdf: builder.mutation({
+      query: (params) => ({
+        url: '/reports/pdf',
+        method: 'GET',
+        params: params,
+        responseHandler: (response) => response.blob(), // Handles binary file data
+      }),
     }),
   }),
 });
 
-export const { useGetReportsQuery } = reportApi;
+export const { 
+  useGetReportsQuery, 
+  useExportToExcelMutation, 
+  useExportToPdfMutation 
+} = reportApi;

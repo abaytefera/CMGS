@@ -5,8 +5,9 @@ export const authApi = APi.injectEndpoints({
     // Update Password Mutation
     changePassword: builder.mutation({
       query: (passwords) => ({
-        url: '/auth/change-password',
-        method: 'POST',
+        // Updated to the standard password update path
+        url: '/auth/update-password', 
+        method: 'PATCH',
         body: passwords, // Sends { currentPass, newPass }
       }),
     }),

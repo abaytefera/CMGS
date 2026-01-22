@@ -1,35 +1,43 @@
-import { configureStore,combineReducers } from "@reduxjs/toolkit";
-import webState from "./WebState.jsx"
-import { persistStore,persistReducer,FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER} from "redux-persist";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import webState from "./WebState.jsx";
+import { 
+  persistStore, 
+  persistReducer, 
+  FLUSH, 
+  REHYDRATE, 
+  PAUSE, 
+  PERSIST, 
+  PURGE, 
+  REGISTER 
+} from "redux-persist";
 import storage from 'redux-persist/lib/storage';
 import { APi } from "./CenteralAPI.jsx";
+import authReducer from "./auth.jsx";
 
-import authReducer from "./auth.jsx"
-const rootReducer=combineReducers({
-    'webState':webState,
-   'auth': authReducer,
-     [APi.reducerPath]:APi.reducer
-})
-const persisConfig= {key:'root',storage: storage.default ? storage.default : storage,whitelist:['webState']};
-const presisReducer=persistReducer(persisConfig,rootReducer)
+const rootReducer = combineReducers({
+  'webState': webState,
+  'auth': authReducer,
+  [APi.reducerPath]: APi.reducer
+});
 
-export const store=configureStore({
-  
-  reducer:presisReducer,
- 
-  
-  
-  middleware:(getDefaultMiddleware)=>{
- 
-   return getDefaultMiddleware({serializableCheck:false,
-    ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-   }).concat(APi.middleware);
+// Added 'auth' to whitelist so the login token persists on refresh
+const persisConfig = { 
+  key: 'root', 
+  storage: storage.default ? storage.default : storage, 
+  whitelist: ['webState', 'auth'] 
+};
 
+const presisReducer = persistReducer(persisConfig, rootReducer);
+
+export const store = configureStore({
+  reducer: presisReducer,
+  middleware: (getDefaultMiddleware) => {
+    return getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }).concat(APi.middleware);
   }
-})
-export const persistor=persistStore(store);
+});
+
+export const persistor = persistStore(store);

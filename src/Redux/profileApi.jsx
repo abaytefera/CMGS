@@ -4,8 +4,11 @@ export const profileApi = APi.injectEndpoints({
   endpoints: (builder) => ({
     // Get logged-in user profile
     getProfile: builder.query({
+      // Confirmed /auth/profile as the correct endpoint
       query: () => '/auth/profile',
       providesTags: ['UserProfile'],
+      // Standardizing to target the 'data' object in the response
+      transformResponse: (res) => res?.data || null,
     }),
     // Update profile details
     updateProfile: builder.mutation({
@@ -14,7 +17,8 @@ export const profileApi = APi.injectEndpoints({
         method: 'PATCH',
         body,
       }),
-      invalidatesTags: ['UserProfile'],
+      // Invalidation ensures all components showing the user's name/photo refresh
+      invalidatesTags: ['UserProfile', 'User'],
     }),
   }),
 });

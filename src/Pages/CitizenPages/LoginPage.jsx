@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { Mail, Lock, Leaf, Loader2 } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Mail, Lock, Leaf, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { LoginUser } from '../../Redux/auth'; 
 
 import LoginBg from '../../Component/CitizenComponent/LoginPageComponent/LoginBg';
@@ -13,107 +13,125 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Accessing auth state and language state
-  const { isloading,user, error } = useSelector((state) => state.auth);
+  const { isloading, error } = useSelector((state) => state.auth);
   const { Language } = useSelector((state) => state.webState);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
-    // Dispatching the createAsyncThunk
     const resultAction = await dispatch(LoginUser({ email, password }));
 
-    // Checking if the thunk was successful
     if (LoginUser.fulfilled.match(resultAction)) {
       localStorage.setItem('authToken', resultAction.payload.token);
-      if(user.role==="officer"){
-
-   
-
-      navigate('/Dashboard1');
-         }else if(user.role==="supervisor"){
-     navigate('/Dashboard2');
-
-         } else if(user.role==="admin"){
-     navigate('/Dashboard3');
-
-         }
-         else if(user.role==="manager"){
-     navigate('/Dashboard4a');
-
-         }
+      setShowSuccess(true);
+      // Perfect 300ms transition
+      setTimeout(() => {
+        navigate('/Dashboard');
+      }, 300);
     }
   };
-   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const t = {
     title: Language === "AMH" ? "ግባ" : "Login Page",
     userLabel: Language === "AMH" ? "ኢሜይል ወይም መለያ ስም" : "Email / Username",
     passLabel: Language === "AMH" ? "የይለፍ ቃል" : "Password",
     loginBtn: Language === "AMH" ? "ግባ" : "Login",
-    forgotPass: Language === "AMH" ? "የይለፍ ቃል ረስተዋል?" : "Forgot Password?"
+    forgotPass: Language === "AMH" ? "የይለፍ ቃል ረስተዋል?" : "Forgot Password?",
+    successMsg: Language === "AMH" ? "ተሳክቷል!" : "Success!",
   };
 
   return (
-    <div>
+    <div className="bg-white min-h-screen font-sans">
       <Header />
-      <div className="min-h-screen pt-20 flex items-center justify-center px-6 relative">
-        <LoginBg />
+      
+      {/* 300ms Clean White Success Overlay */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white animate-in fade-in zoom-in duration-300">
+          <div className="flex flex-col items-center">
+            <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4">
+               <CheckCircle size={48} className="text-emerald-500 animate-bounce" />
+            </div>
+            <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">{t.successMsg}</h2>
+          </div>
+        </div>
+      )}
 
-    
-        <div className="w-full max-w-md bg-white/80 backdrop-blur-xl border border-white rounded-[2.5rem] shadow-2xl p-10 flex flex-col items-center">
+      <div className="min-h-screen pt-24 flex items-center justify-center px-6 relative">
+        <div className="absolute inset-0 opacity-30 pointer-events-none">
+           <LoginBg />
+        </div>
+
+        <div className={`w-full max-w-md bg-white border border-gray-100 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 p-10 flex flex-col items-center z-10 transition-all duration-300 ${showSuccess ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}>
           
-          <div className="bg-emerald-600 p-4 rounded-full text-white shadow-lg mb-4">
+          {/* Logo Icon */}
+          <div className="bg-emerald-500 p-4 rounded-2xl text-white shadow-lg shadow-emerald-200 mb-6">
             <Leaf size={32} />
           </div>
           
-          <h1 className="text-3xl font-black text-slate-800 mb-8 uppercase tracking-tighter">
+          <h1 className="text-3xl font-black text-gray-900 mb-2 uppercase tracking-tighter">
             {t.title}
           </h1>
+          <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-8">
+            Complaint Management System
+          </p>
 
-          {/* Form */}
           <form onSubmit={handleLogin} className="w-full">
-            <AuthInput 
-              icon={Mail} 
-              type="text" 
-              placeholder={t.userLabel} 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-            />
-            <div className="mt-4">
-              <AuthInput 
-                icon={Lock} 
-                type="password" 
-                placeholder={t.passLabel} 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-              />
-            </div>
-
-       
+            {/* Error Message */}
             {error && (
-              <p className="mt-4 text-red-500 text-[10px] font-black uppercase text-center tracking-widest">
-                {error}
-              </p>
+              <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                <AlertCircle className="text-rose-500 shrink-0" size={18} />
+                <p className="text-rose-700 text-[11px] font-bold uppercase tracking-wide">
+                  {error}
+                </p>
+              </div>
             )}
 
+            <div className="space-y-4">
+                <AuthInput 
+                  icon={Mail} 
+                  type="text" 
+                  placeholder={t.userLabel} 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                />
+                
+                <AuthInput 
+                  icon={Lock} 
+                  type="password" 
+                  placeholder={t.passLabel} 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                />
+            </div>
+
+          
             <button
               type="submit"
-              disabled={isloading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest mt-6 shadow-xl shadow-emerald-200 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+              disabled={isloading || showSuccess}
+              className="group relative w-full mt-10 overflow-hidden rounded-2xl bg-emerald-500 p-4 transition-all hover:bg-emerald-600 active:scale-95 disabled:opacity-50 shadow-xl shadow-emerald-200"
             >
-              {isloading ? <Loader2 className="animate-spin" size={20} /> : t.loginBtn}
+              <div className="relative flex items-center justify-center gap-3">
+                {isloading ? (
+                  <Loader2 className="animate-spin text-white" size={22} />
+                ) : (
+                  <span className="text-sm font-black uppercase tracking-[0.2em] text-white">
+                    {t.loginBtn}
+                  </span>
+                )}
+              </div>
+              {/* Subtle shining effect on hover */}
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 group-hover:translate-x-full" />
             </button>
           </form>
 
-          <button className="mt-6 text-slate-400 text-[10px] font-bold hover:text-emerald-600 transition-colors uppercase tracking-widest">
-            {t.forgotPass}
-          </button>
+          
         </div>
       </div>
       <Footer />

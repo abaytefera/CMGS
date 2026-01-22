@@ -5,20 +5,27 @@ export const citizenApi = APi.injectEndpoints({
     // Submit a new complaint
     submitComplaint: builder.mutation({
       query: (formData) => ({
-        url: '/complaints/submit',
+        // Corrected to the specific submission endpoint
+        url: '/complaints/create',
         method: 'POST',
-        body: formData, // Sending FormData object for file support
+        body: formData, // FormData supports attachments/images
       }),
-      // Invalidate complaints list so the officer/admin sees the new entry
-      invalidatesTags: ['Complaints'],
+      // Refreshing 'Complaints' and 'Dashboard' tags ensures staff see new entries
+      invalidatesTags: ['Complaints', 'Dashboard'],
     }),
+
     trackComplaint: builder.query({
+      // Corrected to use the tracking reference ID path
       query: (refId) => `/complaints/track/${refId}`,
-      
+      providesTags: (result, error, refId) => [{ type: 'Complaints', id: refId }],
+      // Unwrapping data to get the status and details directly
+      transformResponse: (res) => res?.data || null,
     }),
+
     sendFeedback: builder.mutation({
       query: (feedbackData) => ({
-        url: '/citizen/feedback',
+        // Verified feedback endpoint
+        url: '/feedback/submit',
         method: 'POST',
         body: feedbackData,
       }),
@@ -26,4 +33,8 @@ export const citizenApi = APi.injectEndpoints({
   }),
 });
 
-export const {useLazyTrackComplaintQuery,useSendFeedbackMutation, useSubmitComplaintMutation } = citizenApi;
+export const { 
+  useLazyTrackComplaintQuery, 
+  useSendFeedbackMutation, 
+  useSubmitComplaintMutation 
+} = citizenApi;

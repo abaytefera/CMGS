@@ -6,7 +6,8 @@ export const departmentApi = APi.injectEndpoints({
     getDepartments: builder.query({
       query: () => '/departments',
       providesTags: ['Department'],
-      transformResponse: (response) => response || [], // Real default value
+      // Standardizing to target the 'data' array from the backend response
+      transformResponse: (response) => response?.data || [], 
     }),
     // POST new department
     addDepartment: builder.mutation({
@@ -24,7 +25,8 @@ export const departmentApi = APi.injectEndpoints({
         method: 'PATCH',
         body,
       }),
-      invalidatesTags: ['Department'],
+      // Invalidates 'Department' to refresh lists and 'Dashboard' to update stats
+      invalidatesTags: ['Department', 'Dashboard'],
     }),
     // DELETE department
     deleteDepartment: builder.mutation({
@@ -32,7 +34,7 @@ export const departmentApi = APi.injectEndpoints({
         url: `/departments/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Department'],
+      invalidatesTags: ['Department', 'Dashboard'],
     }),
   }),
 });

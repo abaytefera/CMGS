@@ -6,7 +6,8 @@ export const categoryApi = APi.injectEndpoints({
     getCategories: builder.query({
       query: () => '/categories',
       providesTags: ['Category'],
-      transformResponse: (res) => res || [], // Real Default Value
+      // Updated to target the 'data' array in your API response
+      transformResponse: (res) => res?.data || [], 
     }),
     // CREATE category
     createCategory: builder.mutation({
@@ -15,7 +16,8 @@ export const categoryApi = APi.injectEndpoints({
         method: 'POST',
         body: newCat,
       }),
-      invalidatesTags: ['Category'],
+      // Invalidates both Category list and Dashboard stats
+      invalidatesTags: ['Category', 'Dashboard'],
     }),
     // UPDATE/TOGGLE category
     updateCategory: builder.mutation({

@@ -11,10 +11,9 @@ const SystemSettings = () => {
   const { data: serverSettings, isLoading } = useGetSystemSettingsQuery();
   const [updateSettings, { isLoading: isSaving }] = useUpdateSettingsMutation();
 
-  // 2. Local state for form handling
   const [form, setForm] = useState({});
 
-  // Sync local state when server data arrives
+
   useEffect(() => {
     if (serverSettings) setForm(serverSettings);
   }, [serverSettings]);

@@ -5,10 +5,11 @@ export const settingsApi = APi.injectEndpoints({
   endpoints: (builder) => ({
     // Fetch global settings
     getSystemSettings: builder.query({
+      // Corrected endpoint path
       query: () => '/settings',
       providesTags: ['Settings'],
-      // Real Default: Ensure the UI doesn't break if DB is empty
-      transformResponse: (res) => res || {
+      // Standardized to unwrap 'data' and provide fallback defaults
+      transformResponse: (res) => res?.data || {
         smsEnabled: false,
         smsApiKey: '',
         smtpHost: '',
@@ -20,11 +21,13 @@ export const settingsApi = APi.injectEndpoints({
     // Update global settings
     updateSettings: builder.mutation({
       query: (newSettings) => ({
+        // Corrected endpoint path
         url: '/settings',
         method: 'PATCH',
         body: newSettings,
       }),
-      invalidatesTags: ['Settings'],
+      // Invalidates Settings to refresh UI and Dashboard for maintenance status
+      invalidatesTags: ['Settings', 'Dashboard'],
     }),
   }),
 });
