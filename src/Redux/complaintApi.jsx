@@ -28,13 +28,13 @@ const complaintApi = APi.injectEndpoints({
     // GET /api/staff/list
     getComplaints: builder.query({
       query: (params) => ({
-        url: '/staff/list', 
+        url: 'api/staff/list', 
         method: 'GET',
         params: params, 
       }),
       providesTags: ['Complaints'],
       // Unwraps the nested results array common in your backend responses
-      transformResponse: (res) => res?.data?.results || [],
+      transformResponse: (res) => res ,
     }),
 
     // GET /api/staff/unassigned
@@ -45,7 +45,7 @@ const complaintApi = APi.injectEndpoints({
         params: params,
       }),
       providesTags: ['Complaints'],
-      transformResponse: (res) => res?.data?.results || [],
+      transformResponse: (res) => res || [],
     }),
   }),
 });

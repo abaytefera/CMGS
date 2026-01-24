@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { 
   LayoutDashboard, Settings, LogOut, ChevronDown, ChevronUp, 
   Lock, User, Database, ShieldCheck, BarChart3, 
   Briefcase, Users, CheckCircle2, ListTodo 
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-
+import { logout } from '../../../../Redux/auth';
 const Sidebar = ({ role }) => {
   const { Language } = useSelector((state) => state.webState);
   const location = useLocation();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
+const dispatch = useDispatch();
   // Dynamic Dashboard URL mapping
   const roleRoutes = {
     admin: "/Dashboard3",
@@ -173,7 +173,9 @@ const Sidebar = ({ role }) => {
           </div>
         )}
 
-        <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-colors mt-4">
+        <button onClick={()=>{
+         dispatch(logout())
+        }}  className="w-full flex   items-center space-x-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-colors mt-4">
           <LogOut size={20} />
           <span className="font-medium text-sm">{t.logout}</span>
         </button>

@@ -11,6 +11,7 @@ import AuthHeader from '../../Component/AuthenticateComponent/AuthHeader';
 
 const ComplaintListPage = () => {
   const { Language } = useSelector((state) => state.webState);
+    const { user } = useSelector((state) => state.auth);
   const { listType } = useParams();
   
   const [searchTerm, setSearchTerm] = useState("");

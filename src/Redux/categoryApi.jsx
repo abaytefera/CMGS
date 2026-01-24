@@ -17,13 +17,13 @@ export const categoryApi = APi.injectEndpoints({
         body: newCat,
       }),
       // Invalidates both Category list and Dashboard stats
-      invalidatesTags: ['Categoryf', 'Dashboard'],
+      invalidatesTags: ['Category', 'Dashboard'],
     }),
     // UPDATE/TOGGLE category
    OneUpdate: builder.mutation({
       query: ({ id, ...patch }) => ({
-        url: `api/categories/${id}`,
-        method: 'PATCH',
+        url: `/api/categories/${id}`,
+        method: 'PUT',
         body: patch,
       }),
       invalidatesTags: ['Category'],

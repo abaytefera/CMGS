@@ -40,7 +40,7 @@ const Header = () => {
   };
 
   return (
-    <header className={`h-20 shadow  bg-[url(https://res.cloudinary.com/dkzvlqjp9/image/upload/v1768827337/natural_pjju9e.jpg)] bg-not-repeat bg-cover bg-center transition-all ease-out duration-300 fixed w-full z-50 ${windowOffset>450 && "bg-black"}`}> 
+    <header className={`h-20  shadow  bg-[url(https://res.cloudinary.com/dkzvlqjp9/image/upload/v1768827337/natural_pjju9e.jpg)] bg-not-repeat bg-cover bg-center transition-all ease-out duration-300 fixed w-full z-50 ${windowOffset>450 && "bg-black"}`}> 
  
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">

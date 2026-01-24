@@ -5,15 +5,15 @@ export const profileApi = APi.injectEndpoints({
     // Get logged-in user profile
     getProfile: builder.query({
       // Confirmed /auth/profile as the correct endpoint
-      query: () => '/auth/profile',
+      query: () => '/api/users/profile',
       providesTags: ['UserProfile'],
       // Standardizing to target the 'data' object in the response
-      transformResponse: (res) => res?.data || null,
+      transformResponse: (res) => res
     }),
     // Update profile details
     updateProfile: builder.mutation({
       query: (body) => ({
-        url: '/auth/profile',
+        url: '/api/users/profile',
         method: 'PATCH',
         body,
       }),

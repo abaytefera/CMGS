@@ -6,8 +6,8 @@ import { Loader2, ExternalLink, AlertTriangle, Shield, BarChart3 } from 'lucide-
 // RTK Query hooks
 import { useGetAdminStatsQuery, useGetSystemActivityQuery } from '../../../Redux/adminApi';
 import { useGetDepartmentsQuery } from '../../../Redux/departmentApi';
-
-
+import { useGetComplaintsQuery } from '../../../Redux/complaintApi';
+import { useGetUsersQuery } from '../../../Redux/userApi';
 import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import AdminStats from '../../../Component/AuthenticateComponent/AdminDashboardComponent/AdminStats';
@@ -21,9 +21,17 @@ const AdminDashboard = () => {
   const { data: stats, isLoading: statsLoading } = useGetAdminStatsQuery();
   const { data: activities, isLoading: activityLoading } = useGetSystemActivityQuery();
   const {data:dep,isLoading:loadingdept}=useGetDepartmentsQuery();
-                   const {data:catagory,isLoading:isloadingCat,isError,error}=useGetCategoriesQuery()
+   const {data:catagory,isLoading:isloadingCat,isError,error}=useGetCategoriesQuery()
+   const {data:users,isLoading:IsLoadingUser}=useGetUsersQuery()
+   const {data:compile,isLoading:isLoadingCompile}=useGetComplaintsQuery();
+
   const [numdept,setnumdept]=useState(0);
   const [numCatagory,setCatagory]=useState(0);
+  const [numUser,setnumUser]=useState(0);
+  const [numCompile,setnumCompile]=useState(0);
+  const [active,setActive]=useState(0);
+  const [Inactive,setInactive]=useState(0);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -32,16 +40,19 @@ const AdminDashboard = () => {
  useEffect(()=>{
 
  setnumdept(dep?.length || 0) ;
- setCatagory(catagory?.length || 0)
- console.log()
-  console.log(numdept);
-console.log("state");
-console.log(stats);
+ setCatagory(catagory?.length)
+ setnumUser(users?.length || 0)
+ setnumCompile(compile?.length || 0);
+ console.log(compile?.length)
+ setActive(compile?.filter((us) => us.status !== "RESOLVED" && us.status !== "REJECTED").length || 0)
+
+setInactive(compile?.filter((us) => us.status === "RESOLVED" && us.status === "REJECTED").length || 0)
+
 if(isError){
   console.log(error);
 }
- },[dep,stats,numCatagory,error])
- 
+ },[dep,stats,numCatagory,error,users])
+ const isloading = statsLoading || activityLoading || loadingdept || IsLoadingUser || isLoadingCompile;
 
   const t = {
     title: Language === "AMH" ? "የአስተዳዳሪ ዳሽቦርድ" : "Admin Dashboard",
@@ -58,7 +69,7 @@ if(isError){
   };
 
 
-  if (statsLoading || activityLoading) return (
+  if (isloading) return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <Loader2 className="animate-spin text-emerald-600" size={48} />
     </div>
@@ -83,7 +94,8 @@ if(isError){
               </p>
             </div>
 
-            <AdminStats data={stats || {}} />
+            <AdminStats  numUser={numUser} numCompile={numCompile} active={active}
+Inactive={Inactive}/>
             <SystemSummary  numdept={numdept} numCatagory={numCatagory} />
            
 

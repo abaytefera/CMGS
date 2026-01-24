@@ -17,18 +17,18 @@ const WorkProfile = () => {
 
   const [tempUser, setTempUser] = useState({ name: "", phone: "" });
 
-  const activeUser = user || {
-    name: "Dr. Elias Zewde",
-    phone: "+251 911 223344",
-    email: "elias.z@epa.gov.et",
-    role: "Senior Officer",
-    department: "Environmental Quality",
-    createdAt: new Date().toISOString()
-  };
+  
+
+useEffect(()=>{
+
+
+console.log(user);
+
+},[user])
 
   useEffect(() => {
     if (user) {
-      setTempUser({ name: user.name || "", phone: user.phone || "" });
+      setTempUser({ name: user.full_name || "", phone: user.phone_name || "" });
     }
   }, [user]);
 
@@ -79,8 +79,8 @@ const WorkProfile = () => {
                      onClick={() => fileInputRef.current.click()}>
                   <div className="p-1.5 bg-white rounded-[2.2rem] shadow-xl border border-slate-100">
                     <div className="w-32 h-32 bg-slate-50 rounded-[2rem] flex items-center justify-center text-slate-400 border border-slate-100 overflow-hidden relative">
-                      {profileImage || activeUser.avatar ? (
-                        <img src={profileImage || activeUser.avatar} alt="Profile" className="w-full h-full object-cover" />
+                      {profileImage ? (
+                        <img src={profileImage  } alt="Profile" className="w-full h-full object-cover" />
                       ) : (
                         <UserIcon size={50} strokeWidth={1.5} />
                       )}
@@ -127,8 +127,8 @@ const WorkProfile = () => {
                 {/* Highlight Card */}
                 <div className="mb-12 p-8 bg-emerald-50/50 rounded-[2.5rem] border border-emerald-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div>
-                    <h2 className="text-2xl font-black text-slate-900 uppercase italic tracking-tight">{activeUser.name}</h2>
-                    <p className="text-emerald-600 font-black text-[10px] uppercase tracking-widest mt-1">{activeUser.role} • {activeUser.department}</p>
+                    <h2 className="text-2xl font-black text-slate-900 uppercase italic tracking-tight">{user.full_name}</h2>
+                    <p className="text-emerald-600 font-black text-[10px] uppercase tracking-widest mt-1">{user.role} • {user.Department.name}</p>
                   </div>
                   <div className="px-5 py-2 bg-white border border-emerald-100 rounded-xl shadow-sm">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Account Status</p>
@@ -141,10 +141,10 @@ const WorkProfile = () => {
 
                 {/* Fields Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <ProfileField label="Full Name" value={tempUser.name} icon={UserIcon} isEditing={isEditing} onChange={(val) => setTempUser({...tempUser, name: val})} />
-                  <ProfileField label="Contact Number" value={tempUser.phone} icon={PhoneIcon} isEditing={isEditing} onChange={(val) => setTempUser({...tempUser, phone: val})} />
-                  <ProfileField label="Access Email" value={activeUser.email} icon={Mail} isEditing={false} />
-                  <ProfileField label="Departmental Unit" value={activeUser.department} icon={Building} isEditing={false} />
+                  <ProfileField label="Full Name" value={user?.full_name} icon={UserIcon} isEditing={isEditing} onChange={(val) => setTempUser({...tempUser, name: val})} />
+                  <ProfileField label="Contact Number" value={user?.phone_number} icon={PhoneIcon} isEditing={isEditing} onChange={(val) => setTempUser({...tempUser, phone: val})} />
+                  <ProfileField label="Access Email" value={user?.username} icon={Mail} isEditing={false} />
+                  <ProfileField label="Departmental Unit" value={user?.Department.namet} icon={Building} isEditing={false} />
                 </div>
 
                 {isEditing && (
@@ -166,7 +166,7 @@ const WorkProfile = () => {
                     <p className="text-[9px] font-bold text-slate-400 uppercase leading-tight">Security Protocol <br/> Active</p>
                   </div>
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
-                    <Calendar size={14} /> Established {new Date(activeUser.createdAt).getFullYear()}
+                    <Calendar size={14} /> Established {new Date(user?.updtedAt).getFullYear()}
                   </p>
                 </div>
               </div>

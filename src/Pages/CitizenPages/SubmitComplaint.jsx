@@ -6,6 +6,7 @@ import { useSubmitComplaintMutation } from "../../Redux/citizenApi";
 import { Loader2 } from "lucide-react";
 
 
+import Header from "../../Component/CitizenComponent/HomeComponet/Header";
 import PageHero from "../../Component/CitizenComponent/SubmitComplaintComponent/PageHero";
 import ComplaintForm from "../../Component/CitizenComponent/SubmitComplaintComponent/ComplaintForm";
 
@@ -49,7 +50,8 @@ export default function SubmitComplaint() {
   return (
     <>
     
-      <div className="pt-20 min-h-screen bg-slate-50">
+      <div className=" min-h-screen bg-slate-50">
+    <Header page={true} ></Header>
         <PageHero
           title={content.title}
           subtitle={content.subtitle}

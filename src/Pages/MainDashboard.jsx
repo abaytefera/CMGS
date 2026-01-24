@@ -6,10 +6,12 @@ import AdminDashboard from './AuthenticationPage/AdminDashboardPage/AdminDashboa
 import OfficerPage1 from './AuthenticationPage/OfficerPage/DashboardPage1';
 import SupervisorDashboard from './AuthenticationPage/SupervisorPage/SupervisorDashboard';
 import ManagementDashboard from './AuthenticationPage/ManagementDashboardPage/ManagementDashboard';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   // Pull loading state and user from auth slice
   const { user, isloading } = useSelector((state) => state.auth || {});
+  const navigator=useNavigate();
   
   // 1. Show a loader while checking authentication state
   if (isloading) {
@@ -19,11 +21,15 @@ const Dashboard = () => {
       </div>
     );
   }
-//  user?.role?.toLowerCase()
-  const role =  user.role;
+
+  const role =user?.role;
+
   useEffect(()=>{
   
-    console.log(user);
+    if(!user){
+navigator('/')
+
+    }
 
   },[user])
 

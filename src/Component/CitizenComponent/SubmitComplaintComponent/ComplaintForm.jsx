@@ -36,17 +36,14 @@ export default function ComplaintForm({ onSubmit, isLoading }) {
     // 1. Capture the form using the native FormData API
     const formData = new FormData(e.currentTarget);
 
-    /** * NOTE ON FILES: 
-     * If you want to send this as a plain JSON object, files won't work perfectly.
-     * If you are sending to a backend, it is best to send the 'formData' directly.
-     **/
+   
     
     // To convert to a plain object for logging/simple APIs:
     const data = Object.fromEntries(formData.entries());
     
     console.log("Form submitted with data:", data);
     console.log(formData);
-    // Pass either 'data' (object) or 'formData' (multipart) based on your API requirements
+    
     onSubmit(formData); 
   };
 
@@ -108,7 +105,7 @@ export default function ComplaintForm({ onSubmit, isLoading }) {
         <button
           type="submit"
           disabled={isLoading}
-          className="group relative px-12 py-4 bg-emerald-600 text-white font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 mx-auto disabled:opacity-50"
+          className="group relative w-full px-12 py-4 bg-emerald-600 text-white font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 mx-auto disabled:opacity-50"
         >
           {isLoading ? (
             <Loader2 className="animate-spin" size={18} />

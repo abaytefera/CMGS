@@ -7,6 +7,7 @@ import ComplaintDetails from "../../Component/CitizenComponent/TrackComplaintPag
 
 import { useLazyTrackComplaintQuery } from "../../Redux/citizenApi";
 import { Loader2, AlertCircle, Search, CheckCircle2 } from "lucide-react";
+import Header from "../../Component/CitizenComponent/HomeComponet/Header";
 
 export default function TrackComplaintPage() {
   const [trigger, { data, isFetching, isError, error, isSuccess }] = useLazyTrackComplaintQuery();
@@ -37,7 +38,7 @@ console.log(error)
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
- 
+   <Header page={true} ></Header>
       <Breadcrumb />
       
       <main className="flex-grow max-w-4xl mx-auto px-6 py-12 w-full">

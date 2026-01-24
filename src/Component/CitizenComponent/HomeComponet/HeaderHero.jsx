@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "./Header";
+import { Link } from "react-router-dom";
 
 export default function HeaderHero() {
   return (
@@ -30,9 +31,9 @@ export default function HeaderHero() {
             Secure • Transparent • Citizen-Centered • Multilingual
           </p>
 
-          <button className="inline-flex items-center bg-blue-600 hover:bg-blue-700 transition px-6 py-3 rounded font-semibold">
+          <Link to={'/submit-complaint'} className="inline-flex items-center bg-blue-600 hover:bg-blue-700 transition px-6 py-3 rounded font-semibold">
             SUBMIT A COMPLAINT →
-          </button>
+          </Link>
 
         </div>
       </div>

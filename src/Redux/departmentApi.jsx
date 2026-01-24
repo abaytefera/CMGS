@@ -18,11 +18,11 @@ export const departmentApi = APi.injectEndpoints({
       }),
       invalidatesTags: ['Department'],
     }),
-    // PATCH (Update) department
+  
     updateDepartment: builder.mutation({
       query: ({ id, ...body }) => ({
-        url: `/departments/${id}`,
-        method: 'PATCH',
+        url: `api/departments/${id}`,
+        method: 'PUT',
         body,
       }),
       // Invalidates 'Department' to refresh lists and 'Dashboard' to update stats

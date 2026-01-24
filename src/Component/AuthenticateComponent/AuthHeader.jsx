@@ -9,9 +9,11 @@ const AuthHeader = ({True}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false); 
   const { Language } = useSelector((state) => state.webState);
+const { user } = useSelector((state) => state.auth);
   const [windowOffset, setWindowOffset] = useState(0);
   const Dispatch = useDispatch();
 
+ 
   const officerName = "Inspector Abebe"; 
 
   useEffect(() => {
@@ -41,7 +43,7 @@ const AuthHeader = ({True}) => {
 
   return (
     <header
-      className={`h-20 shadow bg-[url(https://res.cloudinary.com/dkzvlqjp9/image/upload/v1768827337/natural_pjju9e.jpg)] bg-no-repeat bg-cover bg-center transition-all ease-out duration-300 fixed w-full z-50 ${
+      className={`h-20 lg:pr-40 shadow bg-[url(https://res.cloudinary.com/dkzvlqjp9/image/upload/v1768827337/natural_pjju9e.jpg)] bg-no-repeat bg-cover bg-center transition-all ease-out duration-300 fixed w-full z-50 ${
         windowOffset > 450 ? "bg-black" : ""
       }`}
     >
@@ -114,8 +116,8 @@ const AuthHeader = ({True}) => {
                 <User className="text-white" size={24} />
               </div>
               <div className="flex flex-col">
-                <span className="text-white text-[10px] font-semibold opacity-80 uppercase tracking-tighter leading-none">Officer</span>
-                <span className="text-white text-sm font-bold leading-tight">{officerName}</span>
+                <span className="text-white text-[10px] font-semibold opacity-80 uppercase tracking-tighter leading-none">{user.role}</span>
+                <span className="text-white text-sm font-bold leading-tight">{user.username}</span>
               </div>
             </div>
           </div>
@@ -140,7 +142,7 @@ const AuthHeader = ({True}) => {
                 <User size={28} />
               </div>
               <div>
-                <p className="text-slate-900 font-bold">{officerName}</p>
+                <p className="text-slate-900 font-bold">{user.role}</p>
                 <p className="text-slate-500 text-xs">EPA Personnel</p>
               </div>
             </div>

@@ -12,7 +12,7 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { isloading, error } = useSelector((state) => state.auth);
+  const {user, isloading, error } = useSelector((state) => state.auth);
   const { Language } = useSelector((state) => state.webState);
 
   const [email, setEmail] = useState("");
@@ -32,6 +32,14 @@ const LoginPage = () => {
       }, 300);
     }
   };
+
+  useEffect(()=>{
+
+    if(user){
+
+      navigate('/Dashboard');
+    }
+  },[user])
 
   useEffect(() => {
     window.scrollTo(0, 0);
