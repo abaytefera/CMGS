@@ -13,6 +13,9 @@ const SystemSettings = () => {
 
   const [form, setForm] = useState({});
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (serverSettings) setForm(serverSettings);
@@ -32,37 +35,36 @@ const SystemSettings = () => {
   };
 
   if (isLoading) return (
-    <div className="min-h-screen bg-[#080d14] flex items-center justify-center">
-      <Loader2 className="animate-spin text-emerald-500" size={40} />
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <Loader2 className="animate-spin text-emerald-600" size={40} />
     </div>
   );
-   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
 
   return (
-    <div className="flex min-h-screen bg-[#080d14] text-slate-300">
+    <div className="flex min-h-screen bg-white text-slate-800">
       <Sidebar role="admin" />
       
       <div className="flex-1 flex flex-col min-w-0">
         <AuthHeader True={true} />
         
-        <main className="flex-1 pt-32 px-6 lg:px-10 pb-10 overflow-y-auto">
+        <main className="flex-1 pt-32 px-6 lg:px-10 pb-20 overflow-y-auto bg-slate-50/50">
           <div className="max-w-7xl mx-auto">
             
+            {/* Header Section */}
             <div className="mb-12">
-              <h1 className="text-5xl font-black text-white tracking-tighter uppercase italic">
-                System <span className="text-emerald-500">Settings</span>
+              <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+                System <span className="text-emerald-600">Settings</span>
               </h1>
-              <p className="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] mt-2">
+              <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px] mt-3 ml-1">
                 Platform Configuration & Global Rules
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            {/* Settings Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
               
               {/* SMS GATEWAY */}
-              <SettingCard title="SMS Gateway" icon={MessageSquare} colorClass="border-blue-500/20">
+              <SettingCard title="SMS Gateway" icon={MessageSquare} colorClass="border-blue-100 bg-white">
                 <ToggleRow 
                   label="Enable SMS Notifications" 
                   active={form.smsEnabled || false}
@@ -74,13 +76,13 @@ const SystemSettings = () => {
                   onChange={(e) => handleInputChange('smsApiKey', e.target.value)}
                   type="password" 
                 />
-                <button className="w-full py-3 bg-blue-500/10 text-blue-400 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-blue-500 hover:text-white transition-all">
+                <button className="w-full py-3 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-blue-600 hover:text-white transition-all border border-blue-100">
                   <Send size={14} /> Send Test SMS
                 </button>
               </SettingCard>
 
               {/* EMAIL INTEGRATION */}
-              <SettingCard title="Email Integration" icon={Mail} colorClass="border-purple-500/20">
+              <SettingCard title="Email Integration" icon={Mail} colorClass="border-purple-100 bg-white">
                 <SettingInput 
                   label="SMTP Host" 
                   value={form.smtpHost || ''} 
@@ -101,50 +103,52 @@ const SystemSettings = () => {
               </SettingCard>
 
               {/* LANGUAGE & REGION */}
-              <SettingCard title="Language & Region" icon={Globe} colorClass="border-emerald-500/20">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Interface Language</label>
+              <SettingCard title="Language & Region" icon={Globe} colorClass="border-emerald-100 bg-white">
+                <div className="space-y-1 mb-4">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Interface Language</label>
                   <select 
                     value={form.language || 'English (US)'}
                     onChange={(e) => handleInputChange('language', e.target.value)}
-                    className="w-full bg-[#080d14] border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:border-emerald-500 transition-colors"
                   >
                     <option>English (US)</option>
                     <option>Amharic (Ethiopia)</option>
                   </select>
                 </div>
                 <ToggleRow 
-                   label="Auto-detect Timezone" 
-                   active={form.autoTimezone || false}
-                   onClick={() => handleInputChange('autoTimezone', !form.autoTimezone)}
+                    label="Auto-detect Timezone" 
+                    active={form.autoTimezone || false}
+                    onClick={() => handleInputChange('autoTimezone', !form.autoTimezone)}
                 />
               </SettingCard>
 
               {/* SECURITY OPTIONS */}
-              <SettingCard title="Security Options" icon={Globe} colorClass="border-rose-500/20">
+              <SettingCard title="Security Options" icon={Globe} colorClass="border-rose-100 bg-white">
                 <ToggleRow 
-                   label="Two-Factor Authentication" 
-                   active={form.twoFactor || false}
-                   onClick={() => handleInputChange('twoFactor', !form.twoFactor)}
+                    label="Two-Factor Authentication" 
+                    active={form.twoFactor || false}
+                    onClick={() => handleInputChange('twoFactor', !form.twoFactor)}
                 />
                 <ToggleRow 
-                   label="Maintenance Mode" 
-                   active={form.maintenanceMode || false}
-                   onClick={() => handleInputChange('maintenanceMode', !form.maintenanceMode)}
+                    label="Maintenance Mode" 
+                    active={form.maintenanceMode || false}
+                    onClick={() => handleInputChange('maintenanceMode', !form.maintenanceMode)}
                 />
               </SettingCard>
 
             </div>
 
-            {/* GLOBAL SAVE */}
-            <button 
-              onClick={handleGlobalSave}
-              disabled={isSaving}
-              className="w-full max-w-md mx-auto py-5 bg-emerald-500 rounded-[2rem] text-[#080d14] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(16,185,129,0.3)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
-            >
-              {isSaving ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-              {isSaving ? "Saving..." : "Save All Changes"}
-            </button>
+            {/* GLOBAL SAVE ACTION */}
+            <div className="flex justify-center">
+              <button 
+                onClick={handleGlobalSave}
+                disabled={isSaving}
+                className="w-full max-w-md py-5 bg-emerald-600 rounded-[2rem] text-white font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 shadow-xl shadow-emerald-200 hover:bg-emerald-700 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+              >
+                {isSaving ? <Loader2 className="animate-spin" /> : <Save size={20} />}
+                {isSaving ? "Synchronizing..." : "Save All Changes"}
+              </button>
+            </div>
 
           </div>
         </main>

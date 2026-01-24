@@ -2,13 +2,22 @@ import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useSelector } from "react-redux";
+import L from 'leaflet';
 
-export default function LocationInput({ label, required }) {
+// Fix for default Leaflet marker icons
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+export default function LocationInput({ label, required, name }) {
   const { Language } = useSelector((state) => state.webState);
   const [address, setAddress] = useState("");
+  const [locationDetails, setLocationDetails] = useState({ sub_city: "", woreda: "" });
   const [showMap, setShowMap] = useState(false);
-  const [position, setPosition] = useState([9.0016, 38.7542]); // Default center (Addis Ababa)
-
+  const [position, setPosition] = useState([9.0016, 38.7542]); 
 
   const t = {
     placeholder: Language === "AMH" ? "ከተማ / ወረዳ" : "City / Woreda",
@@ -24,13 +33,24 @@ export default function LocationInput({ label, required }) {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
       );
       const data = await response.json();
-      
       const addr = data.address;
-      const display = addr.city || addr.town || addr.village || "";
-      const subLocation = addr.suburb || addr.neighbourhood || addr.county || "";
+
+      // Extract specific fields for database
+      const subCity = addr.suburb || addr.county || addr.city_district || "";
+      const woreda = addr.neighbourhood || addr.quarter || "";
+      const city = addr.city || addr.town || addr.village || "";
+
+      // Update the readable address for the user
+      const readableAddress = `${woreda}${woreda && subCity ? ', ' : ''}${subCity}${subCity && city ? ', ' : ''}${city}`;
       
-      const readableAddress = `${subLocation}${subLocation && display ? ', ' : ''}${display}`;
       setAddress(readableAddress || t.unknown);
+      
+      // Update the details for database submission
+      setLocationDetails({
+        sub_city: subCity,
+        woreda: woreda
+      });
+
     } catch (error) {
       setAddress(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
     }
@@ -55,6 +75,15 @@ export default function LocationInput({ label, required }) {
       </label>
       
       <div className="relative">
+        {/* DATA FOR DATABASE: These will be picked up by FormData */}
+        <input type="hidden" name="sub_city" value={locationDetails.sub_city} />
+        <input type="hidden" name="woreda" value={locationDetails.woreda} />
+        <input type="hidden" name="latitude" value={position[0]} />
+        <input type="hidden" name="longitude" value={position[1]} />
+        
+        {/* DISPLAY FOR USER: This shows the full readable name */}
+        <input type="hidden" name={name} value={address} />
+        
         <input
           type="text"
           value={address}
@@ -62,6 +91,7 @@ export default function LocationInput({ label, required }) {
           placeholder={t.placeholder}
           className="w-full border rounded-lg px-3 py-2 pr-10 focus:ring-2 focus:ring-green-500 focus:outline-none shadow-sm"
         />
+        
         <button
           type="button"
           onClick={() => setShowMap(!showMap)}

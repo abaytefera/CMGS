@@ -11,48 +11,36 @@ import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import DepartmentForm from '../../../Component/AuthenticateComponent/DepartmentManagementComponent/DepartmentForm';
 import DepartmentTable from '../../../Component/AuthenticateComponent/DepartmentManagementComponent/DepartmentTable';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
-import { Loader2, ServerOff, Globe } from 'lucide-react';
 
+import { Loader2, ServerOff, Globe } from 'lucide-react';
+import { useGetUsersQuery } from '../../../Redux/userApi';
 const DepartmentPage = () => {
   const [editingDept, setEditingDept] = useState(null);
 
-  // RTK Query: Data Fetching
   const { data: departmentsData, isLoading, isError } = useGetDepartmentsQuery();
-  
-  // RTK Query: Mutations
   const [addDepartment, { isLoading: isAdding }] = useAddDepartmentMutation();
   const [updateDepartment, { isLoading: isUpdating }] = useUpdateDepartmentMutation();
   const [deleteDepartment] = useDeleteDepartmentMutation();
+  const {data:user}=useGetUsersQuery()
 
-  // 1. PROFESSIONAL SAMPLE DATA
   const sampleDepartments = [
     {
       _id: "dept-01",
       name: "Environmental Quality",
       code: "ENV-Q",
-      headName: "Dr. Selamawit Kassa",
-      description: "Monitoring air and soil quality standards across industrial zones.",
+      supervisor: "Dr. Selamawit Kassa",
       status: "Active"
     },
     {
       _id: "dept-02",
       name: "Water Resources",
       code: "WAT-R",
-      headName: "Ato Yonas Biru",
-      description: "Management of water bodies and industrial liquid waste discharge.",
-      status: "Active"
-    },
-    {
-      _id: "dept-03",
-      name: "Waste Management",
-      code: "WST-M",
-      headName: "W/ro Mulu Gebre",
-      description: "Coordination of solid waste disposal and hazardous material handling.",
+      supervisor: "Ato Yonas Biru",
       status: "Active"
     }
   ];
+  
 
-  // 2. MERGE LOGIC: Fallback to samples if server is down or empty
   const departments = (departmentsData && departmentsData.length > 0) ? departmentsData : sampleDepartments;
 
   useEffect(() => {
@@ -91,50 +79,58 @@ const DepartmentPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#080d14] text-slate-300">
+    <div className="flex min-h-screen bg-slate-50 text-slate-700">
       <Sidebar role="supervisor" />
 
       <div className="flex-1 flex flex-col min-w-0">
         <AuthHeader True={true} />
 
-        <main className="flex-1 pt-32 px-6 lg:px-10 pb-10">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 pt-32 px-6 lg:px-10 pb-20">
+          <div className="max-w-5xl mx-auto">
             
-            <div className="mb-10 flex justify-between items-end">
-              <div>
-                <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">
-                  Department <span className="text-blue-500">Registry</span>
-                </h1>
-                <div className="flex items-center gap-3 mt-2">
-                  <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border ${isError ? 'border-rose-500/30 bg-rose-500/5' : 'border-emerald-500/30 bg-emerald-500/5'}`}>
-                    {isError ? <ServerOff size={10} className="text-rose-500" /> : <Globe size={10} className="text-emerald-500" />}
-                    <span className={`text-[9px] font-black uppercase tracking-widest ${isError ? 'text-rose-500' : 'text-emerald-500'}`}>
-                      {isError ? "Offline Samples" : "Live Database"}
-                    </span>
-                  </div>
-                  <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em]">
-                    EPA Structural Unit Management
-                  </p>
+            {/* Header Section */}
+            <div className="mb-12 flex flex-col items-center text-center">
+              <h1 className="text-4xl md:text-5xl font-black text-slate-900 uppercase italic tracking-tighter">
+                Department <span className="text-emerald-600">Registry</span>
+              </h1>
+              <div className="flex flex-col items-center gap-3 mt-4">
+                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${isError ? 'border-rose-200 bg-rose-50' : 'border-emerald-200 bg-emerald-50'}`}>
+                  {isError ? <ServerOff size={12} className="text-rose-600" /> : <Globe size={12} className="text-emerald-600" />}
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${isError ? 'text-rose-600' : 'text-emerald-600'}`}>
+                    {isError ? "Offline Mode" : "System Synchronized"}
+                  </span>
                 </div>
+                <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em]">
+                  Federal Environmental Protection Authority
+                </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
+            {/* Content Stack: TOP (Form) to BOTTOM (Table) */}
+            <div className="flex flex-col gap-16">
               
-              <div className="lg:sticky lg:top-32">
+              {/* TOP: FORM SECTION (Centered and constrained) */}
+              <section className="max-w-2xl mx-auto w-full">
                 <DepartmentForm 
                   editingDept={editingDept} 
                   onSave={handleSave} 
                   onCancel={() => setEditingDept(null)} 
                   isSaving={isAdding || isUpdating} 
                 />
-              </div>
+              </section>
 
-              <div className="lg:col-span-2">
+              {/* BOTTOM: TABLE SECTION */}
+              <section className="w-full">
+                <div className="flex items-center gap-4 mb-6">
+                   <div className="h-[1px] flex-1 bg-slate-200"></div>
+                   <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Registered Units</h2>
+                   <div className="h-[1px] flex-1 bg-slate-200"></div>
+                </div>
+
                 {isLoading ? (
                   <div className="flex flex-col items-center py-20 gap-4">
-                    <Loader2 className="animate-spin text-blue-500" size={40} />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Connecting to Registry...</span>
+                    <Loader2 className="animate-spin text-emerald-600" size={40} />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading Records...</span>
                   </div>
                 ) : (
                   <DepartmentTable 
@@ -143,7 +139,7 @@ const DepartmentPage = () => {
                     onDelete={handleDelete}
                   />
                 )}
-              </div>
+              </section>
 
             </div>
           </div>

@@ -4,25 +4,25 @@ export const categoryApi = APi.injectEndpoints({
   endpoints: (builder) => ({
     // GET all categories
     getCategories: builder.query({
-      query: () => '/categories',
-      providesTags: ['Category'],
-      // Updated to target the 'data' array in your API response
-      transformResponse: (res) => res?.data || [], 
-    }),
+  query: () => 'api/categories/',
+  providesTags: ['Category'],
+  
+  transformResponse: (res) => res || [], 
+}),
     // CREATE category
     createCategory: builder.mutation({
       query: (newCat) => ({
-        url: '/categories',
+        url: '/api/categories',
         method: 'POST',
         body: newCat,
       }),
       // Invalidates both Category list and Dashboard stats
-      invalidatesTags: ['Category', 'Dashboard'],
+      invalidatesTags: ['Categoryf', 'Dashboard'],
     }),
     // UPDATE/TOGGLE category
-    updateCategory: builder.mutation({
+   OneUpdate: builder.mutation({
       query: ({ id, ...patch }) => ({
-        url: `/categories/${id}`,
+        url: `api/categories/${id}`,
         method: 'PATCH',
         body: patch,
       }),
@@ -34,5 +34,5 @@ export const categoryApi = APi.injectEndpoints({
 export const { 
   useGetCategoriesQuery, 
   useCreateCategoryMutation, 
-  useUpdateCategoryMutation 
+useOneUpdateMutation 
 } = categoryApi;

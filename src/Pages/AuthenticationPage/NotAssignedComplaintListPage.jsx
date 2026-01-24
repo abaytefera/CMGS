@@ -20,7 +20,7 @@ const NotAssignedComplaintListPage = () => {
     limit: 10
   });
 
-  // 2. Three Realistic Sample Objects for fallback
+  // 2. Fallback Data
   const sampleData = [
     {
       _id: "sample-001",
@@ -39,20 +39,9 @@ const NotAssignedComplaintListPage = () => {
       category: Language === "AMH" ? "የቆሻሻ አወጋገድ" : "Waste Management",
       createdAt: "2026-01-21T08:30:00Z",
       status: "Submitted"
-    },
-    {
-      _id: "sample-003",
-      trackingId: "EPA-2026-7742",
-      citizenName: "Sara Hagos",
-      phoneNumber: "+251 944 556 677",
-      category: Language === "AMH" ? "የውሃ ብክለት" : "Water Contamination",
-      createdAt: "2026-01-21T14:15:00Z",
-      status: "Submitted"
     }
   ];
 
- 
-  // Use real data if it exists and has items, otherwise use sampleData
   const complaints = (data?.data && data.data.length > 0) ? data.data : sampleData;
   const totalEntries = data?.total || complaints.length;
 
@@ -72,59 +61,59 @@ const NotAssignedComplaintListPage = () => {
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   return (
-    <div className="flex min-h-screen bg-[#080d14] text-slate-300 selection:bg-rose-500/30">
+    <div className="flex min-h-screen bg-white text-slate-800 selection:bg-rose-100 selection:text-rose-900">
       <Sidebar role="supervisor" />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <AuthHeader True={true} />
         
-        <main className="flex-1 pt-32 px-6 lg:px-10 overflow-y-auto pb-20">
+        <main className="flex-1 pt-32 px-6 lg:px-10 overflow-y-auto pb-20 bg-slate-50/50">
           <div className="max-w-7xl mx-auto">
             
-            {/* Header */}
+            {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                  <span className="text-[10px] font-black text-rose-500 uppercase tracking-[0.3em]">Pending Allocation</span>
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
+                  <span className="text-[10px] font-black text-rose-600 uppercase tracking-[0.3em]">Pending Allocation</span>
                 </div>
-                <h1 className="text-4xl font-black text-white uppercase tracking-tighter">{t.title}</h1>
-                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-2">{t.subtitle}</p>
+                <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">{t.title}</h1>
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-3 ml-1">{t.subtitle}</p>
               </div>
 
               <div className="flex items-center gap-3 w-full md:w-auto">
                 <div className="relative flex-1 md:w-96">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input 
                     type="text" 
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder={t.searchPlaceholder} 
-                    className="w-full bg-white/5 border border-white/10 py-3.5 pl-12 pr-4 rounded-2xl outline-none focus:border-rose-500/50 text-white"
+                    className="w-full bg-white border border-slate-200 py-3.5 pl-12 pr-4 rounded-2xl outline-none focus:border-rose-400 focus:ring-4 focus:ring-rose-500/5 text-slate-700 shadow-sm transition-all"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Table */}
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] overflow-hidden relative">
+            {/* Table Container - White Theme */}
+            <div className="bg-white border border-slate-200 rounded-[2.5rem] shadow-sm overflow-hidden relative">
               {isFetching && (
-                <div className="absolute inset-0 bg-[#080d14]/60 z-20 flex items-center justify-center backdrop-blur-sm">
+                <div className="absolute inset-0 bg-white/70 z-20 flex items-center justify-center backdrop-blur-sm">
                   <Loader2 className="animate-spin text-rose-500" size={32} />
                 </div>
               )}
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-white/[0.03] text-slate-500 text-[10px] uppercase font-black tracking-[0.2em]">
+                  <thead className="bg-slate-50 text-slate-400 text-[10px] uppercase font-black tracking-[0.2em]">
                     <tr>
-                      <th className="px-8 py-5">{t.colId}</th>
-                      <th className="px-8 py-5">{t.colCitizen}</th>
-                      <th className="px-8 py-5">{t.colCategory}</th>
-                      <th className="px-8 py-5">{t.colDate}</th>
-                      <th className="px-8 py-5">{t.colStatus}</th>
-                      <th className="px-8 py-5 text-right">{t.colActions}</th>
+                      <th className="px-8 py-6">{t.colId}</th>
+                      <th className="px-8 py-6">{t.colCitizen}</th>
+                      <th className="px-8 py-6">{t.colCategory}</th>
+                      <th className="px-8 py-6">{t.colDate}</th>
+                      <th className="px-8 py-6">{t.colStatus}</th>
+                      <th className="px-8 py-6 text-right">{t.colActions}</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-slate-100">
                     {complaints.map((item) => (
                       <ComplaintRowNotAssigned key={item._id} complaint={item} />
                     ))}
@@ -132,12 +121,24 @@ const NotAssignedComplaintListPage = () => {
                 </table>
               </div>
 
-              {/* Pagination */}
-              <div className="p-8 border-t border-white/5 flex justify-between items-center">
-                <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.showing}</span>
-                <div className="flex gap-2">
-                  <button onClick={() => setPage(p => p - 1)} disabled={page === 1} className="p-2.5 bg-white/5 rounded-xl disabled:opacity-20"><ChevronLeft size={18}/></button>
-                  <button onClick={() => setPage(p => p + 1)} disabled={complaints.length < 10 && !data} className="p-2.5 bg-white/5 rounded-xl disabled:opacity-20"><ChevronRight size={18}/></button>
+              {/* Pagination - White Theme */}
+              <div className="p-8 border-t border-slate-100 bg-slate-50/30 flex justify-between items-center">
+                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest italic">{t.showing}</span>
+                <div className="flex gap-3">
+                  <button 
+                    onClick={() => setPage(p => p - 1)} 
+                    disabled={page === 1} 
+                    className="p-3 bg-white border border-slate-200 rounded-xl disabled:opacity-30 hover:bg-slate-50 transition-colors shadow-sm text-slate-600"
+                  >
+                    <ChevronLeft size={18}/>
+                  </button>
+                  <button 
+                    onClick={() => setPage(p => p + 1)} 
+                    disabled={complaints.length < 10 && !data} 
+                    className="p-3 bg-white border border-slate-200 rounded-xl disabled:opacity-30 hover:bg-slate-50 transition-colors shadow-sm text-slate-600"
+                  >
+                    <ChevronRight size={18}/>
+                  </button>
                 </div>
               </div>
             </div>

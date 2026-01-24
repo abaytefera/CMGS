@@ -1,6 +1,6 @@
 import React from 'react';
 
-const FilterTabs = ({ activeTab, setActiveTab }) => {
+const FilterTabsNotAssigned = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { name: 'All', count: 85 },
     { name: 'New', count: 12 },
@@ -33,4 +33,4 @@ const FilterTabs = ({ activeTab, setActiveTab }) => {
   );
 };
 
-export default FilterTabs;
+export default FilterTabsNotAssigned;

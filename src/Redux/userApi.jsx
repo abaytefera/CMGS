@@ -5,20 +5,20 @@ export const userApi = APi.injectEndpoints({
   endpoints: (builder) => ({
     // 1. READ: Get all users
     getUsers: builder.query({
-      query: () => '/users',
+      query: () => 'api/users',
       providesTags: ['User'],
       // Updated to handle the nested data object in your API response
-      transformResponse: (res) => res?.data || [], 
+      transformResponse: (res) => res || [], 
     }),
 
     // 2. CREATE: Add new user
     createUser: builder.mutation({
       query: (newUser) => ({
-        url: '/users', // Keep /users for creation
+        url: '/api/users', // Keep /users for creation
         method: 'POST',
         body: newUser,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ['Userw'],
     }),
 
     // 3. UPDATE: Update existing user
@@ -34,7 +34,7 @@ export const userApi = APi.injectEndpoints({
     // 4. DELETE: Remove user
     deleteUser: builder.mutation({
       query: (id) => ({
-        url: `/users/${id}`, // Uses the specific ID path from your docs
+        url: `api/users/${id}`, // Uses the specific ID path from your docs
         method: 'DELETE',
       }),
       invalidatesTags: ['User'],

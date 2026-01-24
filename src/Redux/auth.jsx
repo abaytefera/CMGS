@@ -13,7 +13,7 @@ export const LoginUser = createAsyncThunk(
   'auth/login', // Better action name for debugging
   async (credentials, thunksAPI) => {
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST', // Capitalized standard
         headers: {
           'Content-Type': 'application/json'

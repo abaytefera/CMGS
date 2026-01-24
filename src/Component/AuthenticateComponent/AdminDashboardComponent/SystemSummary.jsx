@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { ShieldCheck, Server, Layers, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const SystemSummary = () => {
+const SystemSummary = ({numdept,numCatagory}) => {
   const { Language } = useSelector((state) => state.webState);
 
   const t = {
@@ -15,8 +15,8 @@ const SystemSummary = () => {
   };
 
   const summaries = [
-    { title: t.officers, value: t.active, icon: ShieldCheck, url: "/CatagoryMg", color: "text-blue-600", bgColor: "bg-blue-50" },
-    { title: t.categories, value: t.depts, icon: Layers, url: "/DepartmentMg", color: "text-emerald-600", bgColor: "bg-emerald-50" },
+    { title: t.officers, value: numCatagory, icon: ShieldCheck, url: "/CatagoryMg", color: "text-blue-600", bgColor: "bg-blue-50" },
+    { title: t.categories, value: numdept, icon: Layers, url: "/DepartmentMg", color: "text-emerald-600", bgColor: "bg-emerald-50" },
     { title: t.uptime, value: '99.9% Online', icon: Server, url: "", color: "text-purple-600", bgColor: "bg-purple-50" },
   ];
 

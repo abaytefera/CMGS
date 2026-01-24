@@ -1,17 +1,19 @@
+import React from 'react';
+import { useSelector } from "react-redux";
+// UI Components
 import FormInput from "./FormInput";
 import FormSelect from "./FormSelect";
 import FormTextarea from "./FormTextarea";
 import FileUpload from "./FileUpload";
 import LocationInput from "./LocationInput";
+// Icons
 import { FaListUl, FaPen, FaPhone, FaUser, FaEnvelope } from "react-icons/fa";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
-export default function ComplaintForm() {
+export default function ComplaintForm({ onSubmit, isLoading }) {
   const { Language } = useSelector((state) => state.webState);
- const Navigate=useNavigate();
 
   const t = {
     fullName: Language === "AMH" ? "ሙሉ ስም" : "Full Name",
@@ -23,67 +25,102 @@ export default function ComplaintForm() {
     description: Language === "AMH" ? "ዝርዝር መግለጫ" : "Description",
     descPlaceholder: Language === "AMH" ? "ስለ ጉዳዩ በዝርዝር እዚህ ይጻፉ..." : "Describe the issue in detail...",
     submit: Language === "AMH" ? "ቅሬታውን ያቅርቡ" : "Submit Complaint",
-    categories: Language === "AMH" ? [
-      "የአየር ብክለት",
-      "የውሃ ብክለት",
-      "ሕገ-ወጥ የቆሻሻ አወጋገድ",
-      "የድምፅ ብክለት",
-      "ሌላ"
-    ] : [
-      "Air Pollution",
-      "Water Pollution",
-      "Illegal Dumping",
-      "Noise Pollution",
-      "Other",
-    ]
+    categories: Language === "AMH" ? 
+      ["የአየር ብክለት", "የውሃ ብክለት", "ሕገ-ወጥ የቆሻሻ አወጋገድ", "የድምፅ ብክለት", "ሌላ"] : 
+      ["Air Pollution", "Water Pollution", "Illegal Dumping", "Noise Pollution", "Other"]
   };
-  const SubmitHandle=(e)=>{
-   e.preventDefault();
-    console.log("abay");
-Navigate('/ComplaintSubmittedPage')
 
-  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // 1. Capture the form using the native FormData API
+    const formData = new FormData(e.currentTarget);
 
-
+    /** * NOTE ON FILES: 
+     * If you want to send this as a plain JSON object, files won't work perfectly.
+     * If you are sending to a backend, it is best to send the 'formData' directly.
+     **/
+    
+    // To convert to a plain object for logging/simple APIs:
+    const data = Object.fromEntries(formData.entries());
+    
+    console.log("Form submitted with data:", data);
+    console.log(formData);
+    // Pass either 'data' (object) or 'formData' (multipart) based on your API requirements
+    onSubmit(formData); 
+  };
 
   return (
-    <form className="bg-white rounded-xl shadow-lg p-6 space-y-6">
-      
-      <div className="grid md:grid-cols-2 gap-6">
-        <FormInput Icon={FaUser} label={t.fullName} placeholder={t.namePlaceholder} />
-        <FormInput Icon={FaPhone} label={t.phone} required placeholder="+251..." />
+    <form 
+      onSubmit={handleSubmit} 
+      className="bg-white border border-gray-100 rounded-[2.5rem] shadow-sm p-8 md:p-12 space-y-8"
+    >
+      <div className="grid md:grid-cols-2 gap-8">
+        <FormInput 
+          name="citizen_name" 
+          Icon={FaUser} 
+          label={t.fullName} 
+          placeholder={t.namePlaceholder} 
+          required 
+        />
+        <FormInput 
+          name="phone_number" 
+          Icon={FaPhone} 
+          label={t.phone} 
+          required 
+          placeholder="+251..." 
+        />
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <FormInput Icon={FaEnvelope} label={t.email} placeholder="email@example.com" />
-        <LocationInput label={t.location} required={true} />
+      <div className="grid md:grid-cols-2 gap-8">
+        <FormInput 
+          name="email" 
+          Icon={FaEnvelope} 
+          label={t.email} 
+          placeholder="email@example.com" 
+        />
+        {/* 'name' prop is used for the hidden input inside LocationInput */}
+        <LocationInput 
+          name="location" 
+          label={t.location} 
+          required={true} 
+        />
       </div>
 
       <FormSelect
+        name="category"
         Icon={FaListUl}
         label={t.category}
         options={t.categories}
       />
 
       <FormTextarea
+        name="description"
         Icon={FaPen}
         label={t.description}
         placeholder={t.descPlaceholder}
       />
 
-      <FileUpload />
+      {/* 'name' prop ensures files are keyed as 'files' in the FormData */}
+      <FileUpload name="attachments" />
 
-      <div className="text-center pt-4">
+      <div className="text-center pt-6">
         <button
           type="submit"
-          onClick={SubmitHandle}
-          className="px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition-all flex items-center justify-center gap-2 mx-auto group"
+          disabled={isLoading}
+          className="group relative px-12 py-4 bg-emerald-600 text-white font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 mx-auto disabled:opacity-50"
         >
-          {t.submit}
-          <FontAwesomeIcon 
-            icon={faChevronRight} 
-            className="text-sm group-hover:translate-x-1 transition-transform" 
-          />
+          {isLoading ? (
+            <Loader2 className="animate-spin" size={18} />
+          ) : (
+            <>
+              {t.submit}
+              <FontAwesomeIcon 
+                icon={faChevronRight} 
+                className="text-[10px] group-hover:translate-x-1 transition-transform" 
+              />
+            </>
+          )}
         </button>
       </div>
     </form>

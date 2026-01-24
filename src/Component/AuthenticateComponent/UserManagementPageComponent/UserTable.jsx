@@ -2,6 +2,7 @@ import React from 'react';
 import { Edit3, Trash2, Shield, User, Mail, Building2 } from 'lucide-react';
 
 const UserTable = ({ users, onEdit, onDelete }) => {
+  console.log(users);
   return (
     <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
       <div className="overflow-x-auto">
@@ -18,8 +19,8 @@ const UserTable = ({ users, onEdit, onDelete }) => {
             {users.map((user) => {
            
               const safeName = user?.fullName || user?.name || "New User";
-              const safeEmail = user?.email || "No email provided";
-              const safeDept = user?.department || "Unassigned";
+              const safeEmail = user?.username || "No email provided";
+              const safeDept = user?.departmentId || "Unassigned";
               const safeRole = user?.role || "staff";
               
               // 2. SAFE CHARACTER ACCESS

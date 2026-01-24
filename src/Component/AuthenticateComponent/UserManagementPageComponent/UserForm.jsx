@@ -1,30 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { UserPlus, Mail, Lock, Save, X, RefreshCw, Copy, Check, Phone, Building2 } from 'lucide-react';
+import { UserPlus, User, Lock, Save, X, RefreshCw, Copy, Check, Building2, ChevronDown, Phone } from 'lucide-react';
+import { useGetDepartmentsQuery } from '../../../Redux/departmentApi';
 
-// Added 'onSave' and 'departments' to props
-const UserForm = ({ editingUser, onCancel, onSave, departments }) => {
-  const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', role: 'Field Officer', department: '', password: '', active: true
-  });
+const UserForm = ({ editingUser, onCancel, onSave, isLoading }) => {
+  const initialState = {
+    username: '',
+    password: '',
+    full_name: '',
+    phone_number: '', 
+    role: '', 
+    departmentId: '', 
+  };
+
+  const [formData, setFormData] = useState(initialState);
   const [copied, setCopied] = useState(false);
 
-  // --- EMAIL GENERATION LOGIC ---
-  const handleNameInput = (fullName) => {
-    const nameParts = fullName.trim().toLowerCase().split(/\s+/);
-    let emailSuggestion = '';
+  const { data: depfile, isLoading: isDepsLoading } = useGetDepartmentsQuery();
+
+  useEffect(() => {
+    if (editingUser) {
+      setFormData({
+        ...editingUser,
+        role: editingUser.role ? editingUser.role.toUpperCase() : '',
+        departmentId: editingUser.departmentId?._id || editingUser.departmentId || '',
+        phone_number: editingUser.phone_number || editingUser.phone || '' 
+      });
+    } else {
+      setFormData(initialState);
+    }
+  }, [editingUser]);
+
+  const handleNameInput = (fullNameValue) => {
+    const nameParts = fullNameValue.trim().toLowerCase().split(/\s+/);
+    let generatedUser = '';
 
     if (nameParts.length === 1 && nameParts[0] !== '') {
-      emailSuggestion = `${nameParts[0]}@epa.gov`;
+      generatedUser = nameParts[0];
     } else if (nameParts.length >= 2) {
       const firstName = nameParts[0];
       const lastName = nameParts[nameParts.length - 1];
-      emailSuggestion = `${firstName[0]}.${lastName}@epa.gov`;
+      generatedUser = `${firstName[0]}.${lastName}`;
     }
 
-    setFormData({ ...formData, name: fullName, email: emailSuggestion });
+    setFormData(prev => ({ 
+      ...prev, 
+      full_name: fullNameValue, 
+      username: generatedUser 
+    }));
   };
 
-  // --- PASSWORD GENERATION LOGIC ---
   const generatePassword = () => {
     const charset = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$";
     let retVal = "";
@@ -34,160 +58,181 @@ const UserForm = ({ editingUser, onCancel, onSave, departments }) => {
     setFormData(prev => ({ ...prev, password: retVal }));
   };
 
-  // --- COPY ALL LOGIC ---
   const copyToClipboard = () => {
+    const selectedDept = depfile?.find(d => String(d.id || d._id) === String(formData.departmentId));
+    const deptName = selectedDept ? selectedDept.name : 'Not Assigned';
+
     const text = `
-    OFFICER REGISTRATION DETAILS:
-    ----------------------------
-    Name: ${formData.name}
-    Email: ${formData.email}
-    Phone: ${formData.phone}
-    Password: ${formData.password}
-    Role: ${formData.role}
-    Department: ${formData.department}
+REGISTRATION DETAILS:
+----------------------------
+Name: ${formData.full_name}
+Phone: ${formData.phone_number}
+Username: ${formData.username}
+Password: ${formData.password}
+Role: ${formData.role}
+Department: ${deptName}
     `;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // --- SUBMIT LOGIC ---
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.department) return alert("Name and Department are required!");
-    onSave(formData);
+    
+  
+    
+    const finalData = {
+      ...formData,
+      role: formData.role ? formData.role.toUpperCase() : '',
+      departmentId: formData.departmentId ? Number(formData.departmentId) : ''
+    };
+    
+    onSave(finalData);
   };
 
-  useEffect(() => {
-    if (editingUser) setFormData(editingUser);
-    else setFormData({ name: '', email: '', phone: '', role: 'Field Officer', department: '', password: '', active: true });
-  }, [editingUser]);
-
   return (
-    <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-8 rounded-[2.5rem] shadow-2xl sticky top-32">
+    <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-xl max-w-2xl mx-auto">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-xl font-black text-white uppercase italic flex items-center gap-2">
-          <div className="w-2 h-8 bg-emerald-500 rounded-full" />
-          {editingUser ? 'Update Officer' : 'Register Officer'}
+        <h2 className="text-xl font-black text-slate-900 uppercase italic flex items-center gap-2">
+          <div className="w-1.5 h-8 bg-emerald-600 rounded-full" />
+          {editingUser ? 'Update Profile' : 'Staff Onboarding'}
         </h2>
-        {editingUser && <button onClick={onCancel} className="text-slate-500 hover:text-white"><X size={20}/></button>}
+        {editingUser && (
+          <button onClick={onCancel} type="button" className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
+            <X size={20} />
+          </button>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* NAME INPUT */}
-        <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
-          <input 
-            type="text" 
-            value={formData.name}
-            onChange={(e) => handleNameInput(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white focus:border-emerald-500/50 outline-none transition-all" 
-            placeholder="e.g. Abebe Kebede"
-          />
-        </div>
-
-        {/* PHONE & ROLE ROW */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Phone Number</label>
-            <div className="relative">
-              <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-              <input 
-                type="tel" 
-                value={formData.phone}
-                onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-sm text-white focus:border-emerald-500/50 outline-none" 
-                placeholder="09..."
-              />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assign Role</label>
-            <select 
-              value={formData.role}
-              onChange={(e) => setFormData({...formData, role: e.target.value})}
-              className="w-full bg-[#0d151c] border border-white/10 rounded-2xl px-5 py-4 text-sm text-white focus:border-emerald-500/50 outline-none appearance-none cursor-pointer"
-            >
-              <option>Field Officer</option>
-              <option>Supervisor</option>
-              <option>Admin</option>
-            </select>
-          </div>
-        </div>
-
-        {/* DEPARTMENT ASSIGNMENT (NEW) */}
-        <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Department</label>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* FULL NAME */}
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
           <div className="relative">
-            <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-            <select 
-              value={formData.department}
-              onChange={(e) => setFormData({...formData, department: e.target.value})}
-              className="w-full bg-[#0d151c] border border-white/10 rounded-2xl pl-14 pr-5 py-4 text-sm text-white focus:border-emerald-500/50 outline-none appearance-none cursor-pointer"
-            >
-              <option value="">Choose Department</option>
-              {departments && departments.map((dept, i) => (
-                <option key={i} value={dept}>{dept}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* AUTO-GENERATED EMAIL */}
-        <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">System Email</label>
-          <div className="relative">
-            <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-emerald-500/50" size={18} />
-            <input 
-              type="email" 
-              value={formData.email}
-              readOnly 
-              className="w-full bg-emerald-500/5 border border-emerald-500/20 rounded-2xl pl-14 pr-5 py-4 text-sm text-emerald-400 font-bold outline-none cursor-default" 
+            <UserPlus className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="text"
+              value={formData.full_name}
+              onChange={(e) => handleNameInput(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-14 pr-5 py-4 text-sm text-slate-700 focus:border-emerald-500/50 focus:bg-white outline-none transition-all"
+              placeholder="e.g. Abebe Kebede"
             />
           </div>
         </div>
 
-        {/* PASSWORD GENERATOR */}
-        <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">System Password</label>
+        {/* PHONE NUMBER */}
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
+          <div className="relative">
+            <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="tel"
+              value={formData.phone_number}
+              onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+              className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-14 pr-5 py-4 text-sm text-slate-700 focus:border-emerald-500/50 focus:bg-white outline-none transition-all"
+              placeholder="e.g. 0911001122"
+            />
+          </div>
+        </div>
+
+        {/* USERNAME */}
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">System Generated Username</label>
+          <div className="relative">
+            <User className="absolute left-5 top-1/2 -translate-y-1/2 text-emerald-600" size={18} />
+            <input
+              type="text"
+              value={formData.username}
+              readOnly
+              className="w-full bg-emerald-50 border border-emerald-100 rounded-2xl pl-14 pr-5 py-4 text-sm text-emerald-700 font-bold outline-none cursor-default"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Assign Role</label>
+            <div className="relative">
+              <select
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm text-slate-700 focus:border-emerald-500/50 focus:bg-white outline-none appearance-none cursor-pointer"
+              >
+                <option value="" disabled>Select Role</option>
+                <option value="ADMIN">Admin</option>
+                <option value="SUPERVISOR">Supervisor</option>
+                <option value="MANAGER">Manager</option>
+                <option value="OFFICER">Officer</option>
+              </select>
+              <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Department</label>
+            <div className="relative">
+              <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <select
+                value={formData.departmentId}
+                onChange={(e) => setFormData({ ...formData, departmentId: e.target.value })}
+                disabled={isDepsLoading}
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-14 pr-10 py-4 text-sm text-slate-700 focus:border-emerald-500/50 focus:bg-white outline-none appearance-none cursor-pointer"
+              >
+                <option value="" disabled>Select Target Dept</option>
+                {depfile && depfile.map((dep) => (
+                  <option key={dep.id || dep._id} value={dep.id || dep._id}>{dep.name}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+            </div>
+          </div>
+        </div>
+
+        {/* PASSWORD */}
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Temporary Password</label>
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-600" size={18} />
-              <input 
-                type="text" 
+              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input
+                type="text"
                 value={formData.password}
                 readOnly
-                className="w-full bg-white/5 border border-white/10 rounded-2xl pl-14 pr-5 py-4 text-sm text-white font-mono outline-none" 
-                placeholder="Click → to generate"
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-14 pr-5 py-4 text-sm text-slate-700 font-mono outline-none"
+                placeholder="Generate Secure Key →"
               />
             </div>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={generatePassword}
-              className="p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl border border-emerald-500/20 hover:bg-emerald-500 hover:text-black transition-all"
+              className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
             >
               <RefreshCw size={20} />
             </button>
           </div>
         </div>
 
-        {/* ACTIONS */}
-        <div className="pt-4 border-t border-white/5 space-y-4">
-            <button 
-              type="button"
-              onClick={copyToClipboard}
-              className="w-full flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-colors"
-            >
-              {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
-              {copied ? 'Profile Copied' : 'Copy Full Profile for user'}
-            </button>
+        <div className="pt-6 border-t border-slate-100 space-y-4">
+          <button
+            type="button"
+            onClick={copyToClipboard}
+            className="w-full flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-emerald-600 transition-colors"
+          >
+            {copied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+            {copied ? 'Credentials Copied' : 'Copy Credentials for User'}
+          </button>
 
-            <button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400 text-[#080d14] font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-[0_10px_30px_rgba(16,185,129,0.2)] active:scale-95">
-              <Save size={20} />
-              <span className="uppercase tracking-widest text-sm">
-                {editingUser ? 'Save Updates' : 'Complete Setup'}
-              </span>
-            </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-lg active:scale-95"
+          >
+            {isLoading ? <RefreshCw className="animate-spin" size={20} /> : <Save size={20} />}
+            <span className="uppercase tracking-widest text-sm">
+              {editingUser ? 'Update Staff Member' : 'Register & Finalize'}
+            </span>
+          </button>
         </div>
       </form>
     </div>

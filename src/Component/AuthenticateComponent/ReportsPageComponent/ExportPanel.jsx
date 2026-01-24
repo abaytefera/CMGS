@@ -14,10 +14,12 @@ const ExportPanel = () => {
         <span className="text-[10px] font-black uppercase tracking-widest">Download Excel</span>
       </button>
 
-      <button className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 text-slate-400 rounded-2xl hover:text-white transition-all">
-        <Printer size={16} />
-        <span className="text-[10px] font-black uppercase tracking-widest">Print Table</span>
-      </button>
+   <button className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-400 rounded-2xl hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all duration-300 shadow-sm group">
+  <Printer size={16} className="group-hover:scale-110 transition-transform" />
+  <span className="text-[10px] font-black uppercase tracking-widest">
+    Print Table
+  </span>
+</button>
     </div>
   );
 };

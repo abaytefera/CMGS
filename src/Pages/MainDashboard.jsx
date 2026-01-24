@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from "react-redux";
 
 // Double check these paths match your folder structure exactly
@@ -19,21 +19,26 @@ const Dashboard = () => {
       </div>
     );
   }
+//  user?.role?.toLowerCase()
+  const role =  user.role;
+  useEffect(()=>{
+  
+    console.log(user);
 
-  const role = user?.role?.toLowerCase() || "";
+  },[user])
 
   // 2. Render the dashboard based on role
   switch (role) {
-    case "admin":
+    case "ADMIN":
       return <AdminDashboard />;
-    
-    case "officer":
+    OFFICER
+    case "OFFICER":
       return <OfficerPage1 />;
     
-    case "supervisor":
+    case "SUPERVISOR":
       return <SupervisorDashboard />;
     
-    case "manager":
+    case "MANAGER":
       return <ManagementDashboard />;
     
     default:

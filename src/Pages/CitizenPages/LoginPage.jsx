@@ -6,8 +6,7 @@ import { LoginUser } from '../../Redux/auth';
 
 import LoginBg from '../../Component/CitizenComponent/LoginPageComponent/LoginBg';
 import AuthInput from '../../Component/CitizenComponent/LoginPageComponent/AuthInput';
-import Footer from '../../Component/CitizenComponent/Footer';
-import Header from '../../Component/CitizenComponent/Header';
+
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -22,7 +21,7 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const resultAction = await dispatch(LoginUser({ email, password }));
+    const resultAction = await dispatch(LoginUser({ username:email, password }));
 
     if (LoginUser.fulfilled.match(resultAction)) {
       localStorage.setItem('authToken', resultAction.payload.token);
@@ -49,7 +48,7 @@ const LoginPage = () => {
 
   return (
     <div className="bg-white min-h-screen font-sans">
-      <Header />
+
       
       {/* 300ms Clean White Success Overlay */}
       {showSuccess && (
@@ -134,7 +133,7 @@ const LoginPage = () => {
           
         </div>
       </div>
-      <Footer />
+  
     </div>
   );
 };

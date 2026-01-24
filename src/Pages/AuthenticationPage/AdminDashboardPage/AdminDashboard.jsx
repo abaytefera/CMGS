@@ -1,26 +1,47 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from "react-redux";
 
 import { Loader2, ExternalLink, AlertTriangle, Shield, BarChart3 } from 'lucide-react';
 
 // RTK Query hooks
 import { useGetAdminStatsQuery, useGetSystemActivityQuery } from '../../../Redux/adminApi';
+import { useGetDepartmentsQuery } from '../../../Redux/departmentApi';
+
 
 import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import AdminStats from '../../../Component/AuthenticateComponent/AdminDashboardComponent/AdminStats';
 import SystemSummary from '../../../Component/AuthenticateComponent/AdminDashboardComponent/SystemSummary';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
+import { useGetCategoriesQuery } from '../../../Redux/categoryApi';
 
 const AdminDashboard = () => {
   const { Language } = useSelector((state) => state.webState || {});
 
   const { data: stats, isLoading: statsLoading } = useGetAdminStatsQuery();
   const { data: activities, isLoading: activityLoading } = useGetSystemActivityQuery();
+  const {data:dep,isLoading:loadingdept}=useGetDepartmentsQuery();
+                   const {data:catagory,isLoading:isloadingCat,isError,error}=useGetCategoriesQuery()
+  const [numdept,setnumdept]=useState(0);
+  const [numCatagory,setCatagory]=useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
+ useEffect(()=>{
+
+ setnumdept(dep?.length || 0) ;
+ setCatagory(catagory?.length || 0)
+ console.log()
+  console.log(numdept);
+console.log("state");
+console.log(stats);
+if(isError){
+  console.log(error);
+}
+ },[dep,stats,numCatagory,error])
+ 
 
   const t = {
     title: Language === "AMH" ? "የአስተዳዳሪ ዳሽቦርድ" : "Admin Dashboard",
@@ -35,6 +56,7 @@ const AdminDashboard = () => {
     pending: Language === "AMH" ? "በሂደት ላይ" : "In Progress",
     noData: Language === "AMH" ? "ምንም እንቅስቃሴ አልተገኘም" : "No Activity Found",
   };
+
 
   if (statsLoading || activityLoading) return (
     <div className="min-h-screen bg-white flex items-center justify-center">
@@ -62,7 +84,8 @@ const AdminDashboard = () => {
             </div>
 
             <AdminStats data={stats || {}} />
-            <SystemSummary data={stats?.summary || {}} />
+            <SystemSummary  numdept={numdept} numCatagory={numCatagory} />
+           
 
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm mt-10">
               <div className="p-6 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center">

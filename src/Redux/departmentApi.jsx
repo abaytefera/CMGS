@@ -4,15 +4,15 @@ export const departmentApi = APi.injectEndpoints({
   endpoints: (builder) => ({
     // GET all departments
     getDepartments: builder.query({
-      query: () => '/departments',
+      query: () => '/api/departments',
       providesTags: ['Department'],
       // Standardizing to target the 'data' array from the backend response
-      transformResponse: (response) => response?.data || [], 
+      transformResponse: (response) => response
     }),
     // POST new department
     addDepartment: builder.mutation({
       query: (body) => ({
-        url: '/departments',
+        url: '/api/departments',
         method: 'POST',
         body,
       }),

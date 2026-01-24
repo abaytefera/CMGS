@@ -1,28 +1,24 @@
-import { faBullhorn, faLocationDot } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useLocation, Link } from "react-router-dom"; // Add useLocation
 import React, { useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBullhorn, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 
 const SuccessCard = () => {
   const { Language } = useSelector((state) => state.webState);
-  const [isCopied, setIsCopied] = useState(false); 
+  const location = useLocation(); // Hook to access the state passed via navigate
+  const [isCopied, setIsCopied] = useState(false);
 
-  const referenceNumber = "CGMS-00125";
+  // Use the ID from the server, fallback to a placeholder if state is missing
+  const referenceNumber = location.state?.referenceNumber || "CGMS-PENDING";
 
- 
   const handleCopy = () => {
     navigator.clipboard.writeText(referenceNumber);
     setIsCopied(true);
-    
-
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 2000);
+    setTimeout(() => setIsCopied(false), 2000);
   };
 
- 
   const t = {
     title: Language === "AMH" ? "አቤቱታዎ በተሳካ ሁኔታ ተልኳል" : "Complaint Submitted",
     refLabel: Language === "AMH" ? "የመለያ ቁጥርዎ፦" : "Your Reference Number:",
@@ -43,86 +39,74 @@ const SuccessCard = () => {
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8 animate-in zoom-in duration-300">
-     <div className="flex justify-center mb-6">
+      {/* Icon Section */}
+      <div className="flex justify-center mb-6">
         <div className="relative">
           <div className="w-24 h-24 flex items-center justify-center rounded-full bg-green-100 animate-pulse">
             <FaCheckCircle className="text-green-500 text-6xl" />
-          </div>
-          <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-md">
-            <div className="bg-green-500 w-4 h-4 rounded-full"></div>
           </div>
         </div>
       </div>
 
       <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">{t.title}</h1>
-      <p className="text-center text-gray-600 mb-6">
-        {t.refLabel} <span className="font-bold text-green-700">{referenceNumber}</span>
-      </p>
-
-     
-      <div className="flex justify-center mb-6">
-        <div className="relative flex items-center gap-4 border-2 border-dashed border-gray-200 rounded-xl px-6 py-3 bg-gray-50">
-          <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
-            {Language === "AMH" ? "የመለያ ቁጥር" : "Reference"}:
-          </span>
-          <span className="font-mono font-bold text-lg">{referenceNumber}</span>
-          
-          <div className="relative">
-            <button 
-              onClick={handleCopy}
-              className={`text-sm font-bold transition uppercase px-2 py-1 rounded ${
-                isCopied ? "text-green-600 bg-green-50" : "text-blue-600 hover:text-blue-800"
-              }`}
-            >
-              {isCopied ? t.copied : t.copy}
-            </button>
-            
-        
-            {isCopied && (
-              <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] py-1 px-2 rounded shadow-md animate-bounce">
-                {t.copied}
-              </span>
-            )}
+      
+      {/* Dynamic Reference Section */}
+      <div className="flex justify-center my-8">
+        <div className="relative flex items-center gap-4 border-2 border-dashed border-emerald-200 rounded-xl px-6 py-4 bg-emerald-50/50">
+          <div className="flex flex-col">
+             <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                {Language === "AMH" ? "የመለያ ቁጥር" : "Reference ID"}
+             </span>
+             <span className="font-mono font-bold text-2xl text-slate-800">{referenceNumber}</span>
           </div>
+          
+          <button 
+            onClick={handleCopy}
+            className={`ml-4 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              isCopied ? "bg-emerald-500 text-white" : "bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50"
+            }`}
+          >
+            {isCopied ? t.copied : t.copy}
+          </button>
         </div>
       </div>
 
-      <p className="text-center text-gray-700 mb-8 leading-relaxed text-lg">
+      <p className="text-center text-gray-700 mb-8 leading-relaxed text-lg px-4">
         {t.mainMessage}
       </p>
 
-   
-      <div className="mb-6 bg-blue-50/50 rounded-xl p-6 border border-blue-100">
+      {/* Guide Section */}
+      <div className="mb-6 bg-slate-50 rounded-2xl p-6 border border-slate-100">
         <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <FontAwesomeIcon icon={faLocationDot} style={{ color: "red", fontSize: "24px" }} /> {t.howToTrack}
+            <FontAwesomeIcon icon={faLocationDot} className="text-rose-500" /> {t.howToTrack}
         </h2>
-        <ul className="space-y-3 text-gray-700">
-          <li className="flex gap-3 items-center">
-            <span className="text-green-500">✔</span> {t.step1}
+        <ul className="space-y-4 text-gray-700">
+          <li className="flex gap-3 items-start">
+            <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] mt-1 flex-shrink-0">1</div> 
+            {t.step1}
           </li>
-          <li className="flex gap-3 items-center">
-            <span className="text-green-500">✔</span> {t.step2} <strong>{referenceNumber}</strong>
+          <li className="flex gap-3 items-start">
+            <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] mt-1 flex-shrink-0">2</div> 
+            <span>{t.step2} <code className="bg-white px-2 py-0.5 rounded border font-bold text-emerald-700">{referenceNumber}</code></span>
           </li>
-          <li className="flex gap-3 items-center">
-            <span className="text-green-500">✔</span> {t.step3}
+          <li className="flex gap-3 items-start">
+            <div className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] mt-1 flex-shrink-0">3</div> 
+            {t.step3}
           </li>
         </ul>
       </div>
 
-     
-      <div className="bg-orange-50 rounded-xl p-5 flex items-start gap-4 mb-8 border border-orange-100">
-       <FontAwesomeIcon 
-        icon={faBullhorn} 
-        style={{ color: '#3b82f6', fontSize: '20px' }} 
-      />
-        <p className="text-sm text-gray-700 leading-relaxed font-medium">
+      {/* SMS Note */}
+      <div className="bg-amber-50 rounded-xl p-5 flex items-start gap-4 mb-8 border border-amber-100">
+        <FontAwesomeIcon icon={faBullhorn} className="text-amber-500 mt-1" />
+        <p className="text-sm text-amber-900 leading-relaxed">
           {t.smsNote}
         </p>
       </div>
 
-      
+      {/* Action Button */}
       <div className="flex justify-center">
-        <Link  to="/TrackComplaintPage" className="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl shadow-green-200 transition-all hover:-translate-y-1">
+        <Link to="/TrackComplaintPage" className="bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-4 rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-emerald-100 transition-all hover:-translate-y-1 active:scale-95">
           {t.trackBtn}
         </Link>
       </div>

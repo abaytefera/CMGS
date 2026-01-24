@@ -2,30 +2,27 @@ import { APi } from "./CenteralAPI";
 
 export const citizenApi = APi.injectEndpoints({
   endpoints: (builder) => ({
-    // Submit a new complaint
+    // 1. Submit a new complaint
     submitComplaint: builder.mutation({
       query: (formData) => ({
-        // Corrected to the specific submission endpoint
-        url: '/complaints/create',
+        url: 'api/public/submit', // Added 'api/' because CenteralAPI doesn't have it
         method: 'POST',
-        body: formData, // FormData supports attachments/images
+        body: formData, 
       }),
-      // Refreshing 'Complaints' and 'Dashboard' tags ensures staff see new entries
       invalidatesTags: ['Complaints', 'Dashboard'],
     }),
 
+    // 2. Track a complaint
     trackComplaint: builder.query({
-      // Corrected to use the tracking reference ID path
-      query: (refId) => `/complaints/track/${refId}`,
+      query: (refId) => `api/public/track/${refId}`,
       providesTags: (result, error, refId) => [{ type: 'Complaints', id: refId }],
-      // Unwrapping data to get the status and details directly
-      transformResponse: (res) => res?.data || null,
+      transformResponse: (res) => res ,
     }),
 
-    sendFeedback: builder.mutation({
+    
+   submiFeddBack: builder.mutation({
       query: (feedbackData) => ({
-        // Verified feedback endpoint
-        url: '/feedback/submit',
+        url: 'api/public/feedback', // Matches the pattern of your working submit endpoint
         method: 'POST',
         body: feedbackData,
       }),
@@ -35,6 +32,6 @@ export const citizenApi = APi.injectEndpoints({
 
 export const { 
   useLazyTrackComplaintQuery, 
-  useSendFeedbackMutation, 
+useSubmiFeddBackMutation,
   useSubmitComplaintMutation 
 } = citizenApi;

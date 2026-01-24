@@ -22,8 +22,7 @@ const ReportsPage = () => {
   // 2. RTK Query
   const { data: Data, isLoading, isFetching, isError } = useGetReportsQuery(filters);
 
-  // 3. STRUCTURED SAMPLE DATA
-  // We mirror the exact shape: { data: [...], totalCount: X }
+  // 3. Fallback Sample Data
   const sampleData = {
     totalCount: 3,
     data: [
@@ -51,9 +50,7 @@ const ReportsPage = () => {
     ]
   };
 
-  // Logic: Use API Data if it exists and has items, else use sampleData
   const activeData = (Data && Data.data && Data.data.length > 0) ? Data : sampleData;
-
   const reports = activeData?.data || [];
   const totalCount = activeData?.totalCount || 0;
 
@@ -62,38 +59,41 @@ const ReportsPage = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-[#080d14] text-slate-300">
+    <div className="flex min-h-screen bg-white text-slate-900">
+      {/* Sidebar restricted to manager in logic */}
       <Sidebar role="manager" />
       
       <div className="flex-1 flex flex-col min-w-0">
         <AuthHeader True={true} />
         
-        <main className="flex-1 pt-32 px-6 lg:px-10 pb-10 overflow-y-auto">
+        <main className="flex-1 pt-32 px-6 lg:px-10 pb-10 overflow-y-auto bg-slate-50/30">
           <div className="max-w-7xl mx-auto">
             
+            {/* Header Section */}
             <header className="mb-12 flex items-center justify-between">
               <div>
-                <h1 className="text-5xl font-black text-white tracking-tighter uppercase italic leading-none">
-                  Data <span className="text-blue-500 italic">Vault</span>
+                <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+                  Data <span className="text-blue-600 italic">Vault</span>
                 </h1>
                 <div className="flex items-center gap-2 mt-4">
-                  <div className={`px-2 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-tighter ${isError ? 'border-rose-500/30 text-rose-500 bg-rose-500/5' : 'border-blue-500/30 text-blue-500 bg-blue-500/5'}`}>
-                    {isError ? "Offline Archive" : "Encrypted Connection"}
+                  <div className={`px-2 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-tighter ${isError ? 'border-rose-200 text-rose-600 bg-rose-50' : 'border-blue-200 text-blue-600 bg-blue-50'}`}>
+                    {isError ? "Offline Archive" : "Secure Connection"}
                   </div>
-                  <p className="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px]">
+                  <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px]">
                     Archive Access & Analytical Reporting
                   </p>
                 </div>
               </div>
-              <div className="hidden lg:block p-4 bg-white/5 border border-white/10 rounded-3xl shadow-2xl shadow-blue-500/10">
+              <div className="hidden lg:block p-4 bg-white border border-slate-200 rounded-3xl shadow-sm">
                 {isFetching ? (
-                  <Loader2 className="animate-spin text-blue-500" size={32} />
+                  <Loader2 className="animate-spin text-blue-600" size={32} />
                 ) : (
-                  <FileBarChart className="text-blue-500" size={32} />
+                  <FileBarChart className="text-blue-600" size={32} />
                 )}
               </div>
             </header>
 
+            {/* Controls Section */}
             <ReportFilters 
               filters={filters} 
               setFilters={setFilters} 
@@ -103,30 +103,34 @@ const ReportsPage = () => {
 
             <ExportPanel data={reports} />
 
-            <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden relative shadow-2xl">
+            {/* Table Container */}
+            <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden relative shadow-sm mt-8">
+              
               {/* Table Loading Overlay */}
               {isFetching && (
-                <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] z-10 flex items-center justify-center">
-                   <div className="bg-[#080d14] p-4 rounded-2xl border border-white/10 flex items-center gap-3 shadow-2xl">
-                      <Loader2 className="animate-spin text-blue-500" size={16} />
-                      <span className="text-[10px] font-black uppercase text-white">Updating Archive...</span>
-                   </div>
+                <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
+                    <div className="bg-white p-4 rounded-2xl border border-slate-200 flex items-center gap-3 shadow-xl">
+                      <Loader2 className="animate-spin text-blue-600" size={16} />
+                      <span className="text-[10px] font-black uppercase text-slate-800">Updating Archive...</span>
+                    </div>
                 </div>
               )}
 
-              <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                  <ShieldCheck size={12} className="text-emerald-500" />
+              {/* Table Status Bar */}
+              <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                  <ShieldCheck size={12} className="text-emerald-600" />
                   Previewing: {filters.period}
                 </h3>
-                <span className="text-[10px] font-black text-blue-500 uppercase bg-blue-500/10 px-3 py-1 rounded-full">
+                <span className="text-[10px] font-black text-blue-600 uppercase bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
                   {totalCount.toLocaleString()} Records Found
                 </span>
               </div>
               
+              {/* Actual Table */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
-                  <thead className="bg-white/5 text-[9px] uppercase font-black text-slate-500 tracking-widest">
+                  <thead className="bg-slate-50 text-[9px] uppercase font-black text-slate-400 tracking-widest">
                     <tr>
                       <th className="px-8 py-4">Report ID</th>
                       <th className="px-8 py-4">Category</th>
@@ -135,24 +139,27 @@ const ReportsPage = () => {
                       <th className="px-8 py-4 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-slate-100">
                     {reports.length > 0 ? (
                       reports.map((item) => (
-                        <tr key={item._id || item.id} className="group hover:bg-white/[0.02] transition-colors cursor-pointer">
-                          <td className="px-8 py-5 text-xs font-mono text-blue-400">
+                        <tr 
+                          key={item._id || item.id} 
+                          className="group hover:bg-slate-100/70 transition-colors cursor-pointer"
+                        >
+                          <td className="px-8 py-5 text-xs font-mono text-blue-600 font-bold">
                             #{item.trackingId || 'REP-000'}
                           </td>
-                          <td className="px-8 py-5 text-xs font-bold text-white uppercase italic">
+                          <td className="px-8 py-5 text-xs font-bold text-slate-800 uppercase italic">
                             {item.category || 'General'}
                           </td>
-                          <td className="px-8 py-5 text-[10px] text-slate-400 font-bold">
+                          <td className="px-8 py-5 text-[10px] text-slate-500 font-bold uppercase">
                             {item.department || 'Unassigned'}
                           </td>
-                          <td className="px-8 py-5 text-xs text-slate-500">
+                          <td className="px-8 py-5 text-xs text-slate-400">
                             {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}
                           </td>
                           <td className="px-8 py-5 text-right">
-                            <button className="p-2 text-slate-500 group-hover:text-blue-500 group-hover:bg-blue-500/10 rounded-lg transition-all">
+                            <button className="p-2 text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-100/50 rounded-lg transition-all">
                               <ArrowUpRight size={16} />
                             </button>
                           </td>
@@ -161,8 +168,8 @@ const ReportsPage = () => {
                     ) : !isLoading && (
                       <tr>
                         <td colSpan="5" className="py-20 text-center">
-                          <Database size={32} className="mx-auto text-slate-700 mb-4" />
-                          <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                          <Database size={32} className="mx-auto text-slate-200 mb-4" />
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                             No records match the current filters
                           </p>
                         </td>

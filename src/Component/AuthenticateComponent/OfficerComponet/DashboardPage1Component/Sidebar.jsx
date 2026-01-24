@@ -1,132 +1,181 @@
 import React, { useState } from 'react';
 import { useSelector } from "react-redux";
-import {
-  LayoutDashboard,
-  LogOut,
-  ChevronDown,
-  ChevronUp,
-  Lock,
-  User,
-  ShieldCheck,
-  BarChart3, // ✅ PascalCase
-  ClipboardList,
-  Users,
-  Layers,
-  FileSearch,
-  History
+import { 
+  LayoutDashboard, Settings, LogOut, ChevronDown, ChevronUp, 
+  Lock, User, Database, ShieldCheck, BarChart3, 
+  Briefcase, Users, CheckCircle2, ListTodo 
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar = ({ role }) => {
   const { Language } = useSelector((state) => state.webState);
   const location = useLocation();
-  const [isCaseMgOpen, setIsCaseMgOpen] = useState(true);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const dashboardUrl =
-    role === "officer" ? "/Dashboard1" :
-    role === "supervisor" ? "/Dashboard2" :
-    role === "admin" ? "/Dashboard3" : "/Dashboard4";
+  // Dynamic Dashboard URL mapping
+  const roleRoutes = {
+    admin: "/Dashboard3",
+    supervisor: "/Dashboard2",
+    manager: "/DashboardDashboard",
+    officer: "/Dashboard1"
+  };
+
+  const dashboardUrl = roleRoutes[role] || "/Dashboard1";
 
   const t = {
     mainMenu: Language === "AMH" ? "ዋና ማውጫ" : "Main Menu",
-    caseMg: Language === "AMH" ? "የቅሬታ አያያዝ" : "Case Management",
-    allCases: Language === "AMH" ? "ሁሉም ቅሬታዎች" : "All Complaints",
-    assigned: Language === "AMH" ? "የተመደቡ" : "Assigned to Me",
-    categories: Language === "AMH" ? "የስራ ዘርፎች" : "Categories",
-    departments: Language === "AMH" ? "ክፍሎች" : "Departments",
-    userMg: Language === "AMH" ? "ተጠቃሚዎች" : "User Management",
+    caseMgmt: Language === "AMH" ? "የጉዳይ አያያዝ" : "Case Management",
+    dashboard: Language === "AMH" ? "ዳሽቦርድ" : "Dashboard",
     reports: Language === "AMH" ? "ሪፖርት" : "Reports",
+    allComplaints: Language === "AMH" ? "ሁሉም አቤቱታዎች" : "All Complaints",
+    assignTasks: Language === "AMH" ? "ስራ መመደብ" : "Assign Tasks",
+    userMgmt: Language === "AMH" ? "ተጠቃሚዎች" : "User Management",
+    myTasks: Language === "AMH" ? "የእኔ ስራዎች" : "My Task List",
+    settings: Language === "AMH" ? "ቅንብሮች" : "Settings",
     logout: Language === "AMH" ? "ውጣ" : "Logout",
-    profile: Language === "AMH" ? "መገለጫ" : "Profile",
     password: Language === "AMH" ? "የይለፍ ቃል" : "Password",
+    profile: Language === "AMH" ? "መገለጫ" : "Profile",
     systemSettings: Language === "AMH" ? "የስርዓት ቅንብሮች" : "System Settings"
   };
 
-  const isActive = (url) => location.pathname === url;
+  /**
+   * NAVIGATION CONFIGURATION
+   * Only 'manager' has access to Reports.
+   */
+  const menuItems = [
+    { 
+      icon: LayoutDashboard, 
+      label: t.dashboard, 
+      key: 'Dashboard', 
+      url: dashboardUrl, 
+      visible: true // All roles see dashboard
+    },
+    { 
+      icon: BarChart3, 
+      label: t.reports, 
+      key: 'Reports', 
+      url: '/Report', 
+      visible: role === 'manager' // STRICT ACCESS: Only Manager
+    },
+  ];
+
+  const caseItems = [
+    { 
+      icon: Briefcase, 
+      label: t.allComplaints, 
+      url: '/Complaintlist/all', 
+      visible: ['admin', 'supervisor', 'manager'].includes(role) 
+    },
+    { 
+      icon: ListTodo, 
+      label: t.assignTasks, 
+      url: '/NotAssignComplainList/notAssign', 
+      visible: ['admin', 'supervisor'].includes(role) 
+    },
+    { 
+      icon: CheckCircle2, 
+      label: t.myTasks, 
+      url: '/OfficerTasks', 
+      visible: role === 'officer' 
+    },
+    { 
+      icon: Users, 
+      label: t.userMgmt, 
+      url: '/UserManagement', 
+      visible: role === 'admin' 
+    },
+  ];
+
+  const NavLink = ({ item }) => {
+    if (!item.visible) return null;
+    
+    const isActive = location.pathname === item.url;
+
+    return (
+      <Link 
+        to={item.url}
+        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${
+          isActive
+            ? 'bg-emerald-600 text-white shadow-md'
+            : 'text-slate-500 hover:bg-emerald-50 hover:text-emerald-600'
+        }`}
+      >
+        <item.icon size={20} />
+        <span className="font-medium text-sm">{item.label}</span>
+      </Link>
+    );
+  };
 
   return (
-    <aside className="hidden lg:flex w-64 h-screen bg-white border-r border-gray-200 flex-col px-4 py-6 sticky top-0 overflow-y-auto">
-      
-      {/* Logo */}
-      <div className="mb-10 px-2">
+    <aside className="hidden lg:flex w-64 h-screen bg-white border-r border-slate-100 flex-col p-4 sticky top-0 shadow-sm">
+      <div className="flex-shrink-0 mb-10 px-2">
         <Link to={dashboardUrl}>
           <img
             src="https://res.cloudinary.com/dkzvlqjp9/image/upload/v1768827371/logo_xebgif.png"
-            alt="EPA Logo"
-            className="w-36 h-auto"
+            alt="Logo"
+            className="w-40 h-auto"
           />
         </Link>
       </div>
 
-      <nav className="flex-1 space-y-7">
-        
-        {/* Dashboard */}
-        <Link
-          to={dashboardUrl}
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-            isActive(dashboardUrl)
-              ? "bg-emerald-600 text-white shadow-md shadow-emerald-100"
-              : "text-gray-600 hover:bg-gray-50 hover:text-emerald-600"
-          }`}
-        >
-          <LayoutDashboard size={20} />
-          <span className="text-sm font-bold">Dashboard</span>
-        </Link>
+      <nav className="flex-1 space-y-8 overflow-y-auto no-scrollbar">
+        {/* Main Menu Section */}
+        <section>
+          <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+            {t.mainMenu}
+          </p>
+          <div className="space-y-1">
+            {menuItems.map((item, idx) => <NavLink key={idx} item={item} />)}
+          </div>
+        </section>
 
-        {/* Case Management Section */}
-        <div>
-          <button 
-            onClick={() => setIsCaseMgOpen(!isCaseMgOpen)}
-            className="w-full flex items-center justify-between px-4 mb-3 text-xs font-bold text-gray-400 uppercase tracking-widest"
-          >
-            {t.caseMg}
-            {isCaseMgOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          </button>
-          
-          {isCaseMgOpen && (
+        {/* Case Management Section - Filtered by Visibility */}
+        {caseItems.some(item => item.visible) && (
+          <section>
+            <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+              {t.caseMgmt}
+            </p>
             <div className="space-y-1">
-              {role === "admin" && (
-                <>
-                  <Link to="/CatagoryMg" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium ${isActive("/CatagoryMg") ? "text-emerald-600 bg-emerald-50" : "text-gray-600 hover:bg-gray-50"}`}>
-                    <Layers size={18} /> {t.categories}
-                  </Link>
-                  <Link to="/DepartmentMg" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium ${isActive("/DepartmentMg") ? "text-emerald-600 bg-emerald-50" : "text-gray-600 hover:bg-gray-50"}`}>
-                    <ShieldCheck size={18} /> {t.departments}
-                  </Link>
-                  <Link to="/userMg" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium ${isActive("/userMg") ? "text-emerald-600 bg-emerald-50" : "text-gray-600 hover:bg-gray-50"}`}>
-                    <Users size={18} /> {t.userMg}
-                  </Link>
-                </>
-              )}
-              <Link to="/Report" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium ${isActive("/Report") ? "text-emerald-600 bg-emerald-50" : "text-gray-600 hover:bg-gray-50"}`}>
-                <BarChart3 size={18} /> {t.reports}
-              </Link>
+              {caseItems.map((item, idx) => <NavLink key={idx} item={item} />)}
             </div>
-          )}
-        </div>
+          </section>
+        )}
       </nav>
 
-      {/* Account Section */}
-      <div className="pt-6 border-t border-gray-100 space-y-1">
-        <p className="px-4 mb-2 text-xs font-bold text-gray-400 uppercase tracking-widest">Account</p>
-        
-        <Link to="/Profile" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium ${isActive("/Profile") ? "text-emerald-600 bg-emerald-50" : "text-gray-600 hover:bg-gray-50"}`}>
-          <User size={18} /> {t.profile}
-        </Link>
+      {/* Footer Settings */}
+      <div className="pt-6 border-t border-slate-100 space-y-1">
+        <button 
+          onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors ${
+            isSettingsOpen ? 'bg-slate-50 text-emerald-600' : 'text-slate-500 hover:bg-slate-50'
+          }`}
+        >
+          <div className="flex items-center space-x-3">
+            <Settings size={20} />
+            <span className="font-medium text-sm">{t.settings}</span>
+          </div>
+          {isSettingsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
 
-        <Link to="/passwordChange" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium ${isActive("/passwordChange") ? "text-emerald-600 bg-emerald-50" : "text-gray-600 hover:bg-gray-50"}`}>
-          <Lock size={18} /> {t.password}
-        </Link>
-
-        {role === "admin" && (
-          <Link to="/SystemMg" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-bold text-emerald-700 hover:bg-emerald-50 mt-1`}>
-            <History size={18} /> {t.systemSettings}
-          </Link>
+        {isSettingsOpen && (
+          <div className="ml-4 space-y-1 mt-1 border-l-2 border-slate-50">
+            <Link to="/Profile" className="flex items-center space-x-3 px-4 py-2 text-sm text-slate-500 hover:text-emerald-600">
+              <User size={16} /> <span>{t.profile}</span>
+            </Link>
+            <Link to="/passwordChange" className="flex items-center space-x-3 px-4 py-2 text-sm text-slate-500 hover:text-emerald-600">
+              <Lock size={16} /> <span>{t.password}</span>
+            </Link>
+            {role === 'admin' && (
+              <Link to="/SystemMg" className="flex items-center space-x-3 px-4 py-2 text-sm text-emerald-700 font-semibold bg-emerald-50/50 rounded-lg">
+                <ShieldCheck size={16} /> <span>{t.systemSettings}</span>
+              </Link>
+            )}
+          </div>
         )}
 
-        <button className="w-full flex items-center gap-3 px-4 py-3 mt-4 rounded-xl text-red-600 hover:bg-red-50 font-bold transition-colors">
+        <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-colors mt-4">
           <LogOut size={20} />
-          <span className="text-sm">{t.logout}</span>
+          <span className="font-medium text-sm">{t.logout}</span>
         </button>
       </div>
     </aside>
