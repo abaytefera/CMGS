@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { 
   useGetCategoriesQuery, 
   useCreateCategoryMutation, 
-  useUpdateCategoryMutation 
+ 
 } from '../../../Redux/categoryApi';
 import { useGetDepartmentsQuery } from '../../../Redux/departmentApi';
 
@@ -13,6 +13,7 @@ import CategoryForm from '../../../Component/AuthenticateComponent/CategoryManag
 import CategoryTable from '../../../Component/AuthenticateComponent/CategoryManagementComponent/CategoryTable';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 import { Loader2, Database, Layers } from 'lucide-react';
+
 import { useOneUpdateMutation } from '../../../Redux/categoryApi';
 
 const CategoryManagement = () => {
