@@ -19,19 +19,26 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const resultAction = await dispatch(LoginUser({ username:email, password }));
+const handleLogin = async (e) => {
+  e.preventDefault();
+  
+  // 1. Dispatch the action and capture the result
+  const resultAction = await dispatch(LoginUser({ username: email, password }));
 
-    if (LoginUser.fulfilled.match(resultAction)) {
-      localStorage.setItem('authToken', resultAction.payload.token);
-      setShowSuccess(true);
-      // Perfect 300ms transition
-      setTimeout(() => {
-        navigate('/Dashboard');
-      }, 300);
-    }
-  };
+  // 2. LOG THE ERROR HERE
+  if (LoginUser.rejected.match(resultAction)) {
+    console.log("Login Failed Error:", resultAction.payload || resultAction.error);
+  }
+
+  if (LoginUser.fulfilled.match(resultAction)) {
+    console.log("Login Success Data:", resultAction.payload);
+    localStorage.setItem('authToken', resultAction.payload.token);
+    setShowSuccess(true);
+    setTimeout(() => {
+      navigate('/Dashboard');
+    }, 300);
+  }
+};
 
   useEffect(()=>{
 

@@ -42,7 +42,7 @@ function App() {
           <Route path='/Complaintlist/:role/:type' Component={ComplaintListPage} />
               <Route path='/DetailList/:id' element={<ComplaintDetails />} />
               <Route path='/AssignComplain/:id' element={<AssignComplaintPage/>}></Route>
-                 <Route path='/NotAssignComplainList/:listType' element={<NotAssignedComplaintListPage/>}></Route>
+                 <Route path='/NotAssignComplainList/:role/:type' element={<NotAssignedComplaintListPage/>}></Route>
                      <Route path='/userMg' element={<UserManagementPage/>}></Route>
                       <Route path='/DepartmentMg' element={<DepartmentManagement/>}></Route>
                        <Route path='/CatagoryMg' element={<CategoryManagement/>}></Route>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux"; 
-import { User, ChevronLeft, RefreshCcw, CheckCircle, Clock, AlertCircle, FileText, History, ShieldCheck, MapPin, Mail, Phone, Play, File, Lock } from "lucide-react";
+import { User, ChevronLeft, RefreshCcw, CheckCircle, Clock, AlertCircle, FileText, History, ShieldCheck, UserPlus, Lock } from "lucide-react";
 
 import Sidebar from "../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar";
 import AuthHeader from "../../../Component/AuthenticateComponent/AuthHeader";
@@ -9,31 +9,16 @@ import AuthFooter from "../../../Component/AuthenticateComponent/AuthFooter";
 import InfoCard from "../../../Component/AuthenticateComponent/OfficerComponet/ComplaintDetailsComponent/InfoCard";
 import StatusHistory from "../../../Component/AuthenticateComponent/OfficerComponet/ComplaintDetailsComponent/StatusHistory";
 
-// --- MOVED MOCK DATA HERE TO FIX REFERENCE ERROR ---
-const mockFetchComplaint = (id) => Promise.resolve({
-  id: id,
-  ref_number: `CMP-2026-${id}`,
-  citizen_name: "John Doe",
-  phone_number: "+251911223344",
-  email: "john@example.com",
-  sub_city: "Bole",
-  woreda: "08",
-  description: "Test complaint description with details regarding the incident.",
-  status: "SUBMITTED",
-  priority: "MEDIUM",
-  StatusLogs: [
-    { status: "SUBMITTED", date: "2026-01-25", note: "Complaint filed" }
-  ],
-  Attachments: [
-    { id: 1, file_path: "#", file_type: "image/jpeg", original_name: "evidence.jpg" }
-  ],
-  Category: { name: "Public Safety" }
-});
+// ... (mockFetchComplaint stays the same)
 
 const ComplaintDetails = () => {
   const { id } = useParams();
   const { user } = useSelector((state) => state.auth);
+  
+  // Role Helpers
   const isAdmin = user?.role === "ADMIN";
+  const isSupervisor = user?.role === "SUPERVISOR";
+  const isOfficer = user?.role === "OFFICER";
 
   const [complaint, setComplaint] = useState(null);
   const [currentStatus, setCurrentStatus] = useState("");
@@ -41,7 +26,6 @@ const ComplaintDetails = () => {
   const [note, setNote] = useState("");
 
   useEffect(() => {
-    // Calling the function now works because it is defined in scope
     mockFetchComplaint(id).then(data => {
       setComplaint(data);
       setCurrentStatus(data.status);
@@ -69,13 +53,12 @@ const ComplaintDetails = () => {
         <AuthHeader True={true} />
         <main className="flex-grow pt-32 pb-20 px-6 lg:px-10 bg-white">
           
-          {/* Header & Status Toggle */}
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
             <div className="flex items-center gap-4">
               <ChevronLeft size={24} className="cursor-pointer" onClick={() => window.history.back()} />
               <div>
                 <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">{complaint.ref_number}</h1>
-                <p className="text-slate-500 text-sm font-medium">Viewing complaint details</p>
+                <p className="text-slate-500 text-sm font-medium">Complaint Management Panel</p>
               </div>
             </div>
 
@@ -84,9 +67,9 @@ const ComplaintDetails = () => {
                 {activeConfig.icon} {activeConfig.label}
               </div>
 
-              {/* ADMIN RESTRICTION: Dropdown hidden for Admins */}
+              {/* Status Update Toggle for Non-Admins */}
               {!isAdmin && (
-                <button onClick={() => setShowStatusDropdown(!showStatusDropdown)} className="bg-white border border-slate-200 p-2 rounded-full">
+                <button onClick={() => setShowStatusDropdown(!showStatusDropdown)} className="bg-white border border-slate-200 p-2 rounded-full hover:bg-slate-50 transition-colors">
                   <RefreshCcw size={18} />
                 </button>
               )}
@@ -97,16 +80,17 @@ const ComplaintDetails = () => {
             <div className="lg:col-span-2 space-y-8">
               <InfoCard title="Citizen Information">
                 <div className="flex gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">{complaint.citizen_name[0]}</div>
-                    <div>
-                        <p className="font-bold text-slate-900">{complaint.citizen_name}</p>
-                        <p className="text-sm text-slate-500">{complaint.phone_number}</p>
-                    </div>
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xl">{complaint.citizen_name[0]}</div>
+                  <div>
+                    <p className="font-bold text-slate-900 text-lg">{complaint.citizen_name}</p>
+                    <p className="text-sm text-slate-500 font-medium">{complaint.phone_number}</p>
+                    <p className="text-xs text-slate-400 mt-1">{complaint.email}</p>
+                  </div>
                 </div>
               </InfoCard>
 
-              <InfoCard title="Description">
-                <p className="text-slate-700">{complaint.description}</p>
+              <InfoCard title="Complaint Description">
+                <p className="text-slate-700 leading-relaxed">{complaint.description}</p>
               </InfoCard>
             </div>
 
@@ -115,23 +99,35 @@ const ComplaintDetails = () => {
                 <StatusHistory history={complaint.StatusLogs} />
               </InfoCard>
 
-              {/* ADMIN RESTRICTION: Actions panel disabled for Admin */}
-              <InfoCard title={isAdmin ? "Read Only Access" : "Officer Actions"}>
+              {/* DYNAMIC ACTION PANEL BASED ON ROLE */}
+              <InfoCard title={isAdmin ? "Read Only Access" : isSupervisor ? "Supervisor Controls" : "Officer Actions"}>
                 {isAdmin ? (
-                  <div className="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-center">
+                  <div className="p-6 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-center">
                     <Lock size={24} className="mx-auto text-slate-300 mb-2" />
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Administrator View Only</p>
                   </div>
+                ) : isSupervisor ? (
+                  /* SUPERVISOR VIEW: Show Assignment Button */
+                  <div className="space-y-4">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Management Actions</p>
+                    <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 transition-all active:scale-95">
+                      <UserPlus size={18} /> Assign to Officer
+                    </button>
+                    <button className="w-full bg-white border border-rose-200 text-rose-600 font-bold py-3 rounded-xl hover:bg-rose-50 transition-colors">
+                      Reject Complaint
+                    </button>
+                  </div>
                 ) : (
+                  /* OFFICER VIEW: Show Note and Update Button */
                   <div className="space-y-4">
                     <textarea 
-                        className="w-full bg-slate-50 p-4 rounded-xl text-sm outline-none border border-slate-200"
-                        placeholder="Add investigation note..." 
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
+                      className="w-full bg-slate-50 p-4 rounded-xl text-sm outline-none border border-slate-200 focus:bg-white focus:border-emerald-500 transition-all min-h-[120px]"
+                      placeholder="Add investigation note or update status detail..." 
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
                     />
-                    <button className="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg">
-                        Update Complaint
+                    <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95">
+                      Update & Save Changes
                     </button>
                   </div>
                 )}

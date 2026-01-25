@@ -47,38 +47,7 @@ console.log(CompileList);
  const { data: compile, isLoading: isLoadingCompile, isError } = useGetComplaintsQuery();
   
 
-//   const [totalComplaints, setTotalComplaints] = useState([]);
-// const [notAssigned, setNotAssigned] = useState([]);
-// const [resolved, setResolved] = useState([]);
-// const [rejected, setRejected] = useState([]);
-// const [activeOfficers, setActiveOfficers] = useState([]);
 
-// Run filter logic whenever data changes
-// useEffect(() => {
-//   if (!compile || !Array.isArray(compile)) return;
-
-//   setTotalComplaints(compile);
-
-//   setNotAssigned(
-//     compile.filter(item => item.status === 'NOT_ASSIGNED').length
-//   );
-
-//   setResolved(
-//     compile.filter(item => item.status === 'RESOLVED').length
-//   );
-
-//   setRejected(
-//     compile.filter(item => item.status === 'REJECTED').length
-//   );
-// }, [compile]);
-
-// useEffect(() => {
-//   if (!officers || !Array.isArray(officers)) return;
-
-//   setActiveOfficers(
-//     officers.filter(officer => officer.is_active === true)
-//   );
-// }, [officers]);
 
 
   if (isLoading) return (
@@ -117,11 +86,11 @@ console.log(CompileList);
               
               {/* Stats Cards Cluster (Taking 2/3 of space on XL) */}
               <div className="xl:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-  <Link to={`/Complaintlist/supervisor/${"resolved"}`}>
+  <Link to={`/Complaintlist/supervisor/}`}>
     <SLAWarning title={t.totalComp} count={CompileList?.totalComplaints} severity="low" icon={BarChart3} />
   </Link>
 
-  <Link to={`/Complaintlist/supervisor/${"unassigned"}`}>
+  <Link to={`/NotAssignComplainList/supervisor/${"unassigned"}`}>
     <SLAWarning title={t?.notAssigned} count={CompileList?.notAssigned} severity="high" icon={UserPlus} />
   </Link>
 

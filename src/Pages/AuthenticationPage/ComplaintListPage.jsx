@@ -20,6 +20,9 @@ const ComplaintListPage = () => {
 
   const { role, type } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
+  console.log( role)
+    console.log(type)
+  
   
   // Filter state
   const [filterType, setFilterType] = useState("TOTAL");
@@ -28,6 +31,10 @@ const ComplaintListPage = () => {
     role: role, 
     type: type 
   });
+  useEffect(()=>{
+
+console.log(TotalCompile);
+  },[TotalCompile])
 
   const filteredComplaints = useMemo(() => {
     if (!TotalCompile) return [];
