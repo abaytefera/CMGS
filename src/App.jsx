@@ -36,9 +36,10 @@ function App() {
       <Route path='/submit-complaint' Component={SubmitComplaint}></Route>
       <Route path='/ComplaintSubmittedPage' Component={ComplaintSubmittedPage}></Route>
          <Route path='/TrackComplaintPage' Component={TrackComplaintPage}></Route>
-         <Route path='/FeedbackPage' Component={FeedbackPage}></Route>
+          <Route path='/FeedbackPage' Component={FeedbackPage}></Route>
          
-             <Route path='/Complaintlist/:listType' Component={ComplaintListPage}></Route>
+       
+          <Route path='/Complaintlist/:role/:type' Component={ComplaintListPage} />
               <Route path='/DetailList/:id' element={<ComplaintDetails />} />
               <Route path='/AssignComplain/:id' element={<AssignComplaintPage/>}></Route>
                  <Route path='/NotAssignComplainList/:listType' element={<NotAssignedComplaintListPage/>}></Route>

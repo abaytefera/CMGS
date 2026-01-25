@@ -5,15 +5,14 @@ import { ChangeLanguage } from "../../Redux/WebState";
 import { Link } from "react-router-dom";
 import { User, Bell } from "lucide-react"; 
 
-const AuthHeader = ({True}) => {
+const AuthHeader = ({ True }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false); 
   const { Language } = useSelector((state) => state.webState);
-const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const [windowOffset, setWindowOffset] = useState(0);
   const Dispatch = useDispatch();
 
- 
   const officerName = "Inspector Abebe"; 
 
   useEffect(() => {
@@ -28,7 +27,7 @@ const { user } = useSelector((state) => state.auth);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  const toggleLanguge = (e) => {
+  const toggleLanguage = (e) => {
     const value = e.target.value;
     if (!value) return;
     Dispatch(ChangeLanguage(value));
@@ -43,13 +42,13 @@ const { user } = useSelector((state) => state.auth);
 
   return (
     <header
-      className={`h-20 lg:pr-40 shadow bg-[url(https://res.cloudinary.com/dkzvlqjp9/image/upload/v1768827337/natural_pjju9e.jpg)] bg-no-repeat bg-cover bg-center transition-all ease-out duration-300 fixed w-full z-50 ${
-        windowOffset > 450 ? "bg-black" : ""
-      }`}
+      className={`h-20 lg:pr-40 shadow bg-white transition-all ease-out duration-300 fixed w-full z-50`}
     >
-      <div className={`max-w-7xl mx-auto px-4 sm:px-6 ${True ? "lg:px-8" :"lg:px-1"} `}>
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 ${True ? "lg:px-8" : "lg:px-1"}`}>
         <div className="flex justify-between items-center h-20">
-        <div className={`flex-shrink-0 mb-8 ${True ?"opacity-0":"blcok"}`}>
+
+          {/* Logo */}
+          <div className={`flex-shrink-0 mb-8 ${True ? "opacity-0" : "block"}`}>
             <Link to="/dashboard">
               <img
                 src="https://res.cloudinary.com/dkzvlqjp9/image/upload/v1768827371/logo_xebgif.png"
@@ -59,20 +58,20 @@ const { user } = useSelector((state) => state.auth);
             </Link>
           </div>
 
+          {/* Desktop Right Menu */}
           <div className="hidden md:flex items-center space-x-6">
-            
-            {/* Notification Bell Section */}
+
+            {/* Notification Bell */}
             <div className="relative">
               <button 
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 text-white hover:bg-white/10 rounded-full transition-all"
+                className="relative p-2 text-slate-700 hover:bg-slate-100 rounded-full transition-all"
               >
                 <Bell size={24} />
                 {/* Red Dot Indicator */}
-                <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 border-2 border-green-800 rounded-full"></span>
+                <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
               </button>
 
-              {/* Notification Dropdown */}
               {showNotifications && (
                 <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-2xl py-4 z-50 border border-slate-100 animate-in fade-in zoom-in duration-200">
                   <div className="px-4 pb-2 border-b border-slate-50 flex justify-between items-center">
@@ -81,12 +80,10 @@ const { user } = useSelector((state) => state.auth);
                   </div>
                   <div className="max-h-60 overflow-y-auto">
                     <div className="p-4 text-center text-slate-400 text-sm">
-                   
                       <div className="text-left bg-blue-50 p-3 rounded-lg mb-2">
                         <p className="text-xs text-blue-800 font-bold">New Complaint Assigned</p>
                         <p className="text-[10px] text-blue-600">Reference: CGMS-00125</p>
                       </div>
-                      {/* {content.noNotif} */}
                     </div>
                   </div>
                 </div>
@@ -102,30 +99,31 @@ const { user } = useSelector((state) => state.auth);
               />
               <select
                 value={Language}
-                onChange={toggleLanguge}
-                className="bg-transparent text-white outline-none cursor-pointer font-medium"
+                onChange={toggleLanguage}
+                className="bg-transparent text-slate-700 outline-none cursor-pointer font-medium"
               >
                 <option value="ENG" className="text-black">ENG</option>
                 <option value="AMH" className="text-black">AMH</option>
               </select>
             </div>
 
-            {/* Officer Profile Section */}
-            <div className={`flex ${True && "md:mr-20" }  items-center space-x-3 bg-white/10 backdrop-blur-md border border-white/20 p-1.5 pr-4 rounded-full hover:bg-white/20 transition-all cursor-pointer`}>
+            {/* Officer Profile */}
+            <div className={`flex ${True && "md:mr-20"} items-center space-x-3 bg-white/10 backdrop-blur-md border border-white/20 p-1.5 pr-4 rounded-full hover:bg-white/20 transition-all cursor-pointer`}>
               <div className="w-10 h-10 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center overflow-hidden shadow-sm">
                 <User className="text-white" size={24} />
               </div>
               <div className="flex flex-col">
-                <span className="text-white text-[10px] font-semibold opacity-80 uppercase tracking-tighter leading-none">{user.role}</span>
-                <span className="text-white text-sm font-bold leading-tight">{user.username}</span>
+                <span className="text-slate-700 text-[10px] font-semibold opacity-80 uppercase tracking-tighter leading-none">{user.role}</span>
+                <span className="text-slate-900 text-sm font-bold leading-tight">{user.username}</span>
               </div>
             </div>
           </div>
 
+          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMenu}
-              className="text-white hover:text-green-400 focus:outline-none"
+              className="text-slate-700 hover:text-green-600 focus:outline-none"
             >
               {isOpen ? <HiX size={30} /> : <HiMenu size={30} />}
             </button>
@@ -155,7 +153,7 @@ const { user } = useSelector((state) => state.auth);
             <div className="flex items-center justify-between border-y py-4">
               <span className="text-slate-700 font-medium">{content.LangLabel}</span>
               <select
-                onChange={toggleLanguge}
+                onChange={toggleLanguage}
                 value={Language}
                 className="text-slate-700 border rounded-lg p-2 bg-slate-50"
               >

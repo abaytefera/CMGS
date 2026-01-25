@@ -7,6 +7,7 @@ const ComplaintRow = ({ complaint }) => {
 
   const name = complaint?.citizenName || "Unknown Citizen";
   const firstLetter = name.charAt(0).toUpperCase();
+ 
 const   navigate=useNavigate()
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -20,7 +21,7 @@ const   navigate=useNavigate()
   return (
     <tr onClick={() => navigate(`/DetailList/${complaint.id}`)} className="group hover:bg-white/[0.02] transition-colors">
       <td className="px-8 py-6">
-        <span className="text-xs font-black text-white tracking-wider">{complaint?.trackingId || "N/A"}</span>
+        <span className="text-xs font-black  tracking-wider">{complaint?.id || "N/A"}</span>
       </td>
       <td className="px-8 py-6">
         <div className="flex items-center gap-3">
@@ -28,7 +29,7 @@ const   navigate=useNavigate()
             {firstLetter}
           </div>
           <div>
-            <p className="text-xs font-black text-slate-200 leading-none mb-1">{name}</p>
+            <p className="text-xs font-black text-slate-200 leading-none mb-1">{complaint.citizen_name}</p>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">
               {complaint?.phoneNumber || "No Phone"}
             </p>
@@ -37,7 +38,7 @@ const   navigate=useNavigate()
       </td>
       <td className="px-8 py-6">
         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-          {complaint?.category || "Uncategorized"}
+          {complaint?.Category.name || "Uncategorized"}
         </span>
       </td>
       <td className="px-8 py-6">

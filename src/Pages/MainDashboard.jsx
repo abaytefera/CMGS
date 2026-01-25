@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   // Pull loading state and user from auth slice
-  const { user, isloading } = useSelector((state) => state.auth || {});
+  const { user, isloading } = useSelector((state) => state.auth );
   const navigator=useNavigate();
   
   // 1. Show a loader while checking authentication state
@@ -22,7 +22,7 @@ const Dashboard = () => {
     );
   }
 
-  const role =user?.role;
+  const role =user.role;
 
   useEffect(()=>{
   

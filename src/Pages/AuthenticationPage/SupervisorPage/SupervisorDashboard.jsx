@@ -13,14 +13,18 @@ import SLAWarning from '../../../Component/AuthenticateComponent/SupervisorCompo
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import EfficiencyChart from '../../../Component/AuthenticateComponent/SupervisorComponent/EfficiencyChart'
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
-import { useGetComplaintsQuery } from '../../../Redux/complaintApi';
+import { useGetComplaintsDashboardQuery, useGetComplaintsQuery } from '../../../Redux/complaintApi';
 const SupervisorDashboard = () => {
   const { Language } = useSelector((state) => state.webState);
   const { data: stats, isLoading } = useGetSupervisorStatsQuery();
-
+const {data:CompileList,isLoading:isLoadingCompiletask}=useGetComplaintsDashboardQuery('supervisor');
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  useEffect(()=>{
+
+console.log(CompileList);
+  },[CompileList])
 
   const t = {
     live: Language === "AMH" ? "ቀጥታ ክትትል" : "Live Overview",
@@ -41,39 +45,40 @@ const SupervisorDashboard = () => {
     officer: Language === "AMH" ? "ባለሙያ" : "Officer",
   };
  const { data: compile, isLoading: isLoadingCompile, isError } = useGetComplaintsQuery();
+  
 
-  const [totalComplaints, setTotalComplaints] = useState([]);
-const [notAssigned, setNotAssigned] = useState([]);
-const [resolved, setResolved] = useState([]);
-const [rejected, setRejected] = useState([]);
-const [activeOfficers, setActiveOfficers] = useState([]);
+//   const [totalComplaints, setTotalComplaints] = useState([]);
+// const [notAssigned, setNotAssigned] = useState([]);
+// const [resolved, setResolved] = useState([]);
+// const [rejected, setRejected] = useState([]);
+// const [activeOfficers, setActiveOfficers] = useState([]);
 
 // Run filter logic whenever data changes
-useEffect(() => {
-  if (!compile || !Array.isArray(compile)) return;
+// useEffect(() => {
+//   if (!compile || !Array.isArray(compile)) return;
 
-  setTotalComplaints(compile);
+//   setTotalComplaints(compile);
 
-  setNotAssigned(
-    compile.filter(item => item.status === 'NOT_ASSIGNED').length
-  );
+//   setNotAssigned(
+//     compile.filter(item => item.status === 'NOT_ASSIGNED').length
+//   );
 
-  setResolved(
-    compile.filter(item => item.status === 'RESOLVED').length
-  );
+//   setResolved(
+//     compile.filter(item => item.status === 'RESOLVED').length
+//   );
 
-  setRejected(
-    compile.filter(item => item.status === 'REJECTED').length
-  );
-}, [compile]);
+//   setRejected(
+//     compile.filter(item => item.status === 'REJECTED').length
+//   );
+// }, [compile]);
 
-useEffect(() => {
-  if (!officers || !Array.isArray(officers)) return;
+// useEffect(() => {
+//   if (!officers || !Array.isArray(officers)) return;
 
-  setActiveOfficers(
-    officers.filter(officer => officer.is_active === true)
-  );
-}, [officers]);
+//   setActiveOfficers(
+//     officers.filter(officer => officer.is_active === true)
+//   );
+// }, [officers]);
 
 
   if (isLoading) return (
@@ -111,27 +116,28 @@ useEffect(() => {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
               
               {/* Stats Cards Cluster (Taking 2/3 of space on XL) */}
-              <div className="xl:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Link to="/Complaintlist/all">
-                  <SLAWarning title={t.totalComp} count={totalComplaints || "40"} severity="low" icon={BarChart3} />
-                </Link>
-                <Link to="/NotAssignComplainList/notAssign">
-                  <SLAWarning title={t.notAssigned} count={notAssigned || "12"} severity="high" icon={UserPlus} />
-                </Link>
-                <SLAWarning title={t.resolvedComp} count={stats?.resolved || "20"} severity="low" icon={CheckCircle2} />
-                <Link to="/Complaintlist/rejected">
-                  <SLAWarning title={t.rejectedComp} count={resolved || "5"} severity="medium" icon={XCircle} />
-                </Link>
-                <Link to="/Complaintlist/breach">
-                  <SLAWarning title={t.slaBreach} count={rejected || "8"} severity="high" icon={AlertCircle} />
-                </Link>
-                <Link to="/Complaintlist/approaching">
-                  <SLAWarning title={t.approaching} count={stats?.approaching || "15"} severity="medium" icon={History} />
-                </Link>
-                <Link to="/Complaintlist/active">
-                  <SLAWarning title={t.activeOfficers} count={stats?.activeOfficers || "10"} severity="low" icon={Users} />
-                </Link>
-              </div>
+              <div className="xl:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <Link to={`/Complaintlist/supervisor/${"resolved"}`}>
+    <SLAWarning title={t.totalComp} count={CompileList?.totalComplaints} severity="low" icon={BarChart3} />
+  </Link>
+
+  <Link to={`/Complaintlist/supervisor/${"unassigned"}`}>
+    <SLAWarning title={t?.notAssigned} count={CompileList?.notAssigned} severity="high" icon={UserPlus} />
+  </Link>
+
+<Link to={`/Complaintlist/supervisor/${"resolved"}`}>
+  <SLAWarning title={t.resolvedComp} count={CompileList?.rejected} severity="low" icon={CheckCircle2} />
+</Link>
+  <Link to={`/Complaintlist/supervisor/${"rejected"}`}>
+    <SLAWarning title={t.rejectedComp} count={CompileList?.resolved} severity="medium" icon={XCircle} />
+  </Link>
+
+
+    <SLAWarning title={t?.activeOfficers} count={CompileList?.activeOfficers} severity="low" icon={Users} />
+ 
+</div>
+
+
 
               {/* Efficiency Card (Taking 1/3 of space) */}
               <div className="bg-white border border-gray-100 rounded-[2rem] shadow-sm p-6 flex flex-col items-center">

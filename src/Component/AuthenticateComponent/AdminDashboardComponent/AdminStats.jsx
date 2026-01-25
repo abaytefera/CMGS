@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Users, FileText, Activity, CheckCircle, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const AdminStats = ({numUser,numCompile,active,Inactive}) => {
+const AdminStats = ({CompileList}) => {
   const { Language } = useSelector((state) => state.webState);
 
   const t = {
@@ -15,10 +15,10 @@ const AdminStats = ({numUser,numCompile,active,Inactive}) => {
   };
 
   const stats = [
-    { label: t.totalUsers, value: numUser, icon: Users, color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-100', url: "/userMg" },
-    { label: t.totalComp, value: numCompile, icon: FileText, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-100', url: "/Complaintlist/ALL" },
-    { label: t.activeCases, value: active, icon: Activity, color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-100', url: "/Complaintlist/active" },
-    { label: t.closedCases, value: Inactive, icon: CheckCircle, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-100', url: "/Complaintlist/Closed" },
+    { label: t.totalUsers, value: CompileList?.totalUsers, icon: Users, color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-100', url: "/userMg" },
+    { label: t.totalComp, value: CompileList?.totalComplaints, icon: FileText, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-100', url: "/Complaintlist/admin/list/" },
+    { label: t.activeCases, value: CompileList?.activeComplaints, icon: Activity, color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-100', url: "/Complaintlist/admin/list/active" },
+    { label: t.closedCases, value: CompileList?.closedComplaints, icon: CheckCircle, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-100', url: "/Complaintlist/admin/list/closed" },
   ];
 
   return (

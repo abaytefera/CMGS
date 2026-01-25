@@ -18,18 +18,21 @@ export const userApi = APi.injectEndpoints({
         method: 'POST',
         body: newUser,
       }),
-      invalidatesTags: ['Userw'],
-    }),
-
-    // 3. UPDATE: Update existing user
-    updateUser: builder.mutation({
-      query: ({ id, ...patch }) => ({
-        url: `/users/${id}`, // Uses the specific ID path from your docs
-        method: 'PATCH',
-        body: patch,
-      }),
       invalidatesTags: ['User'],
     }),
+
+ 
+updateUser: builder.mutation({
+  query: ({ id, ...patch }) => ({
+ 
+    url: `api/users/${id}`,
+    
+    method: 'PUT',
+    body: patch,
+  }),
+
+  invalidatesTags: (result, error, { id }) => [{ type: 'User', id }],
+}),
 
     // 4. DELETE: Remove user
     deleteUser: builder.mutation({

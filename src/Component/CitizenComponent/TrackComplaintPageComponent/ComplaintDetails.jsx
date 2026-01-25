@@ -91,7 +91,7 @@ const ComplaintDetails = ({ complaint }) => {
 
       <Link 
         to='/FeedbackPage'
-        className="mt-8 w-full py-5 rounded-[1.5rem] font-bold uppercase tracking-widest text-xs text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+        className="mt-8 w-full py-5 rounded-[1.5rem] font-bold uppercase tracking-widest text-xs text-white bg-green-600 hover:bg-green-700 shadow-lg shadow-blue-100 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
       >
         {t.feedback}
       </Link>

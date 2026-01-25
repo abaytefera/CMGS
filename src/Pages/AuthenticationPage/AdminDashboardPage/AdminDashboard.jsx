@@ -14,7 +14,7 @@ import AdminStats from '../../../Component/AuthenticateComponent/AdminDashboardC
 import SystemSummary from '../../../Component/AuthenticateComponent/AdminDashboardComponent/SystemSummary';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 import { useGetCategoriesQuery } from '../../../Redux/categoryApi';
-
+import { useGetComplaintsDashboardQuery } from '../../../Redux/complaintApi';
 const AdminDashboard = () => {
   const { Language } = useSelector((state) => state.webState || {});
 
@@ -22,37 +22,21 @@ const AdminDashboard = () => {
   const { data: activities, isLoading: activityLoading } = useGetSystemActivityQuery();
   const {data:dep,isLoading:loadingdept}=useGetDepartmentsQuery();
    const {data:catagory,isLoading:isloadingCat,isError,error}=useGetCategoriesQuery()
-   const {data:users,isLoading:IsLoadingUser}=useGetUsersQuery()
-   const {data:compile,isLoading:isLoadingCompile}=useGetComplaintsQuery();
+   const  {data:CompileList,isLoading:isloadingcompile} =useGetComplaintsDashboardQuery ('admin');
 
-  const [numdept,setnumdept]=useState(0);
-  const [numCatagory,setCatagory]=useState(0);
-  const [numUser,setnumUser]=useState(0);
-  const [numCompile,setnumCompile]=useState(0);
-  const [active,setActive]=useState(0);
-  const [Inactive,setInactive]=useState(0);
+
+useEffect(()=>{
+console.log(CompileList);
+
+},[CompileList])
 
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
   
- useEffect(()=>{
 
- setnumdept(dep?.length || 0) ;
- setCatagory(catagory?.length)
- setnumUser(users?.length || 0)
- setnumCompile(compile?.length || 0);
- console.log(compile?.length)
- setActive(compile?.filter((us) => us.status !== "RESOLVED" && us.status !== "REJECTED").length || 0)
-
-setInactive(compile?.filter((us) => us.status === "RESOLVED" && us.status === "REJECTED").length || 0)
-
-if(isError){
-  console.log(error);
-}
- },[dep,stats,numCatagory,error,users])
- const isloading = statsLoading || activityLoading || loadingdept || IsLoadingUser || isLoadingCompile;
+ const isloading = statsLoading || activityLoading || loadingdept 
 
   const t = {
     title: Language === "AMH" ? "የአስተዳዳሪ ዳሽቦርድ" : "Admin Dashboard",
@@ -94,9 +78,9 @@ if(isError){
               </p>
             </div>
 
-            <AdminStats  numUser={numUser} numCompile={numCompile} active={active}
-Inactive={Inactive}/>
-            <SystemSummary  numdept={numdept} numCatagory={numCatagory} />
+            <AdminStats  CompileList={CompileList}
+/>
+            <SystemSummary   />
            
 
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm mt-10">

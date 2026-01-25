@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-// 1. Import toast and Toaster
-import toast, { Toaster } from 'react-hot-toast'; 
+// Toast
+import toast, { Toaster } from 'react-hot-toast';
 import { 
   useGetDepartmentsQuery, 
   useAddDepartmentMutation, 
-  useUpdateDepartmentMutation, 
-  useDeleteDepartmentMutation 
+  useUpdateDepartmentMutation
 } from '../../../Redux/departmentApi';
 
 import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
@@ -14,72 +13,66 @@ import DepartmentForm from '../../../Component/AuthenticateComponent/DepartmentM
 import DepartmentTable from '../../../Component/AuthenticateComponent/DepartmentManagementComponent/DepartmentTable';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 
-import { Loader2, ServerOff, Globe } from 'lucide-react';
+import { Loader2, ServerOff, Globe, Plus, X } from 'lucide-react';
 import { useGetUsersQuery } from '../../../Redux/userApi';
 
 const DepartmentPage = () => {
   const [editingDept, setEditingDept] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
+  // RTK Query Hooks
   const { data: departmentsData, isLoading, isError } = useGetDepartmentsQuery();
   const [addDepartment, { isLoading: isAdding }] = useAddDepartmentMutation();
   const [updateDepartment, { isLoading: isUpdating }] = useUpdateDepartmentMutation();
   const { data: user } = useGetUsersQuery();
 
-  const sampleDepartments = [
-    { _id: "dept-01", name: "Environmental Quality", code: "ENV-Q", supervisor: "Dr. Selamawit Kassa", status: "Active" },
-    { _id: "dept-02", name: "Water Resources", code: "WAT-R", supervisor: "Ato Yonas Biru", status: "Active" }
-  ];
-
-  const departments = (departmentsData && departmentsData.length > 0) ? departmentsData : sampleDepartments;
+  const departments = departmentsData || [];
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Save or update department
   const handleSave = async (formData) => {
-    // 2. Create a loading toast ID to update later
     const toastId = toast.loading(editingDept ? "Updating department..." : "Adding department...");
     try {
       if (editingDept) {
         await updateDepartment({ 
           id: editingDept._id || editingDept.id, 
-          name: formData.name,
-          is_active: formData.is_active
+          ...formData
         }).unwrap();
-        
         toast.success("Department updated successfully!", { id: toastId });
-        setEditingDept(null);
       } else {
         await addDepartment(formData).unwrap();
         toast.success("Department added successfully!", { id: toastId });
       }
+      setEditingDept(null);
+      setShowForm(false);
     } catch (err) {
-      console.error("Database Error:", err);
       toast.error(err?.data?.message || "Failed to save department", { id: toastId });
     }
   };
 
-  const ONStatus = async ({ id, is_active }) => {
+  // Toggle department active status
+  const handleToggleStatus = async ({ id, is_active }) => {
     try {
-      // 3. Simple quick toast for status toggle
       await updateDepartment({ id, is_active: !is_active }).unwrap();
       toast.success(`Department ${!is_active ? 'Activated' : 'Deactivated'}`);
     } catch (err) {
-      console.error("Status update failed");
       toast.error("Failed to update status");
     }
   };
 
+  // Edit button
   const handleEdit = (dept) => {
     setEditingDept(dept);
+    setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-700">
-      {/* 4. Place Toaster component anywhere in your JSX */}
-      <Toaster position="top-right" reverseOrder={false} />
-      
+      <Toaster position="top-right" />
       <Sidebar role="supervisor" />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -87,8 +80,8 @@ const DepartmentPage = () => {
 
         <main className="flex-1 pt-32 px-6 lg:px-10 pb-20">
           <div className="max-w-5xl mx-auto">
-            
-            {/* Header Section */}
+
+            {/* HEADER */}
             <div className="mb-12 flex flex-col items-center text-center">
               <h1 className="text-4xl md:text-5xl font-black text-slate-900 uppercase italic tracking-tighter">
                 Department <span className="text-emerald-600">Registry</span>
@@ -106,46 +99,69 @@ const DepartmentPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col gap-16">
-              <section className="max-w-2xl mx-auto w-full">
-                <DepartmentForm 
-                  editingDept={editingDept} 
-                  onSave={handleSave} 
-                  onCancel={() => {
-                    setEditingDept(null);
-                    toast("Editing cancelled", { icon: 'ℹ️' });
-                  }} 
-                  user={user}
-
-                  isSaving={isAdding || isUpdating} 
-                />
-              </section>
-
-              <section className="w-full">
-                <div className="flex items-center gap-4 mb-6">
-                   <div className="h-[1px] flex-1 bg-slate-200"></div>
-                   <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Registered Units</h2>
-                   <div className="h-[1px] flex-1 bg-slate-200"></div>
-                </div>
-
-                {isLoading ? (
-                  <div className="flex flex-col items-center py-20 gap-4">
-                    <Loader2 className="animate-spin text-emerald-600" size={40} />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading Records...</span>
-                  </div>
-                ) : (
-                  <DepartmentTable 
-                    data={departments} 
-                    onEdit={handleEdit} 
-                    onToggleStatus={ONStatus}
-                  />
-                )}
-              </section>
+            {/* REGISTER BUTTON */}
+            <div className="flex justify-end mb-6">
+              <button
+                onClick={() => {
+                  setEditingDept(null);
+                  setShowForm(true);
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-black rounded-full hover:bg-emerald-700 transition"
+              >
+                <Plus size={16} />
+                Register Department
+              </button>
             </div>
+
+            {/* TABLE */}
+            {isLoading ? (
+              <div className="flex flex-col items-center py-20 gap-4">
+                <Loader2 className="animate-spin text-emerald-600" size={40} />
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Loading Records...
+                </span>
+              </div>
+            ) : (
+              <DepartmentTable 
+                data={departments} 
+                onEdit={handleEdit} 
+                onToggleStatus={handleToggleStatus}
+              />
+            )}
           </div>
         </main>
         <AuthFooter />
       </div>
+
+      {/* ================= MODAL FORM ================= */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl mx-4 bg-white rounded-[3rem] shadow-2xl p-6">
+            {/* CLOSE BUTTON */}
+            <button
+              onClick={() => {
+                setShowForm(false);
+                setEditingDept(null);
+              }}
+              className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 hover:bg-slate-200"
+            >
+              <X size={18} />
+            </button>
+
+            <DepartmentForm
+              editingDept={editingDept}
+              onSave={handleSave}
+              onCancel={() => {
+                setShowForm(false);
+                setEditingDept(null);
+                toast("Editing cancelled", { icon: 'ℹ️' });
+              }}
+              user={user}
+              isSaving={isAdding || isUpdating}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

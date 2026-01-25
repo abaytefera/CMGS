@@ -21,6 +21,7 @@ const ManagementDashboard = () => {
   const slaCompliance = stats?.sla || "0%";
   const trendValue = stats?.trend || 0;
   const resolutionData = charts?.resolution || { resolved: 0, pending: 0, overdue: 0 };
+  
 
   if (statsLoading || chartsLoading) {
     return (

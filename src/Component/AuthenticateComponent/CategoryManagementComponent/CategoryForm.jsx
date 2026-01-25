@@ -29,13 +29,11 @@ const CategoryForm = ({ editingCat, departments, onSave, onCancel }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Basic validation check before calling parent onSave
     if (!formData.name || !formData.departmentId || !formData.resolutionTimeDays) {
       return; 
     }
 
     try {
-      // Ensure numeric values are sent as Numbers to the API
       const payload = {
         ...formData,
         departmentId: Number(formData.departmentId),
@@ -44,13 +42,11 @@ const CategoryForm = ({ editingCat, departments, onSave, onCancel }) => {
       };
 
       await onSave(payload);
-      
-      // Reset form only on successful creation
+
       if (!editingCat) {
         setFormData(initialState);
       }
     } catch (err) {
-      // Errors are handled by the parent's toast logic
       console.error("Form submission error:", err);
     }
   };
@@ -63,14 +59,13 @@ const CategoryForm = ({ editingCat, departments, onSave, onCancel }) => {
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-xl font-black text-slate-900 uppercase italic flex items-center gap-2 tracking-tight">
           <Layers className="text-emerald-500" size={24} />
-          {editingCat ? 'Modify Category' : 'New Classification'}
+          {editingCat ?  'Edit Category' : 'Category Register'}
         </h2>
-        {editingCat && (
-          <X 
-            className="cursor-pointer text-slate-400 hover:text-rose-500 transition-colors" 
-            onClick={onCancel} 
-          />
-        )}
+
+        <X 
+          className="cursor-pointer text-slate-400 hover:text-rose-500 transition-colors" 
+          onClick={onCancel} 
+        />
       </div>
 
       <div className="space-y-5">
@@ -86,9 +81,9 @@ const CategoryForm = ({ editingCat, departments, onSave, onCancel }) => {
           />
         </div>
 
-        {/* DEPARTMENT ASSIGNMENT */}
+        {/* Department */}
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Department Owner</label>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Department </label>
           <div className="relative">
             <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <select 
@@ -104,51 +99,61 @@ const CategoryForm = ({ editingCat, departments, onSave, onCancel }) => {
           </div>
         </div>
 
+        {/* Resolution & Escalation */}
         <div className="grid grid-cols-2 gap-4">
-            {/* Resolution Time Days */}
-            <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Resolution (Days)</label>
-                <div className="relative">
-                    <Timer className="absolute left-5 top-1/2 -translate-y-1/2 text-emerald-500" size={18} />
-                    <input 
-                        type="number"
-                        placeholder="e.g. 5"
-                        value={formData.resolutionTimeDays}
-                        onChange={(e) => setFormData({...formData, resolutionTimeDays: e.target.value})}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-sm text-slate-900 outline-none transition-all"
-                    />
-                </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Resolution (Days)</label>
+            <div className="relative">
+              <Timer className="absolute left-5 top-1/2 -translate-y-1/2 text-emerald-500" size={18} />
+              <input 
+                type="number"
+                placeholder="e.g. 5"
+                value={formData.resolutionTimeDays}
+                onChange={(e) => setFormData({...formData, resolutionTimeDays: e.target.value})}
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-sm text-slate-900 outline-none transition-all"
+              />
             </div>
+          </div>
 
-            {/* Escalation Time Days */}
-            <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Escalation (Days)</label>
-                <div className="relative">
-                    <AlertCircle className="absolute left-5 top-1/2 -translate-y-1/2 text-amber-500" size={18} />
-                    <input 
-                        type="number"
-                        placeholder="e.g. 2"
-                        value={formData.escalationTimeDays}
-                        onChange={(e) => setFormData({...formData, escalationTimeDays: e.target.value})}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-sm text-slate-900 outline-none transition-all"
-                    />
-                </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Escalation (Days)</label>
+            <div className="relative">
+              <AlertCircle className="absolute left-5 top-1/2 -translate-y-1/2 text-amber-500" size={18} />
+              <input 
+                type="number"
+                placeholder="e.g. 2"
+                value={formData.escalationTimeDays}
+                onChange={(e) => setFormData({...formData, escalationTimeDays: e.target.value})}
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-sm text-slate-900 outline-none transition-all"
+              />
             </div>
+          </div>
         </div>
 
-        <button 
-          type="submit" 
-          className={`w-full font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-lg ${
-            editingCat 
-              ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
-              : 'bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-emerald-200 hover:shadow-emerald-400'
-          }`}
-        >
-          <Save size={20} />
-          <span className="uppercase tracking-[0.2em] text-xs">
-            {editingCat ? 'Commit Changes' : 'Confirm Registry'}
-          </span>
-        </button>
+        {/* Buttons */}
+        <div className="flex justify-end gap-4 pt-6">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-6 py-3 rounded-2xl font-black bg-slate-200 hover:bg-slate-300 transition"
+          >
+            Cancel
+          </button>
+
+          <button 
+            type="submit"
+            className={`px-6 py-3 rounded-2xl font-black flex items-center gap-2 text-white transition-all ${
+              editingCat 
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500' 
+                : 'bg-gradient-to-r from-emerald-600 to-teal-700'
+            }`}
+          >
+         
+            <span className="uppercase tracking-[0.2em] text-xs">
+              {editingCat ? 'Save' : 'Register'}
+            </span>
+          </button>
+        </div>
       </div>
     </form>
   );

@@ -22,13 +22,14 @@ import StatCard from '../../../Component/AuthenticateComponent/OfficerComponet/D
 import ComplaintList from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/ComplaintList';
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
-
+import { useGetComplaintsDashboardQuery } from '../../../Redux/complaintApi';
 const OfficerPage1 = () => {
   const { Language } = useSelector((state) => state.webState);
   
   // Data Fetching
   const { data: stats, isLoading: isLoadingStats } = useGetOfficerStatsQuery();
-  const { data: compile, isLoading: isLoadingCompile, isError } = useGetComplaintsQuery();
+const {data:CompileList,isLoading:isLoadingCompiletask}=useGetComplaintsDashboardQuery('officer');
+
 
   // Translations
   const t = {
@@ -43,28 +44,19 @@ const OfficerPage1 = () => {
     statRejected: Language === "AMH" ? "ውድቅ የተደረጉ" : "Rejected",
   };
 
+
   // Internal State for Filtered Data
   const [assigned, setAssigned] = useState([]);
   const [inProgress, setInProgress] = useState([]);
   const [resolved, setResolved] = useState([]);
   const [rejected, setRejected] = useState([]);
 
-  // Filter logic whenever 'compile' data changes
-  useEffect(() => {
-    if (compile && Array.isArray(compile)) {
-      setAssigned(compile.filter(item => item.status === 'ASSIGNED'));
-      setInProgress(compile.filter(item => item.status === 'IN_PROGRESS'));
-      setResolved(compile.filter(item => item.status === 'RESOLVED'));
-      setRejected(compile.filter(item => item.status === 'REJECTED'));
-    }
-  }, [compile]);
 
-  // Error handling for data fetch
-  useEffect(() => {
-    if (isError) {
-      toast.error("Failed to fetch recent records. Please refresh.");
-    }
-  }, [isError]);
+  useEffect(()=>{
+
+console.log(CompileList);
+
+  },[CompileList])
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -113,11 +105,11 @@ const OfficerPage1 = () => {
 
             {/* Stats Grid - FIXED: Passing .length to avoid Object error */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10">
-              <StatCard title={t.statAssigned} type="Assigned" count={isLoadingCompile ? "…" : assigned.length} icon={ClipboardList} />
-              <StatCard title={t.statProgress} type="Progress" count={isLoadingCompile ? "…" : inProgress.length} icon={Clock} />
-              <StatCard title={t.statOverdue} type="Overdue" count={isLoadingCompile ? "…" : 0} icon={AlertCircle} />
-              <StatCard title={t.statResolved} type="Resolved" count={isLoadingCompile ? "…" : resolved.length} icon={CheckCircle} />
-              <StatCard title={t.statRejected} type="Rejected" count={isLoadingCompile ? "…" : rejected.length} icon={XCircle} />
+              <StatCard title={t.statAssigned} type="assigned" count={isLoadingCompiletask ? "…" : CompileList.assigned} icon={ClipboardList} />
+              <StatCard title={t.statProgress} type="in_progress" count={isLoadingCompiletask ? "…" : CompileList.inProgress} icon={Clock} />
+              <StatCard title={t.statOverdue} type="overdue" count={isLoadingCompiletask ? "…" : CompileList.overdue} icon={AlertCircle} />
+              <StatCard title={t.statResolved} type="resolved" count={isLoadingCompiletask ? "…" : CompileList.resolved} icon={CheckCircle} />
+              <StatCard title={t.statRejected} type="rejected" count={isLoadingCompiletask ? "…" : CompileList.rejected} icon={XCircle} />
             </div>
 
             {/* Table Section Header */}
@@ -131,7 +123,7 @@ const OfficerPage1 = () => {
                 </h3>
               </div>
               
-              {isLoadingCompile && (
+              {isLoadingCompiletask && (
                 <div className="flex items-center gap-2 text-gray-400 text-xs font-bold italic">
                   <Loader2 size={14} className="animate-spin" /> Updating Records...
                 </div>
@@ -141,7 +133,7 @@ const OfficerPage1 = () => {
             {/* Complaints List Table */}
             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-12">
               {/* Pass the full 'compile' array to the list for rendering rows */}
-              <ComplaintList Data={compile || []} />
+              <ComplaintList Data={[]} />
             </div>
 
           </div>

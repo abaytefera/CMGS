@@ -4,10 +4,10 @@ const complaintApi = APi.injectEndpoints({
   endpoints: (builder) => ({
     // GET /api/staff/details/:id
     getComplaintById: builder.query({
-      query: (id) => `/staff/details/${id}`,
+      query: (id) => `api/staff/details/${id}`,
       providesTags: (result, error, id) => [{ type: 'Complaints', id }],
       // Targets the 'data' key which contains the specific complaint object
-      transformResponse: (res) => res?.data || null,
+      transformResponse: (res) => res || null,
     }),
 
     // PATCH /api/staff/update-status/:id
@@ -36,6 +36,7 @@ const complaintApi = APi.injectEndpoints({
       // Unwraps the nested results array common in your backend responses
       transformResponse: (res) => res ,
     }),
+    
 
     // GET /api/staff/unassigned
     getUnassignedComplaints: builder.query({
@@ -47,12 +48,49 @@ const complaintApi = APi.injectEndpoints({
       providesTags: ['Complaints'],
       transformResponse: (res) => res || [],
     }),
+        // GET /api/staff/list
+    getComplaintsDashboard: builder.query({
+      query: (params) => ({
+        url: `/api/dashboard/${params}`, 
+        method: 'GET',
+        params: params, 
+      }),
+      providesTags: ['Complaints'],
+      // Unwraps the nested results array common in your backend responses
+      transformResponse: (res) => res ,
+    }),
+    getComplaintsList: builder.query({
+      query: (params) => ({
+        url: `api/staff/list${params}`, 
+        method: 'GET',
+        params: params, 
+      }),
+      providesTags: ['Complaints'],
+      // Unwraps the nested results array common in your backend responses
+      transformResponse: (res) => res ,
+    }),
+   getComplaintsbyCatagory: builder.query({
+  query: ({ role, type }) => ({
+    // Fixed the slashes and formatting
+    url: `/api/dashboard/${role}/list/`, 
+    method: 'GET',
+    // Using the 'params' object is the cleanest way to handle ?type=value
+    params: { type: type }, 
   }),
+  providesTags: ['Complaints'],
+  transformResponse: (res) => res,
+}),
+  }),
+
 });
 
 export const { 
   useGetComplaintByIdQuery, 
   useGetComplaintsQuery, 
   useGetUnassignedComplaintsQuery, 
-  useUpdateComplaintStatusMutation 
+  useUpdateComplaintStatusMutation ,
+ useGetComplaintsDashboardQuery,
+ useGetComplaintsListQuery,
+useGetComplaintsbyCatagoryQuery
+ 
 } = complaintApi;

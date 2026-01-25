@@ -18,7 +18,13 @@ const WorkProfile = () => {
   const [tempUser, setTempUser] = useState({ name: "", phone: "" });
 
   
+ useEffect(()=>{
 
+    if(user){
+
+      navigate('/Dashboard');
+    }
+  },[user])
 useEffect(()=>{
 
 
@@ -50,11 +56,13 @@ console.log(user);
     }
   };
 
+
   if (isLoading) return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <Loader2 className="animate-spin text-emerald-600" size={40} />
     </div>
   );
+
 
   return (
     <div className="flex min-h-screen bg-white text-slate-800 font-sans">
