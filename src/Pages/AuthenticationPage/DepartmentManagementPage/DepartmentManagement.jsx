@@ -25,6 +25,11 @@ const DepartmentPage = () => {
   const [addDepartment, { isLoading: isAdding }] = useAddDepartmentMutation();
   const [updateDepartment, { isLoading: isUpdating }] = useUpdateDepartmentMutation();
   const { data: user } = useGetUsersQuery();
+ useEffect(()=>{
+
+  console.log(user);
+
+ },[user])
 
   const departments = departmentsData || [];
 
