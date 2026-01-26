@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from "react-redux";
-import { Search, Download, ListFilter, CheckCircle, XCircle, Clock, AlertTriangle, PlayCircle } from 'lucide-react';
+import { Search, ListFilter, CheckCircle, XCircle, AlertTriangle, PlayCircle, Loader2 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
 import { useGetComplaintsbyCatagoryQuery } from '../../Redux/complaintApi';
@@ -15,73 +15,83 @@ const ComplaintListPage = () => {
   
   // Role Helpers
   const isAdmin = user?.role === "ADMIN";
-  const isSupervisor = user?.role === "SUPERVISOR";
   const isOfficer = user?.role === "OFFICER";
 
   const { role, type } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
-  console.log( role)
-    console.log(type)
-  
-  
-  // Filter state
   const [filterType, setFilterType] = useState("TOTAL");
 
+  // RTK Query
   const { data: TotalCompile, isLoading, isFetching } = useGetComplaintsbyCatagoryQuery({ 
     role: role, 
     type: type 
-  });
-  useEffect(()=>{
+  }, { skip: !role || !type }); // Prevent calling API if params are missing
 
-console.log(TotalCompile);
-  },[TotalCompile])
-
+  // Memoized Filtering Logic
   const filteredComplaints = useMemo(() => {
-    if (!TotalCompile) return [];
+    // 1. Critical Fix: Ensure TotalCompile is an array before spreading
+    if (!TotalCompile || !Array.isArray(TotalCompile)) return [];
     
-    let list = [...TotalCompile];
+    // 2. Safety: Remove any null/undefined entries that might have come from the API
+    let list = TotalCompile.filter(item => item !== null && typeof item === 'object');
 
     // --- OFFICER SPECIFIC FILTER LOGIC ---
     if (isOfficer) {
       switch (filterType) {
         case "IN_PROGRESS":
-          list = list.filter(item => item.status?.toUpperCase() === "IN_PROGRESS");
+          list = list.filter(item => item?.status?.toUpperCase() === "IN_PROGRESS");
           break;
         case "RESOLVED":
-          list = list.filter(item => item.status?.toUpperCase() === "RESOLVED");
+          list = list.filter(item => item?.status?.toUpperCase() === "RESOLVED");
           break;
         case "REJECTED":
-          list = list.filter(item => item.status?.toUpperCase() === "REJECTED");
+          list = list.filter(item => item?.status?.toUpperCase() === "REJECTED");
           break;
         case "OVERDUE":
-          // Logic: Status isn't closed/resolved AND it's older than 3 days (example logic)
           const threeDaysAgo = new Date();
           threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-          list = list.filter(item => 
-            !['RESOLVED', 'REJECTED', 'CLOSED'].includes(item.status?.toUpperCase()) &&
-            new Date(item.createdAt) < threeDaysAgo
-          );
+          list = list.filter(item => {
+            const status = item?.status?.toUpperCase() || "";
+            const createdDate = item?.createdAt ? new Date(item.createdAt) : null;
+            return (
+              !['RESOLVED', 'REJECTED', 'CLOSED'].includes(status) &&
+              createdDate && createdDate < threeDaysAgo
+            );
+          });
           break;
-        default: // TOTAL
+        default:
           break;
       }
     } 
-    // Admin & Supervisor logic remains as previously discussed
     else if (isAdmin && filterType === "ACTIVE") {
-      list = list.filter(item => !['RESOLVED', 'REJECTED', 'CLOSED'].includes(item.status?.toUpperCase()));
+      list = list.filter(item => !['RESOLVED', 'REJECTED', 'CLOSED'].includes(item?.status?.toUpperCase()));
     }
 
-    // Apply Search
+    // Apply Search with Optional Chaining
     if (searchTerm) {
       const lowerSearch = searchTerm.toLowerCase();
       list = list.filter(item => 
-        item.ref_number?.toLowerCase().includes(lowerSearch) || 
-        item.citizen_name?.toLowerCase().includes(lowerSearch)
+        item?.ref_number?.toLowerCase().includes(lowerSearch) || 
+        item?.citizen_name?.toLowerCase().includes(lowerSearch)
       );
     }
 
     return list;
   }, [TotalCompile, filterType, searchTerm, isOfficer, isAdmin]);
+
+  // Loading State UI
+  if (isLoading || !user) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-emerald-600" />
+          <p className="font-bold text-slate-500 animate-pulse uppercase tracking-widest text-xs">
+            {Language === "AMH" ? "በመጫን ላይ..." : "Loading Records..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-white text-slate-800">
@@ -99,7 +109,6 @@ console.log(TotalCompile);
                   {type} {Language === "AMH" ? "መዝገቦች" : "Records"}
                 </h1>
                 
-                {/* DYNAMIC FILTER BUTTONS FOR OFFICER */}
                 <div className="flex flex-wrap gap-2 mt-6">
                   <button 
                     onClick={() => setFilterType("TOTAL")}
@@ -164,11 +173,11 @@ console.log(TotalCompile);
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-[2.5rem] shadow-sm overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-[2.5rem] shadow-sm overflow-hidden mb-10">
               <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
                  <ListFilter className="text-emerald-600" size={18} />
                  <span className="text-xs font-black text-slate-800 uppercase tracking-widest italic">
-                    Showing: {filterType.replace('_', ' ')}
+                    Showing: {filterType.replace('_', ' ')} ({filteredComplaints.length})
                  </span>
               </div>
 
@@ -183,9 +192,17 @@ console.log(TotalCompile);
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {filteredComplaints.map((item) => (
-                      <ComplaintRow key={item.id || item._id} complaint={item} />
-                    ))}
+                    {filteredComplaints.length > 0 ? (
+                      filteredComplaints.map((item) => (
+                        <ComplaintRow key={item?.id || item?._id} complaint={item} />
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="px-8 py-20 text-center text-slate-400 uppercase font-black text-[10px] tracking-widest">
+                          No Records Found
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
