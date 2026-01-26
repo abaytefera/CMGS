@@ -50,7 +50,9 @@ function App() {
                      <Route path='/passwordChange' element={<ChangePasswordPage/>}></Route>
                            <Route path='/Profile' element={<WorkProfile/>}></Route>
                        <Route path='/Report' element={<ReportsPage/>}></Route>
+          
                        <Route path='/Dashboard' element={<Dashboard/>}></Route>
+                     
       
          
 </Routes>

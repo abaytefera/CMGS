@@ -22,7 +22,7 @@ const Dashboard = () => {
     );
   }
 
-  const role =user.role;
+  const role =user?.role;
 
   useEffect(()=>{
   

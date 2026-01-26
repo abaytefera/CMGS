@@ -142,11 +142,7 @@ const CategoryForm = ({ editingCat, departments, onSave, onCancel }) => {
 
           <button 
             type="submit"
-            className={`px-6 py-3 rounded-2xl font-black flex items-center gap-2 text-white transition-all ${
-              editingCat 
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500' 
-                : 'bg-gradient-to-r from-emerald-600 to-teal-700'
-            }`}
+            className={`px-6 py-3 rounded-2xl bg-green-500 font-black flex items-center gap-2 text-white transition-all `}
           >
          
             <span className="uppercase tracking-[0.2em] text-xs">

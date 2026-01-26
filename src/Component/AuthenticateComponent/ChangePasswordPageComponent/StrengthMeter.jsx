@@ -1,7 +1,6 @@
 import React from 'react';
 
 const StrengthMeter = ({ strength }) => {
-  // strength is a value 0-3
   const colors = ['bg-rose-500', 'bg-amber-500', 'bg-blue-500', 'bg-emerald-500'];
   const labels = ['Weak', 'Fair', 'Good', 'Strong'];
 
@@ -13,12 +12,13 @@ const StrengthMeter = ({ strength }) => {
           {labels[strength]}
         </span>
       </div>
+
       <div className="flex gap-2 h-1.5">
         {[0, 1, 2, 3].map((step) => (
           <div
             key={step}
             className={`flex-1 rounded-full transition-all duration-500 ${
-              step <= strength ? colors[strength] : 'bg-white/10'
+              step < strength ? colors[strength] : 'bg-slate-200'
             }`}
           />
         ))}

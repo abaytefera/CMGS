@@ -77,25 +77,7 @@ console.log(CompileList);
 
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
-                  </span>
-                  <span className="text-xs font-semibold text-emerald-600 uppercase tracking-widest">
-                    {t.live}
-                  </span>
-                </div>
-
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                  {t.pageTitle}
-                </h1>
-
-                <p className="text-gray-500 text-sm mt-1 font-medium">
-                  {t.systemName}
-                </p>
-              </div>
+              
 
               <div className="px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg text-sm font-bold flex items-center gap-2 shadow-sm">
                 <TrendingUp size={16} />
@@ -103,7 +85,8 @@ console.log(CompileList);
               </div>
             </div>
 
-            {/* Stats Grid - FIXED: Passing .length to avoid Object error */}
+
+   {/* Stats Grid - FIXED: Passing .length to avoid Object error */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10">
               <StatCard title={t.statAssigned} type="assigned" count={isLoadingCompiletask ? "…" : CompileList.assigned} icon={ClipboardList} />
               <StatCard title={t.statProgress} type="in_progress" count={isLoadingCompiletask ? "…" : CompileList.inProgress} icon={Clock} />

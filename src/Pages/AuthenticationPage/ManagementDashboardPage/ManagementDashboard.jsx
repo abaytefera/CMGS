@@ -8,15 +8,20 @@ import TrendChart from '../../../Component/AuthenticateComponent/ManagementDashb
 import ResolutionPie from '../../../Component/AuthenticateComponent/ManagementDashboardComponent/ResolutionPie';
 import StatCard from '../../../Component/AuthenticateComponent/ManagementDashboardComponent/StatCard';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
+import { useGetComplaintsDashboardQuery } from '../../../Redux/complaintApi';
 
 const ManagementDashboard = () => {
   const { data: stats, isLoading: statsLoading } = useGetManagementStatsQuery();
   const { data: charts, isLoading: chartsLoading } = useGetDashboardChartsQuery();
-
+   const  {data:CompileList,isLoading:isloadingcompile} =useGetComplaintsDashboardQuery ('manager');
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(()=>{
+console.log(CompileList)
+
+  },[CompileList])
   const totalComplaints = stats?.total || "0";
   const slaCompliance = stats?.sla || "0%";
   const trendValue = stats?.trend || 0;

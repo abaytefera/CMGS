@@ -7,17 +7,17 @@ export const profileApi = APi.injectEndpoints({
       // Confirmed /auth/profile as the correct endpoint
       query: () => '/api/users/profile',
       providesTags: ['UserProfile'],
-      // Standardizing to target the 'data' object in the response
+ 
       transformResponse: (res) => res
     }),
-    // Update profile details
+
     updateProfile: builder.mutation({
       query: (body) => ({
         url: '/api/users/profile',
-        method: 'PATCH',
+        method: 'PUT',
         body,
       }),
-      // Invalidation ensures all components showing the user's name/photo refresh
+      
       invalidatesTags: ['UserProfile', 'User'],
     }),
   }),

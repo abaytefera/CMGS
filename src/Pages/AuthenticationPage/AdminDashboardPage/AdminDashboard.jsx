@@ -80,9 +80,8 @@ console.log(CompileList);
 
             <AdminStats  CompileList={CompileList}
 />
-            <SystemSummary   />
-           
-
+            <SystemSummary catagory={catagory?.length} dep={dep?.length}  />
+          
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm mt-10">
               <div className="p-6 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center">
                 <div className="flex items-center gap-2">

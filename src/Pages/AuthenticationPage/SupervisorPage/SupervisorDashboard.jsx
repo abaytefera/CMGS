@@ -68,17 +68,8 @@ console.log(CompileList);
             
             {/* --- HEADER SECTION --- */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em]">{t.live}</span>
-                </div>
-                <h1 className="text-3xl font-black text-gray-900 tracking-tight">{t.title}</h1>
-              </div>
-              
-              <button className="px-6 py-2.5 bg-gray-900 text-white rounded-xl text-xs font-bold shadow-lg hover:bg-emerald-600 transition-all">
-                {t.departments}
-              </button>
+            
+          
             </div>
 
             {/* --- TOP GRID: STATS & EFFICIENCY --- */}

@@ -104,7 +104,7 @@ console.log(TotalCompile);
                   <button 
                     onClick={() => setFilterType("TOTAL")}
                     className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                      filterType === "TOTAL" ? "bg-slate-900 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
+                      filterType === "TOTAL" ? "bg-green-900 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
                     }`}
                   >
                     Total

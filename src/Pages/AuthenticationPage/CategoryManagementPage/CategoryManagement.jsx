@@ -95,14 +95,11 @@ const CategoryManagement = () => {
 
             {/* HEADER */}
             <header className="text-center">
-              <h1 className="text-4xl font-black uppercase">
+              <h1 className="text-2xl font-black uppercase">
                 Category <span className="text-emerald-600">Management</span>
               </h1>
 
-              <p className="mt-3 text-[10px] uppercase font-black tracking-widest flex justify-center gap-2">
-                <Database size={12} className={isError ? 'text-rose-500' : 'text-emerald-500'} />
-                {isError ? 'System Offline' : 'Live Registry'}
-              </p>
+              
             </header>
 
             {/* REGISTER BUTTON */}

@@ -50,6 +50,15 @@ updateUser: builder.mutation({
       transformResponse: (res) => res  
     }),
 
+ updateUserPassword: builder.mutation({
+      query: (body) => ({
+        url: '/api/users/change-password', 
+        method: 'PUT',
+        body,
+      }),
+    }),
+
+
   
   }),
 });
@@ -59,5 +68,7 @@ export const {
   useCreateUserMutation, 
   useUpdateUserMutation, 
   useDeleteUserMutation ,
-  useGetProfileQuery
+  useGetProfileQuery,
+useUpdateUserPasswordMutation
+  
 } = userApi;

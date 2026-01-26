@@ -72,7 +72,7 @@ const ReportsPage = () => {
             {/* Header Section */}
             <header className="mb-12 flex items-center justify-between">
               <div>
-                <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+                <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase  leading-none">
                   Data <span className="text-blue-600 italic">Vault</span>
                 </h1>
                 <div className="flex items-center gap-2 mt-4">

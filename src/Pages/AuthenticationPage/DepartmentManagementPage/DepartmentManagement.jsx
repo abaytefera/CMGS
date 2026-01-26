@@ -136,17 +136,9 @@ const DepartmentPage = () => {
       {/* ================= MODAL FORM ================= */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl mx-4 bg-white rounded-[3rem] shadow-2xl p-6">
+          <div className="relative w-full max-w-2xl mx-4  rounded-[3rem]  p-6">
             {/* CLOSE BUTTON */}
-            <button
-              onClick={() => {
-                setShowForm(false);
-                setEditingDept(null);
-              }}
-              className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 hover:bg-slate-200"
-            >
-              <X size={18} />
-            </button>
+           
 
             <DepartmentForm
               editingDept={editingDept}

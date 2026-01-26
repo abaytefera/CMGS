@@ -18,17 +18,21 @@ export const supervisorApi = APi.injectEndpoints({
       transformResponse: (response) => response?.data || [],
     }),
 
-    // Mutation to assign the case
-    assignComplaint: builder.mutation({
-      query: (assignmentData) => ({
-        // Correct endpoint for staff assignment
-        url: `/staff/assign/${assignmentData.id}`,
-        method: 'PATCH',
-        body: assignmentData,
-      }),
-      // Refreshes the dashboard stats and complaint lists automatically
-      invalidatesTags: ['Complaints', 'Dashboard'], 
-    }),
+ // Redux/supervisorApi.js
+assignComplaint: builder.mutation({
+  query: (assignmentData) => ({
+    // Use the absolute path or relative to your baseQuery
+    url: '/workflow/assign', 
+    method: 'POST', // Ensure your backend is app.post() not app.put()
+    body: {
+      complaintId: assignmentData.id,
+      officerId: assignmentData.officerId,
+      priority: assignmentData.priority,
+      timeline: assignmentData.timeline
+    },
+  }),
+  invalidatesTags: ['Complaints', 'Dashboard'], 
+}),
   }),
   overrideExisting: false,
 });
@@ -36,6 +40,7 @@ export const supervisorApi = APi.injectEndpoints({
 // Export the injected hook (Names kept exactly as requested)
 export const { 
   useGetOfficersQuery, 
-  useAssignComplaintMutation, 
-  useGetSupervisorStatsQuery 
+useAssignComplaintMutation,
+   
+  useGetSupervisorStatsQuery, 
 } = supervisorApi;

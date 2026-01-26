@@ -20,7 +20,7 @@ const ComplaintRowNotAssigned = ({ complaint }) => {
   // Navigation handler
   const handleRowClick = () => {
     // Only navigate if we have an ID
-    const targetId = complaint?._id || "sample";
+    const targetId = complaint?.id || "sample";
     navigate(`/DetailList/${targetId}`);
   };
 

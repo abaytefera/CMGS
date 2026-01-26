@@ -17,6 +17,7 @@ const   navigate=useNavigate()
       default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     }
   };
+  console.log("onthis found");
 
   return (
     <tr onClick={() => navigate(`/DetailList/${complaint.id}`)} className="group hover:bg-white/[0.02] transition-colors">

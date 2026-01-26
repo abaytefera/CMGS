@@ -89,12 +89,10 @@ const UserManagementPage = () => {
           <div className="max-w-5xl mx-auto">
             {/* Header */}
             <header className="mb-10">
-              <h1 className="text-4xl font-black uppercase normal">
-                Staff <span className="text-emerald-600">Management</span>
-              </h1>
+              
               <p className="text-[10px] font-black uppercase mt-3 flex items-center gap-2">
                 <Database size={12} className={isError ? "text-rose-500" : "text-emerald-500"} />
-                {isError ? "Database Sync Error" : "Cloud Database Synchronized"}
+                {isError ? "Database Sync Error" : "All user"}
               </p>
             </header>
 
