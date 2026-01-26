@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Save, X, User, ChevronDown } from 'lucide-react';
+import { X, ChevronDown } from 'lucide-react';
 
-const DepartmentForm = ({ editingDept, onSave, onCancel, user, isSaving }) => {
+const DepartmentForm = ({
+  editingDept,
+  onSave,
+  onCancel,
+  user = [],
+  isSaving
+}) => {
   const [formData, setFormData] = useState({
     name: '',
     supervisor: '',
     status: true
   });
 
+  // Populate form when editing
   useEffect(() => {
     if (editingDept) {
       setFormData({
-        ...editingDept,
         name: editingDept.name || '',
-        supervisor: editingDept.supervisor || ''
+        supervisor: editingDept.supervisor
+          ? String(editingDept.supervisor)
+          : '',
+        status: editingDept.status ?? true
       });
     } else {
       setFormData({
@@ -48,7 +57,6 @@ const DepartmentForm = ({ editingDept, onSave, onCancel, user, isSaving }) => {
           {editingDept ? 'Update Department' : 'New Department'}
         </h2>
 
-        {/* CLOSE BUTTON */}
         <button
           type="button"
           onClick={onCancel}
@@ -76,7 +84,7 @@ const DepartmentForm = ({ editingDept, onSave, onCancel, user, isSaving }) => {
           />
         </div>
 
-        {/* SUPERVISOR */}
+        {/* SUPERVISOR SELECT */}
         <div className="space-y-2 relative">
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">
             Assigned Supervisor
@@ -95,13 +103,19 @@ const DepartmentForm = ({ editingDept, onSave, onCancel, user, isSaving }) => {
               required
             >
               <option value="">Select a Supervisor</option>
-              {user
-                ?.filter((u) => u.role === 'SUPERVISOR')
-                .map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.full_name || u.username}
-                  </option>
-                ))}
+
+              {Array.isArray(user) &&
+                user
+                  .filter(
+                    (u) =>
+                      u.role &&
+                      u.role.toUpperCase() === 'SUPERVISOR'
+                  )
+                  .map((u) => (
+                    <option key={u.id} value={String(u.id)}>
+                      {u.full_name || u.username}
+                    </option>
+                  ))}
             </select>
 
             <ChevronDown
@@ -116,15 +130,15 @@ const DepartmentForm = ({ editingDept, onSave, onCancel, user, isSaving }) => {
           type="submit"
           disabled={isSaving}
           className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-white transition-all transform active:scale-[0.98]
-            ${
-              editingDept
-                ? 'bg-emerald-500 shadow-lg shadow-emerald-200 hover:bg-emerald-600'
-                : 'bg-emerald-500 shadow-lg shadow-emerald-200 hover:bg-emerald-600'
-            }
+            bg-emerald-500 shadow-lg shadow-emerald-200 hover:bg-emerald-600
             ${isSaving ? 'opacity-70 cursor-not-allowed' : ''}
           `}
         >
-          {isSaving ? 'Processing...' : editingDept ? 'Save' : 'Register'}
+          {isSaving
+            ? 'Processing...'
+            : editingDept
+            ? 'Save'
+            : 'Register'}
         </button>
       </div>
     </form>
