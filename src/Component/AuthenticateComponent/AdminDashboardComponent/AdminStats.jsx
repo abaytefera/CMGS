@@ -17,10 +17,10 @@ const AdminStats = ({CompileList}) => {
   const stats = [
     { label: t.totalUsers, value: CompileList?.totalUsers, icon: Users, color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-100', url: "/userMg" },
     { label: t.totalComp, value: CompileList?.totalComplaints, icon: FileText, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-100', url: "/Complaintlist/admin/list/" },
-    { label: t.activeCases, value: CompileList?.activeComplaints, icon: Activity, color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-100', url: "/Complaintlist/admin/list/active" },
-    { label: t.closedCases, value: CompileList?.closedComplaints, icon: CheckCircle, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-100', url: "/Complaintlist/admin/list/closed" },
+    { label: t.activeCases, value: CompileList?.activeComplaints, icon: Activity, color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-100', url: "/Complaintlist/admin/active" },
+    { label: t.closedCases, value: CompileList?.closedComplaints, icon: CheckCircle, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-100', url: "/Complaintlist/admin/closed" },
   ];
-
+                                                                                        
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
       {stats.map((stat, i) => (

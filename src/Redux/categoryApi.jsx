@@ -4,7 +4,7 @@ export const categoryApi = APi.injectEndpoints({
   endpoints: (builder) => ({
     // GET all categories
     getCategories: builder.query({
-  query: () => 'api/categories/',
+  query: () => '/api/categories/',
   providesTags: ['Category'],
   
   transformResponse: (res) => res || [], 

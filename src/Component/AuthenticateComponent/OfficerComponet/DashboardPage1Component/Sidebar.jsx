@@ -28,7 +28,7 @@ const Sidebar = () => {
   }, [user, isAuthLoading, navigate]);
 
   const dashboardUrl ="/Dashboard"
-  const role = user?.role;
+  const role = user.role;
 
   const t = {
     mainMenu: Language === "AMH" ? "ዋና ማውጫ" : "Main Menu",
@@ -44,11 +44,11 @@ const Sidebar = () => {
   const quickButtons = [
     { icon: Users, label: "Users", url: "/userMg", visible: role === 'ADMIN' },
     { icon: FileText, label: "Total Complaints", url: "/Complaintlist/admin/list/", visible: role === 'ADMIN' },
-    { icon: Activity, label: "Active Case", url: "/Complaintlist/admin/list/active", visible: role === 'ADMIN' },
-    { icon: CheckCircle2, label: "Close Case", url: "/Complaintlist/admin/list/closed", visible: role === 'ADMIN' },
+    { icon: Activity, label: "Active Case", url: "/Complaintlist/admin/active", visible: role === 'ADMIN' },
+    { icon: CheckCircle2, label: "Close Case", url: "/Complaintlist/admin/closed", visible: role === 'ADMIN' },
     { icon: FolderTree, label: "Categories", url:"/CatagoryMg", visible: role === 'ADMIN' },
     { icon: Building2, label: "Department", url:"/DepartmentMg", visible: role === 'ADMIN' },
-    { icon: Database, label: "Total Compilation", url: "/Complaintlist/supervisor/", visible: role === 'SUPERVISOR' },
+    { icon: Database, label: "Total Compilation", url: "/Complaintlist/supervisor/list/", visible: role === 'SUPERVISOR' },
     { icon: ListTodo, label: "Not Assigned", url: "/NotAssignComplainList/supervisor/unassigned", visible: role === 'SUPERVISOR' },
     { icon: XCircle, label: "Rejected", url: "/Complaintlist/supervisor/rejected", visible: role === 'SUPERVISOR' },
     { icon: CheckCircle2, label: "Resolved", url: "/Complaintlist/supervisor/resolved", visible: role === 'SUPERVISOR' },
@@ -56,10 +56,10 @@ const Sidebar = () => {
     { icon: Clock, label: "Approaching", url: "", visible: role === 'SUPERVISOR' },
     { icon: UserCheck, label: "Active Officer", url: "", visible: role === 'SUPERVISOR' },
     { icon: Briefcase, label: "Assigned", url: "/Complaintlist/officer/assigned", visible: role === 'OFFICER' },
-    { icon: PlayCircle, label: "In Progress", url: "/Complaintlist/officer/tasks/in_progress", visible: role === 'OFFICER' },
-    { icon: AlertTriangle, label: "Overdue", url: "/Complaintlist/officer/tasks/overdue", visible: role === 'OFFICER' },
-    { icon: CheckCircle2, label: "Resolved", url: "/Complaintlist/officer/tasks/resolved", visible: role === 'OFFICER' },
-    { icon: XCircle, label: "Rejected", url: "/Complaintlist/officer/tasks/rejected", visible: role === 'OFFICER' },
+    { icon: PlayCircle, label: "In Progress", url: "/Complaintlist/officer/in_progress", visible: role === 'OFFICER' },
+    { icon: AlertTriangle, label: "Overdue", url: "/Complaintlist/officer/overdue", visible: role === 'OFFICER' },
+    { icon: CheckCircle2, label: "Resolved", url: "/Complaintlist/officer/resolved", visible: role === 'OFFICER' },
+    { icon: XCircle, label: "Rejected", url: "/Complaintlist/officer/rejected", visible: role === 'OFFICER' },
     { icon: FileText, label: "Total Complaints", url: "", visible: role === 'MANAGER' },
     { icon: ShieldCheck, label: "SLA Compilation", url: "", visible: role === 'MANAGER' },
     { icon: BarChart3, label: "Reports", url: "/Report", visible: role === 'MANAGER' },
