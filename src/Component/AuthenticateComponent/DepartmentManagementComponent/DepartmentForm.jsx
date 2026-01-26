@@ -2,38 +2,53 @@ import React, { useState, useEffect } from 'react';
 import { Save, X, User, ChevronDown } from 'lucide-react';
 
 const DepartmentForm = ({ editingDept, onSave, onCancel, user, isSaving }) => {
-  const [formData, setFormData] = useState({ name: '', supervisor: '', status: true });
+  const [formData, setFormData] = useState({
+    name: '',
+    supervisor: '',
+    status: true
+  });
 
   useEffect(() => {
     if (editingDept) {
-      setFormData({ 
-        ...editingDept, 
-        name: editingDept.name || '', 
+      setFormData({
+        ...editingDept,
+        name: editingDept.name || '',
         supervisor: editingDept.supervisor || ''
       });
     } else {
-      setFormData({ name: '', supervisor: '', status: true });
+      setFormData({
+        name: '',
+        supervisor: '',
+        status: true
+      });
     }
   }, [editingDept]);
-  
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
-    if (!editingDept) setFormData({ name: '', supervisor: '', status: true });
+
+    if (!editingDept) {
+      setFormData({
+        name: '',
+        supervisor: '',
+        status: true
+      });
+    }
   };
 
   return (
-    <form 
-      onSubmit={handleSubmit} 
+    <form
+      onSubmit={handleSubmit}
       className="bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-2xl relative max-w-xl mx-auto"
     >
       {/* HEADER */}
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-xl font-black text-slate-900 uppercase">
-          {editingDept ? "Update Department" : "New Department"}
+          {editingDept ? 'Update Department' : 'New Department'}
         </h2>
-        {/* UNIVERSAL CLOSE BUTTON */}
+
+        {/* CLOSE BUTTON */}
         <button
           type="button"
           onClick={onCancel}
@@ -49,48 +64,67 @@ const DepartmentForm = ({ editingDept, onSave, onCancel, user, isSaving }) => {
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">
             Department Name
           </label>
-          <input 
+          <input
             type="text"
             value={formData.name}
-            onChange={e => setFormData({ ...formData, name: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, name: e.target.value })
+            }
             className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 font-semibold outline-none focus:border-emerald-500 focus:ring-emerald-500/10 transition-all"
             placeholder="e.g. Environmental Quality Control"
             required
           />
         </div>
 
-        {/* SUPERVISOR SELECTION */}
+        {/* SUPERVISOR */}
         <div className="space-y-2 relative">
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">
             Assigned Supervisor
           </label>
+
           <div className="relative">
-            <select 
+            <select
               value={formData.supervisor}
-              onChange={e => setFormData({...formData, supervisor: e.target.value})}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  supervisor: e.target.value
+                })
+              }
               className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 font-semibold outline-none focus:border-emerald-500 transition-all appearance-none cursor-pointer pr-12"
               required
             >
               <option value="">Select a Supervisor</option>
-              {user?.filter(u => u.role === 'SUPERVISOR').map(u => (
-                <option key={u.id} value={u.id}>
-                  {u.full_name || u.username}
-                </option>
-              ))}
+              {user
+                ?.filter((u) => u.role === 'SUPERVISOR')
+                .map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.full_name || u.username}
+                  </option>
+                ))}
             </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+
+            <ChevronDown
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              size={18}
+            />
           </div>
         </div>
 
-        {/* SUBMIT BUTTON */}
-        <button 
-          type="submit" 
+        {/* SUBMIT */}
+        <button
+          type="submit"
           disabled={isSaving}
           className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-white transition-all transform active:scale-[0.98]
-            ${editingDept ? 'bg-emerald-500 shadow-lg hadow-emerald-200 hover:bg-emerald-600' : 'bg-emerald-500 shadow-lg shadow-emerald-200 hover:bg-emerald-600'}
-            ${isSaving ? 'opacity-70 cursor-not-allowed' : ''}`}
+            ${
+              editingDept
+                ? 'bg-emerald-500 shadow-lg shadow-emerald-200 hover:bg-emerald-600'
+                : 'bg-emerald-500 shadow-lg shadow-emerald-200 hover:bg-emerald-600'
+            }
+            ${isSaving ? 'opacity-70 cursor-not-allowed' : ''}
+          `}
         >
-          {isSaving ? 'Processing...' : (editingDept ? 'Save' : 'Register')}
+          {isSaving ? 'Processing...' : editingDept ? 'Save' : 'Register'}
         </button>
       </div>
     </form>
