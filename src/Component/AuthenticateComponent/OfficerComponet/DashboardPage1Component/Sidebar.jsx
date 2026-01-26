@@ -28,7 +28,7 @@ const Sidebar = () => {
   }, [user, isAuthLoading, navigate]);
 
   const dashboardUrl ="/Dashboard"
-  const role = user.role;
+  const role = user?.role;
 
   const t = {
     mainMenu: Language === "AMH" ? "ዋና ማውጫ" : "Main Menu",

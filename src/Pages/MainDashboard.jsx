@@ -22,7 +22,7 @@ const Dashboard = () => {
     );
   }
 
-  const role ="SUPERVISOR"
+  const role =user?.role
 
   useEffect(()=>{
   
