@@ -15,11 +15,7 @@ const DepartmentForm = ({ editingDept, onSave, onCancel, user, isSaving }) => {
       setFormData({ name: '', supervisor: '', status: true });
     }
   }, [editingDept]);
-  useEffect(()=>{
-
-console.log("user data");
-consoe.log(user)
-  },[user])
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
