@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSelector } from "react-redux";
-import { Download, ExternalLink } from 'lucide-react';
+import { Download, ExternalLink, Inbox } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const ComplaintList = ({ Data }) => {
-  const { Language } = useSelector((state) => state.webState);
+const ComplaintList = ({ Data = [] }) => { // Default to empty array to prevent .map errors
+  const { Language = "EN" } = useSelector((state) => state.webState || {});
   const navigate = useNavigate();
 
   const t = {
@@ -14,36 +14,27 @@ const ComplaintList = ({ Data }) => {
     colSubject: Language === "AMH" ? "የአቤቱታው ርዕስ" : "Complaint Subject",
     colStatus: Language === "AMH" ? "ሁኔታ" : "Status",
     colPriority: Language === "AMH" ? "ቅድሚያ" : "Priority",
-    statusNew: Language === "AMH" ? "አዲስ" : "New",
-    statusProgress: Language === "AMH" ? "በሂደት ላይ" : "In Progress",
-    statusOverdue: Language === "AMH" ? "ጊዜ ያለፈበት" : "Overdue",
-    pHigh: Language === "AMH" ? "ከፍተኛ" : "High",
-    pMedium: Language === "AMH" ? "መካከለኛ" : "Medium",
-    pCritical: Language === "AMH" ? "አስቸኳይ" : "Critical",
+    noData: Language === "AMH" ? "ምንም መዝገብ አልተገኘም" : "No records found",
+    // Helper function for dynamic status labels
+    getStatusLabel: (status) => {
+        if (Language === "AMH") {
+            const labels = { 'New': 'አዲስ', 'In Progress': 'በሂደት ላይ', 'Overdue': 'ጊዜ ያለፈበት' };
+            return labels[status] || status;
+        }
+        return status;
+    }
   };
 
-  const complaints = [
-    { id: 'EPA-9921', subject: t.colSubject, status: 'New', statusLabel: t.statusNew, priority: t.pHigh },
-    { id: 'EPA-9925', subject: t.colSubject, status: 'In Progress', statusLabel: t.statusProgress, priority: t.pMedium },
-    { id: 'EPA-9810', subject: t.colSubject, status: 'Overdue', statusLabel: t.statusOverdue, priority: t.pCritical },
-  ];
-
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-xl overflow-hidden">
-      
-      {/* Header */}
+    <div className="w-full bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
       <div className="p-6 flex justify-between items-center border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {t.title}
-        </h3>
-
+        <h3 className="text-lg font-semibold text-gray-900">{t.title}</h3>
         <button className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-md text-sm hover:bg-emerald-700 transition">
           <Download size={16} />
           {t.export}
         </button>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
@@ -57,45 +48,48 @@ const ComplaintList = ({ Data }) => {
           </thead>
 
           <tbody className="divide-y divide-gray-200">
-            {complaints.map((c) => (
-              <tr
-                key={c.id}
-                onClick={() => navigate(`/DetailList/${c.id}`)}
-                className="hover:bg-gray-50 cursor-pointer"
-              >
-                <td className="px-6 py-4 font-mono text-emerald-600">
-                  {c.id}
-                </td>
-
-                <td className="px-6 py-4 text-gray-800">
-                  {c.subject}
-                </td>
-
-                <td className="px-6 py-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    c.status === 'New'
-                      ? 'bg-blue-100 text-blue-700'
-                      : c.status === 'Overdue'
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-emerald-100 text-emerald-700'
-                  }`}>
-                    {c.statusLabel}
-                  </span>
-                </td>
-
-                <td className="px-6 py-4 text-gray-700">
-                  {c.priority}
-                </td>
-
-                <td className="px-6 py-4 text-right">
-                  <button className="p-2 rounded-md hover:bg-gray-200">
-                    <ExternalLink size={16} />
-                  </button>
+            {Data.length > 0 ? (
+              Data.map((c) => (
+                <tr
+                  key={c._id || c.id}
+                  onClick={() => navigate(`/DetailList/${c._id || c.id}`)}
+                  className="hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  <td className="px-6 py-4 font-mono text-emerald-600 font-medium">
+                    {c.ref_number || c.id}
+                  </td>
+                  <td className="px-6 py-4 text-gray-800">{c.subject || "---"}</td>
+                  <td className="px-6 py-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      c.status === 'New' ? 'bg-blue-100 text-blue-700' : 
+                      c.status === 'Overdue' ? 'bg-red-100 text-red-700' : 
+                      'bg-emerald-100 text-emerald-700'
+                    }`}>
+                      {t.getStatusLabel(c.status)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-gray-700">{c.priority}</td>
+                  <td className="px-6 py-4 text-right">
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); navigate(`/DetailList/${c._id || c.id}`); }}
+                        className="p-2 rounded-md hover:bg-gray-200 text-gray-400 hover:text-gray-600"
+                    >
+                      <ExternalLink size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="px-6 py-12 text-center text-gray-400">
+                  <div className="flex flex-col items-center gap-2">
+                    <Inbox size={32} strokeWidth={1} />
+                    <p>{t.noData}</p>
+                  </div>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
-
         </table>
       </div>
     </div>
