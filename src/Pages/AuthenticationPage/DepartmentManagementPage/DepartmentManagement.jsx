@@ -26,7 +26,7 @@ const DepartmentPage = () => {
   const [updateDepartment, { isLoading: isUpdating }] = useUpdateDepartmentMutation();
   const { data: user } = useGetUsersQuery();
  useEffect(()=>{
-
+console.log("update info")
   console.log(user);
 
  },[user])
