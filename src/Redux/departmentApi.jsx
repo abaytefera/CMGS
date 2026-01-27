@@ -21,7 +21,7 @@ export const departmentApi = APi.injectEndpoints({
   
     updateDepartment: builder.mutation({
       query: ({ id, ...body }) => ({
-        url: `api/departments/${id}`,
+        url: `/api/departments/${id}`,
         method: 'PUT',
         body,
       }),

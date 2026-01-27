@@ -105,19 +105,10 @@ const ComplaintListPage = () => {
             
             <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
               <div>
-                <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">
-                  {type} {Language === "AMH" ? "መዝገቦች" : "Records"}
-                </h1>
+                
                 
                 <div className="flex flex-wrap gap-2 mt-6">
-                  <button 
-                    onClick={() => setFilterType("TOTAL")}
-                    className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                      filterType === "TOTAL" ? "bg-green-900 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
-                    }`}
-                  >
-                    Total
-                  </button>
+                 
 
                   {isOfficer && (
                     <>
@@ -209,7 +200,7 @@ const ComplaintListPage = () => {
             </div>
           </div>
         </main>
-        <AuthFooter />
+        
       </div>
     </div>
   );

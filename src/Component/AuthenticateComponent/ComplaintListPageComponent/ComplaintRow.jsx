@@ -1,76 +1,105 @@
 import React from 'react';
-import { MoreHorizontal, Eye } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Eye, PlayCircle, CheckCircle, XCircle, AlertTriangle, MoreHorizontal, Phone } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const ComplaintRow = ({ complaint }) => {
   const navigate = useNavigate();
 
-  // Safety check for names
-  const name = complaint?.citizen_name || complaint?.citizenName || "Unknown Citizen";
-  const firstLetter = name.charAt(0).toUpperCase();
+  // Data mapping
+  const name = complaint?.citizen_name || "Unknown Citizen";
+  const phoneNumber = complaint?.phone_number || "No Number";
+  const trackingId = complaint?.ref_number || complaint?.id || "N/A";
+  const status = complaint?.status?.toUpperCase() || "PENDING";
 
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'assigned': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      case 'resolved': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-      case 'pending': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
-      default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+  // DYNAMIC STATUS COLORS
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'IN_PROGRESS':
+        return {
+          pill: 'bg-amber-100 text-amber-800 border-amber-200',
+          dot: 'bg-amber-500'
+        };
+      case 'RESOLVED':
+        return {
+          pill: 'bg-green-100 text-green-800 border-green-200',
+          dot: 'bg-green-600'
+        };
+      case 'REJECTED':
+        return {
+          pill: 'bg-rose-100 text-rose-800 border-rose-200',
+          dot: 'bg-rose-600'
+        };
+      case 'OVERDUE':
+        return {
+          pill: 'bg-red-100 text-red-900 border-red-200 animate-pulse',
+          dot: 'bg-red-600'
+        };
+      default: // PENDING
+        return {
+          pill: 'bg-blue-100 text-blue-800 border-blue-200',
+          dot: 'bg-blue-500'
+        };
     }
   };
 
+  const style = getStatusStyle(status);
+
   return (
     <tr 
-      onClick={() => navigate(`/DetailList/${complaint?.id || complaint?._id}`)} 
-      className="group hover:bg-slate-50 transition-colors cursor-pointer"
+      onClick={() => navigate(`/DetailList/${complaint?._id || complaint?.id}`)} 
+      className="group hover:bg-slate-50 border-b border-slate-100 transition-colors cursor-pointer"
     >
-      <td className="px-8 py-6">
-        <span className="text-xs font-black tracking-wider">{complaint?.id || "N/A"}</span>
+      {/* TRACKING ID */}
+      <td className="px-8 py-5">
+        <span className="text-[11px] font-bold text-slate-400 font-mono">
+          #{trackingId}
+        </span>
       </td>
-      <td className="px-8 py-6">
+
+      {/* CITIZEN INFO (GREEN AVATAR) */}
+      <td className="px-8 py-5">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-[10px] font-black text-emerald-500 border border-emerald-500/20">
-            {firstLetter}
+          <div className="w-10 h-10 rounded-xl bg-green-600 text-white flex items-center justify-center text-xs font-black shadow-sm">
+            {name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="text-xs font-black text-slate-800 leading-none mb-1">
-              {complaint?.citizen_name || "Unknown"}
+            <p className="text-sm font-black text-slate-900 leading-none mb-1 capitalize">
+              {name}
             </p>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">
-              {complaint?.phoneNumber || "No Phone"}
+            <p className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
+              <Phone size={10} /> {phoneNumber}
             </p>
           </div>
         </div>
       </td>
-      <td className="px-8 py-6">
-        {/* FIXED LINE BELOW: Added optional chaining before .name */}
-        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-          {complaint?.Category?.name || "Uncategorized"}
+
+      {/* DYNAMIC STATUS PILL */}
+      <td className="px-8 py-5">
+        <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${style.pill}`}>
+          <span className={`w-2 h-2 rounded-full ${style.dot}`}></span>
+          {status.replace('_', ' ')}
         </span>
       </td>
-      <td className="px-8 py-6">
-        <span className="text-[10px] font-black text-slate-500 uppercase italic">
-          {complaint?.createdAt ? new Date(complaint.createdAt).toLocaleDateString() : "---"}
-        </span>
-      </td>
-      <td className="px-8 py-6">
-        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.15em] border ${getStatusColor(complaint?.status)}`}>
-          {complaint?.status || "Unknown"}
-        </span>
-      </td>
-      <td className="px-8 py-6 text-right">
-        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Link 
-            to={`/complaint-details/${complaint?._id || complaint?.id}`}
-            onClick={(e) => e.stopPropagation()} // Prevent row click from firing
-            className="p-2 hover:bg-emerald-500/20 text-emerald-500 rounded-lg transition-colors"
+
+      {/* ACTION (GREEN OPEN BUTTON) */}
+      <td className="px-8 py-5 text-right">
+        <div className="flex justify-end items-center gap-4">
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/DetailList/${complaint?._id || complaint?.id}`);
+            }}
+            className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md hover:shadow-green-200"
           >
-            <Eye size={16} />
-          </Link>
+            <Eye size={14} />
+            Open
+          </button>
+
           <button 
             onClick={(e) => e.stopPropagation()} 
-            className="p-2 hover:bg-slate-100 text-slate-400 rounded-lg"
+            className="p-2 text-slate-300 hover:text-slate-600 rounded-lg transition-colors"
           >
-            <MoreHorizontal size={16} />
+            <MoreHorizontal size={20} />
           </button>
         </div>
       </td>

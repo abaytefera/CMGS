@@ -4,7 +4,7 @@ const complaintApi = APi.injectEndpoints({
   endpoints: (builder) => ({
   
     getComplaintById: builder.query({
-      query: (id) => `api/staff/details/${id}`,
+      query: (id) => `/api/staff/details/${id}`,
       providesTags: (result, error, id) => [{ type: 'Complaints', id }],
     
       transformResponse: (res) => res || null,
@@ -28,7 +28,7 @@ const complaintApi = APi.injectEndpoints({
     // GET /api/staff/list
     getComplaints: builder.query({
       query: (params) => ({
-        url: 'api/staff/list', 
+        url: '/api/staff/list', 
         method: 'GET',
         params: params, 
       }),

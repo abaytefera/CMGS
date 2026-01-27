@@ -243,7 +243,7 @@ const ComplaintDetails = () => {
             </div>
           </div>
         </main>
-        <AuthFooter />
+       
       </div>
     </div>
   );

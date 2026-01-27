@@ -181,7 +181,7 @@ const ReportsPage = () => {
             </div>
           </div>
         </main>
-        <AuthFooter />
+      
       </div>
     </div>
   );

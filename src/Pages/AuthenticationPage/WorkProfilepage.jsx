@@ -182,7 +182,7 @@ const WorkProfile = () => {
             </div>
           </div>
         </main>
-        <AuthFooter />
+       
       </div>
     </div>
   );

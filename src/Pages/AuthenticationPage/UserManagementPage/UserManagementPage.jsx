@@ -90,10 +90,7 @@ const UserManagementPage = () => {
             {/* Header */}
             <header className="mb-10">
               
-              <p className="text-[10px] font-black uppercase mt-3 flex items-center gap-2">
-                <Database size={12} className={isError ? "text-rose-500" : "text-emerald-500"} />
-                {isError ? "Database Sync Error" : "All user"}
-              </p>
+             
             </header>
 
             {/* Onboarding + Directory */}
@@ -102,12 +99,8 @@ const UserManagementPage = () => {
               {/* Onboarding Header */}
               <section className="space-y-4">
                 <div className="flex items-center gap-3 px-2">
-                  <div className="p-2 bg-emerald-100 rounded-lg">
-                    <UserPlus size={18} className="text-emerald-600" />
-                  </div>
-                  <h2 className="text-sm font-black uppercase tracking-widest">
-                    {editingUser ? "Edit Profile" : "Register user"}
-                  </h2>
+                 
+                 
                   <button
                     onClick={() => setShowUserForm(true)}
                     className="ml-auto flex px-5 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest"
@@ -121,21 +114,9 @@ const UserManagementPage = () => {
               <section className="space-y-6">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-2">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-slate-100 rounded-lg">
-                      <Users size={18} />
-                    </div>
-                    <h2 className="text-sm font-black uppercase">Directory</h2>
+                   
                   </div>
-                  <div className="relative w-full md:w-96">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2" size={18} />
-                    <input
-                      type="text"
-                      placeholder="Search name..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full border rounded-2xl py-4 pl-12 pr-6"
-                    />
-                  </div>
+              
                 </div>
 
                 {isLoading ? (
@@ -202,7 +183,7 @@ const UserManagementPage = () => {
           )}
         </main>
 
-        <AuthFooter />
+        
       </div>
     </div>
   );

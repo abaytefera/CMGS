@@ -265,7 +265,7 @@ const AssignComplaintPage = () => {
           </div>
         </main>
         
-        <AuthFooter />
+        
       </div>
     </div>
   );

@@ -16,23 +16,22 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
     const searchLower = searchTerm.toLowerCase();
     return (
       cat.name?.toLowerCase().includes(searchLower) ||
-      cat.Department?.name?.toLowerCase().includes(searchLower) ||
-      cat.departmentId?.toString().includes(searchLower)
+      cat.Department?.name?.toLowerCase().includes(searchLower)
     );
   });
 
-  // Reusable icon button class to keep code clean
+  // Reusable icon button class
   const btnClass = "p-2.5 bg-slate-50 rounded-xl transition-all shadow-sm active:scale-95 border border-slate-100 hover:text-white";
 
   return (
     <div className="flex flex-col gap-6 w-full">
-      {/* SEARCH & STATS - Stacks on mobile */}
+      {/* SEARCH & STATS */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between px-2">
         <div className="relative w-full max-w-md group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
           <input
             type="text"
-            placeholder="Search by name, ID or department..."
+            placeholder="Search by name or department..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm"
@@ -45,9 +44,7 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
         </div>
       </div>
 
-      {/* ================= DESKTOP TABLE ================= 
-          Visible on md (768px) and up. Uses overflow-x-auto for small tablets.
-      */}
+      {/* ================= DESKTOP TABLE ================= */}
       <div className="hidden md:block bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/40">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[800px] md:min-w-full">
@@ -68,7 +65,7 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
                       <p className={`font-bold italic text-sm ${cat.is_active ? 'text-slate-900' : 'text-slate-400'}`}>
                         {cat.name}
                       </p>
-                      <p className="text-[10px] text-slate-400 font-mono">ID #{cat.id}</p>
+                      {/* ID Removed from here */}
                     </div>
                   </td>
 
@@ -76,7 +73,7 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
                     <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit border border-emerald-100">
                       <Building2 size={12} />
                       <span className="text-[10px] uppercase font-black">
-                        {cat.Department?.name || `Dept #${cat.departmentId}`}
+                        {cat.Department?.name || "Unassigned"}
                       </span>
                     </div>
                   </td>
@@ -116,9 +113,7 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
         </div>
       </div>
 
-      {/* ================= MOBILE CARDS ================= 
-          Visible only on screens smaller than md (768px)
-      */}
+      {/* ================= MOBILE CARDS ================= */}
       <div className="md:hidden flex flex-col gap-4 px-2">
         {filteredCategories.map((cat) => (
           <div
@@ -130,11 +125,11 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
                 <p className={`font-bold italic text-lg tracking-tight ${cat.is_active ? 'text-slate-900' : 'text-slate-400'}`}>
                   {cat.name}
                 </p>
-                <p className="text-[10px] text-slate-400 font-mono tracking-widest">ID #{cat.id}</p>
+                {/* ID Removed from here */}
               </div>
               <div className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
                 <Building2 size={12} />
-                <span className="text-[10px] font-black uppercase">{cat.Department?.name || `D-${cat.departmentId}`}</span>
+                <span className="text-[10px] font-black uppercase">{cat.Department?.name || "General"}</span>
               </div>
             </div>
 

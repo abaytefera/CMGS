@@ -5,7 +5,7 @@ export const citizenApi = APi.injectEndpoints({
     // 1. Submit a new complaint
     submitComplaint: builder.mutation({
       query: (formData) => ({
-        url: 'api/public/submit', // Added 'api/' because CenteralAPI doesn't have it
+        url: '/api/public/submit', // Added 'api/' because CenteralAPI doesn't have it
         method: 'POST',
         body: formData, 
       }),
@@ -14,7 +14,7 @@ export const citizenApi = APi.injectEndpoints({
 
     // 2. Track a complaint
     trackComplaint: builder.query({
-      query: (refId) => `api/public/track/${refId}`,
+      query: (refId) => `/api/public/track/${refId}`,
       providesTags: (result, error, refId) => [{ type: 'Complaints', id: refId }],
       transformResponse: (res) => res ,
     }),
@@ -22,7 +22,7 @@ export const citizenApi = APi.injectEndpoints({
     
    submiFeddBack: builder.mutation({
       query: (feedbackData) => ({
-        url: 'api/public/feedback', // Matches the pattern of your working submit endpoint
+        url: '/api/public/feedback', // Matches the pattern of your working submit endpoint
         method: 'POST',
         body: feedbackData,
       }),

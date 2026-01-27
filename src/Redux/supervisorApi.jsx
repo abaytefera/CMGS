@@ -19,7 +19,7 @@ export const supervisorApi = APi.injectEndpoints({
     }),
 
  // Redux/supervisorApi.js
-assignComplaint: builder.mutation({
+updateAssign: builder.mutation({
   query: (assignmentData) => ({
     // Use the absolute path or relative to your baseQuery
     url: '/workflow/assign', 
@@ -40,7 +40,7 @@ assignComplaint: builder.mutation({
 // Export the injected hook (Names kept exactly as requested)
 export const { 
   useGetOfficersQuery, 
-useAssignComplaintMutation,
+useUpdateAssignMutation,
    
   useGetSupervisorStatsQuery, 
 } = supervisorApi;

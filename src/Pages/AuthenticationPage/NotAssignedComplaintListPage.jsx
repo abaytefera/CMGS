@@ -166,7 +166,7 @@ const NotAssignedComplaintListPage = () => {
 
           </div>
         </main>
-        <AuthFooter />
+
       </div>
     </div>
   );

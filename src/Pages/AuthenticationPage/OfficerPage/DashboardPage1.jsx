@@ -122,7 +122,7 @@ console.log(CompileList);
           </div>
         </main>
 
-        <AuthFooter />
+      
       </div>
     </div>
   );

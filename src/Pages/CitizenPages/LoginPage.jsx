@@ -53,7 +53,7 @@ const handleLogin = async (e) => {
   }, []);
 
   const t = {
-    title: Language === "AMH" ? "ግባ" : "Login Page",
+    title: Language === "AMH" ? "ግባ" : "Login ",
     userLabel: Language === "AMH" ? "ኢሜይል ወይም መለያ ስም" : "Email / Username",
     passLabel: Language === "AMH" ? "የይለፍ ቃል" : "Password",
     loginBtn: Language === "AMH" ? "ግባ" : "Login",
@@ -84,19 +84,15 @@ const handleLogin = async (e) => {
 
         <div className={`w-full max-w-md bg-white border border-gray-100 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 p-10 flex flex-col items-center z-10 transition-all duration-300 ${showSuccess ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}>
           
-          {/* Logo Icon */}
-          <div className="bg-emerald-500 p-4 rounded-2xl text-white shadow-lg shadow-emerald-200 mb-6">
-            <Leaf size={32} />
-          </div>
+         <div className='flex flex-col'>
+          <img src="EEPA1 (1).jpg" alt="" />
           
-          <h1 className="text-3xl font-black text-gray-900 mb-2 uppercase tracking-tighter">
-            {t.title}
-          </h1>
+          </div>
           <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-8">
-            Complaint Management System
+           
           </p>
 
-          <form onSubmit={handleLogin} className="w-full">
+          <form onSubmit={handleLogin} className="w-full  h-80">
             {/* Error Message */}
             {error && (
               <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
