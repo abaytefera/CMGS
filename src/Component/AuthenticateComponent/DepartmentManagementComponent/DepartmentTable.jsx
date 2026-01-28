@@ -11,7 +11,6 @@ import {
 
 const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  // State for the professional confirmation pop-up
   const [confirmToggle, setConfirmToggle] = useState(null);
 
   const filteredData = data.filter((dept) => {
@@ -93,7 +92,7 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
             <tr>
               <th className="px-8 py-6">Department Identity</th>
               <th className="px-8 py-6">Current Status</th>
-              <th className="px-8 py-6 text-right">Quick Actions</th>
+              <th className="px-8 py-6 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
@@ -121,21 +120,23 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
                 </td>
 
                 <td className="px-8 py-6 text-right">
-                  <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* ✅ ACTIONS: Removed opacity-0 to make buttons always visible */}
+                  <div className="flex justify-end gap-3 transition-all">
                     <button 
                       onClick={() => onEdit(dept)} 
-                      className="p-3 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
-                      title="Edit"
+                      className="p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-transparent hover:border-emerald-100"
+                      title="Edit Department"
                     >
                       <Edit3 size={18} />
                     </button>
                     <button
                       onClick={() => handleToggleClick(dept)}
-                      className={`p-3 rounded-xl transition-all ${
+                      className={`p-3 rounded-xl transition-all flex items-center justify-center ${
                         dept.is_active 
-                          ? "text-slate-400 hover:text-rose-500 hover:bg-rose-50" 
-                          : "bg-emerald-500 text-white shadow-lg shadow-emerald-100"
+                          ? "text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-100 hover:border-rose-100" 
+                          : "bg-emerald-600 text-white shadow-lg shadow-emerald-100 hover:bg-emerald-700"
                       }`}
+                      title={dept.is_active ? "Disable" : "Enable"}
                     >
                       {dept.is_active ? <ShieldAlert size={18} /> : <ShieldCheck size={18} />}
                     </button>

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import {
   Edit3,
-  CheckCircle2, // Professional Active Icon
-  ShieldX,      // Professional Disabled Icon
+  CheckCircle2, 
+  ShieldX,      
   Building2,
   Search,
   SlidersHorizontal,
@@ -69,7 +69,7 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
         </div>
       )}
 
-      {/* SEARCH BAR (Remains same for consistency) */}
+      {/* SEARCH BAR */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between px-2">
         <div className="relative w-full max-w-md group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
@@ -96,7 +96,7 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
 
           <tbody className="divide-y divide-slate-50">
             {filteredCategories.map((cat) => (
-              <tr key={cat.id || cat._id} className="group hover:bg-slate-50/50 transition-all">
+              <tr key={cat.id || cat._id} className="hover:bg-slate-50/50 transition-all">
                 <td className="px-8 py-6">
                   <div className="flex flex-col">
                     <span className={`font-bold text-sm ${cat.is_active ? 'text-slate-800' : 'text-slate-400'}`}>
@@ -121,10 +121,12 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
                 </td>
 
                 <td className="px-8 py-6 text-right">
-                  <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* OPACITY CLASSES REMOVED - BUTTONS ALWAYS VISIBLE */}
+                  <div className="flex justify-end gap-3 transition-opacity">
                     <button 
                       onClick={() => onEdit(cat)} 
                       className="p-2.5 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
+                      title="Edit"
                     >
                       <Edit3 size={18} />
                     </button>
@@ -135,6 +137,7 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
                         ? "text-slate-400 hover:text-rose-500 hover:bg-rose-50" 
                         : "text-emerald-500 bg-emerald-50 hover:bg-emerald-100"
                       }`}
+                      title={cat.is_active ? "Deactivate" : "Activate"}
                     >
                       {cat.is_active ? <ShieldX size={18} /> : <CheckCircle2 size={18} />}
                     </button>
@@ -146,18 +149,18 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
         </table>
       </div>
 
-      {/* Mobile Card Layout with same professional icons */}
+      {/* Mobile Card Layout */}
       <div className="md:hidden flex flex-col gap-4 px-2">
         {filteredCategories.map((cat) => (
           <div key={cat.id || cat._id} className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-md">
-             <div className="flex justify-between items-start mb-4">
+              <div className="flex justify-between items-start mb-4">
                 <h4 className={`font-bold text-base ${cat.is_active ? 'text-slate-900' : 'text-slate-400 line-through'}`}>{cat.name}</h4>
                 {cat.is_active ? 
                   <CheckCircle2 size={16} className="text-emerald-500" /> : 
                   <ShieldX size={16} className="text-slate-300" />
                 }
-             </div>
-             <div className="flex gap-2">
+              </div>
+              <div className="flex gap-2">
                 <button onClick={() => onEdit(cat)} className="flex-1 py-3 bg-slate-50 rounded-xl text-[10px] font-black uppercase text-slate-500">Edit</button>
                 <button 
                   onClick={() => handleToggleClick(cat)} 
@@ -165,7 +168,7 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
                 >
                   {cat.is_active ? 'Deactivate' : 'Activate'}
                 </button>
-             </div>
+              </div>
           </div>
         ))}
       </div>

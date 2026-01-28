@@ -32,7 +32,7 @@ const Sidebar = () => {
 
   const t = {
     mainMenu: Language === "AMH" ? "ዋና ማውጫ" : "Main Menu",
-  
+    quickActions: Language === "AMH" ? "ፈጣን እርምጃዎች" : "Quick Actions",
     dashboard: Language === "AMH" ? "ዳሽቦርድ" : "Dashboard",
     settings: Language === "AMH" ? "ቅንብሮች" : "Settings",
     logout: Language === "AMH" ? "ውጣ" : "Logout",
@@ -131,7 +131,10 @@ const Sidebar = () => {
             </section>
 
             <section>
-             
+              <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{t.quickActions}</p>
+              <div className="space-y-0.5">
+                {quickButtons.map((item, idx) => <NavLink key={idx} item={item} />)}
+              </div>
             </section>
           </nav>
 
