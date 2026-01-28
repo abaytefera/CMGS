@@ -78,10 +78,10 @@ const ComplaintList = ({ Data = [] }) => {
                   </td>
                   <td className="px-6 py-5 text-right">
                     {/* ENHANCED VIEW BUTTON */}
-                    <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-emerald-600 rounded-xl text-[11px] font-black uppercase tracking-widest group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 transition-all shadow-sm">
+                    
                       <Eye size={14} />
-                      {t.view}
-                    </div>
+                      
+                    
                   </td>
                 </tr>
               ))
