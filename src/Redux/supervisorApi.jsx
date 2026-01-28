@@ -8,7 +8,7 @@ export const supervisorApi = APi.injectEndpoints({
       query: () => 'api/dashboard/management',
       providesTags: ['Complaints', 'Dashboard'],
       // Standardizing response to target the 'data' key
-      transformResponse: (res) => res?.data?.stats || { total: 0, pending: 0, assigned: 0 },
+      transformResponse: (res) => res || { total: 0, pending: 0, assigned: 0 },
     }),
 
     getOfficers: builder.query({
