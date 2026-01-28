@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from "react-redux";
-import { Download, Inbox, Eye } from 'lucide-react'; // Added Eye for a subtle touch
+import { Download, Inbox, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const ComplaintList = ({ Data = [] }) => { 
@@ -14,7 +14,6 @@ const ComplaintList = ({ Data = [] }) => {
     colSubject: Language === "AMH" ? "የአቤቱታው ርዕስ" : "Complaint Subject",
     colStatus: Language === "AMH" ? "ሁኔታ" : "Status",
     colPriority: Language === "AMH" ? "ቅድሚያ" : "Priority",
-    view: Language === "AMH" ? "ተመልከት" : "View Details", 
     noData: Language === "AMH" ? "ምንም መዝገብ አልተገኘም" : "No records found",
     getStatusLabel: (status) => {
         if (Language === "AMH") {
@@ -44,7 +43,7 @@ const ComplaintList = ({ Data = [] }) => {
               <th className="px-6 py-5 text-left">{t.colSubject}</th>
               <th className="px-6 py-5 text-left">{t.colStatus}</th>
               <th className="px-6 py-5 text-left">{t.colPriority}</th>
-              <th className="px-6 py-5 text-right">Action</th>
+              <th className="px-6 py-5 text-center">Action</th>
             </tr>
           </thead>
 
@@ -76,12 +75,11 @@ const ComplaintList = ({ Data = [] }) => {
                   <td className="px-6 py-5">
                     <span className="text-gray-600 font-medium">{c.priority}</span>
                   </td>
-                  <td className="px-6 py-5 text-right">
-                    {/* ENHANCED VIEW BUTTON */}
-                    
-                      <Eye size={14} />
-                      
-                    
+                  <td className="px-6 py-5 text-center">
+                    {/* Visual indicator only - row click handles navigation */}
+                    <div className="flex justify-center text-gray-400 group-hover:text-emerald-600 transition-colors">
+                      <Eye size={18} />
+                    </div>
                   </td>
                 </tr>
               ))
