@@ -86,14 +86,14 @@ console.log("update info")
         <main className="flex-1 pt-32 px-6 lg:px-10 pb-20">
           <div className="max-w-5xl mx-auto">
 
-            {/* HEADER */}
-            <div className="mb-12 flex flex-col items-center text-center">
               
-              <div className="flex flex-col items-center gap-3 mt-4">
+          
+               <h1 className="text-2xl relative bottom-2 font-black capitalize">
+                Department <span className="text-emerald-600">Management</span>
+              </h1>
                
-               
-              </div>
-            </div>
+          
+          
 
             {/* REGISTER BUTTON */}
             <div className="flex justify-end mb-6">

@@ -89,7 +89,9 @@ const UserManagementPage = () => {
           <div className="max-w-5xl mx-auto">
             {/* Header */}
             <header className="mb-10">
-              
+              <h1 className="text-2xl relative top-10 font-black capitalize">
+                User <span className="text-emerald-600">Management</span>
+              </h1>
              
             </header>
 

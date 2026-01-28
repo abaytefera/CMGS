@@ -94,8 +94,8 @@ const CategoryManagement = () => {
           <div className="max-w-5xl mx-auto flex flex-col gap-10">
 
             {/* HEADER */}
-            <header className="text-center">
-              <h1 className="text-2xl font-black uppercase">
+            <header className="text-left">
+              <h1 className="text-2xl relative top-10 font-black capitalize">
                 Category <span className="text-emerald-600">Management</span>
               </h1>
 

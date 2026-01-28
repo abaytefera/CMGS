@@ -12,7 +12,7 @@ const UserTable = ({ users = [], onEdit, onDelete }) => {
   console.log(users)
 
   return (
-    <div className="space-y-6 font-sans antialiased text-slate-900 bg-white p-6 rounded-xl">
+    <div className="space-y-6 font-sans relative bottom-18 antialiased text-slate-900 bg-white p-6 rounded-xl">
       
       {/* SEARCH INPUT */}
       <div className="relative max-w-md group">
