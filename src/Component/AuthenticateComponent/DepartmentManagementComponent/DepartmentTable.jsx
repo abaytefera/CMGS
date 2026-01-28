@@ -5,7 +5,9 @@ import {
   Filter, 
   Building2, 
   ShieldCheck, 
-  ShieldAlert, // Fixed: This is the correct icon name in Lucide
+  ShieldAlert,
+  ShieldOff, // Added as a valid replacement for ShieldX
+  CheckCircle2, // Added for your new Active status
   AlertTriangle 
 } from "lucide-react";
 
@@ -33,7 +35,7 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
   return (
     <div className="flex flex-col gap-6 font-sans relative">
       
-      {/* ================= PROFESSIONAL MODAL ================= */}
+      {/* ================= CONFIRMATION MODAL ================= */}
       {confirmToggle && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300">
           <div className="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl border border-slate-100 flex flex-col items-center text-center">
@@ -92,7 +94,7 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
             <tr>
               <th className="px-8 py-6">Department Identity</th>
               <th className="px-8 py-6">Current Status</th>
-              <th className="px-8 py-6 text-right">Quick Actions</th>
+              <th className="px-8 py-6 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
@@ -114,14 +116,13 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
                     {dept.is_active ? (
                       <><ShieldCheck size={16} className="animate-pulse" /> Verified Active</>
                     ) : (
-                      <><ShieldAlert size={16} /> Deactivated</>
+                      <><ShieldOff size={16} /> Deactivated</>
                     )}
                   </div>
                 </td>
 
                 <td className="px-8 py-6 text-right">
-                  {/* Kept visible actions as per previous request, fixed ShieldAlert icon */}
-                  <div className="flex justify-end gap-3 transition-opacity">
+                  <div className="flex justify-end gap-3">
                     <button 
                       onClick={() => onEdit(dept)} 
                       className="p-3 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
@@ -137,8 +138,7 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
                           : "bg-emerald-600 text-white shadow-lg shadow-emerald-100"
                       }`}
                     >
-                      {/* Fixed: Use ShieldAlert instead of ShieldX */}
-                      {dept.is_active ? <ShieldAlert size={18} /> : <ShieldCheck size={18} />}
+                      {dept.is_active ? <ShieldOff size={18} /> : <ShieldCheck size={18} />}
                     </button>
                   </div>
                 </td>
@@ -159,7 +159,19 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
                   </div>
                   <h4 className={`font-bold text-sm uppercase ${dept.is_active ? 'text-slate-900' : 'text-slate-400 line-through'}`}>{dept.name}</h4>
                 </div>
-                {dept.is_active ? <ShieldCheck size={18} className="text-emerald-500" /> : <ShieldAlert size={18} className="text-slate-300" />}
+                
+       
+                {dept.is_active ? (
+                  <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[10px] uppercase tracking-wider">
+                    <CheckCircle2 size={14} className="animate-pulse" /> Active
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-slate-400 font-bold text-[10px] uppercase tracking-wider">
+                    <ShieldOff size={14} /> Inactive
+                  </div>
+                )}
+          
+                
              </div>
              <div className="flex gap-3">
                 <button onClick={() => onEdit(dept)} className="flex-1 py-3.5 bg-slate-50 rounded-2xl text-[10px] font-black uppercase text-slate-500 tracking-widest border border-slate-100">Edit</button>
