@@ -26,6 +26,7 @@ const AdminDashboard = () => {
 
 
 useEffect(()=>{
+  console.log("what is happen")
 console.log(CompileList);
 
 },[CompileList])
