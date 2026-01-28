@@ -3,17 +3,14 @@ import { HiMenu, HiX } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { ChangeLanguage } from "../../Redux/WebState";
 import { Link } from "react-router-dom";
-import { User, Bell } from "lucide-react"; 
+import { User } from "lucide-react"; 
 
 const AuthHeader = ({ True }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false); 
   const { Language } = useSelector((state) => state.webState);
   const { user } = useSelector((state) => state.auth);
   const [windowOffset, setWindowOffset] = useState(0);
   const Dispatch = useDispatch();
-
-  const officerName = "Inspector Abebe"; 
 
   useEffect(() => {
     const scrollHandle = () => {
@@ -36,8 +33,6 @@ const AuthHeader = ({ True }) => {
   const content = {
     LangLabel: Language === "AMH" ? "ቋንቋ ይቀይሩ" : "Language Change",
     Logout: Language === "AMH" ? "ውጣ" : "Logout",
-    notifTitle: Language === "AMH" ? "ማሳወቂያዎች" : "Notifications",
-    noNotif: Language === "AMH" ? "አዲስ ማሳወቂያ የለም" : "No new notifications",
   };
 
   return (
@@ -48,7 +43,7 @@ const AuthHeader = ({ True }) => {
         <div className="flex justify-between items-center h-20">
 
           {/* Logo */}
-          <div className={`flex-shrink-0 mb-8 ${True ? "opacity-0" : "block"}`}>
+          <div className={`flex-shrink-0 ${True ? "opacity-0" : "block"}`}>
             <Link to="/dashboard">
               <img
                 src="https://res.cloudinary.com/dkzvlqjp9/image/upload/v1768827371/logo_xebgif.png"
@@ -60,61 +55,25 @@ const AuthHeader = ({ True }) => {
 
           {/* Desktop Right Menu */}
           <div className="hidden md:flex items-center space-x-6">
-
-            {/* Notification Bell */}
-            <div className="relative">
-              <button 
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 text-slate-700 hover:bg-slate-100 rounded-full transition-all"
-              >
-                <Bell size={24} />
-                {/* Red Dot Indicator */}
-                <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
-              </button>
-
-              {showNotifications && (
-                <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-2xl py-4 z-50 border border-slate-100 animate-in fade-in zoom-in duration-200">
-                  <div className="px-4 pb-2 border-b border-slate-50 flex justify-between items-center">
-                    <span className="font-bold text-slate-800">{content.notifTitle}</span>
-                    <span className="text-[10px] bg-red-50 text-red-500 px-2 py-0.5 rounded-full font-bold">2 NEW</span>
-                  </div>
-                  <div className="max-h-60 overflow-y-auto">
-                    <div className="p-4 text-center text-slate-400 text-sm">
-                      <div className="text-left bg-blue-50 p-3 rounded-lg mb-2">
-                        <p className="text-xs text-blue-800 font-bold">New Complaint Assigned</p>
-                        <p className="text-[10px] text-blue-600">Reference: CGMS-00125</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
+            
             {/* Language Selector */}
-            <div className="relative flex cursor-pointer group gap-1 items-center">
-              <img
-                src="https://res.cloudinary.com/dkzvlqjp9/image/upload/v1768827358/Language_bizms7.png"
-                alt="Lang"
-                className="w-8 h-8"
-              />
-              <select
-                value={Language}
-                onChange={toggleLanguage}
-                className="bg-transparent text-slate-700 outline-none cursor-pointer font-medium"
-              >
-                <option value="ENG" className="text-black">ENG</option>
-                <option value="AMH" className="text-black">AMH</option>
-              </select>
-            </div>
+            <select 
+              onChange={toggleLanguage} 
+              value={Language}
+              className="text-xs font-bold border-none bg-slate-50 rounded-lg px-2 py-1 focus:ring-0 cursor-pointer"
+            >
+              <option value="EN">EN</option>
+              <option value="AMH">AMH</option>
+            </select>
 
             {/* Officer Profile */}
-            <div className={`flex ${True && "md:mr-20"} items-center space-x-3 bg-white/10 backdrop-blur-md border border-white/20 p-1.5 pr-4 rounded-full hover:bg-white/20 transition-all cursor-pointer`}>
+            <div className={`flex ${True && "md:mr-20"} items-center space-x-3 p-1.5 pr-4 rounded-full border border-slate-100 hover:bg-slate-50 transition-all cursor-pointer`}>
               <div className="w-10 h-10 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center overflow-hidden shadow-sm">
                 <User className="text-white" size={24} />
               </div>
               <div className="flex flex-col">
-                <span className="text-slate-700 text-[10px] font-semibold opacity-80 uppercase tracking-tighter leading-none">{user.role}</span>
-                <span className="text-slate-900 text-sm font-bold leading-tight">{user.username}</span>
+                <span className="text-slate-500 text-[10px] font-semibold uppercase tracking-tighter leading-none">{user?.role}</span>
+                <span className="text-slate-900 text-sm font-bold leading-tight">{user?.username}</span>
               </div>
             </div>
           </div>
@@ -123,7 +82,7 @@ const AuthHeader = ({ True }) => {
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMenu}
-              className="text-slate-700 hover:text-green-600 focus:outline-none"
+              className="text-slate-700 hover:text-emerald-600 focus:outline-none"
             >
               {isOpen ? <HiX size={30} /> : <HiMenu size={30} />}
             </button>
@@ -140,26 +99,9 @@ const AuthHeader = ({ True }) => {
                 <User size={28} />
               </div>
               <div>
-                <p className="text-slate-900 font-bold">{user.role}</p>
-                <p className="text-slate-500 text-xs">EPA Personnel</p>
+                <p className="text-slate-900 font-bold">{user?.username}</p>
+                <p className="text-slate-500 text-xs">{user?.role}</p>
               </div>
-            </div>
-
-            <button className="flex items-center justify-between p-4 bg-blue-50 text-blue-700 rounded-xl font-bold">
-              <span>{content.notifTitle}</span>
-              <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">2</span>
-            </button>
-
-            <div className="flex items-center justify-between border-y py-4">
-              <span className="text-slate-700 font-medium">{content.LangLabel}</span>
-              <select
-                onChange={toggleLanguage}
-                value={Language}
-                className="text-slate-700 border rounded-lg p-2 bg-slate-50"
-              >
-                <option value="ENG">English</option>
-                <option value="AMH">አማርኛ</option>
-              </select>
             </div>
 
             <button className="bg-red-50 text-red-600 font-bold py-3 rounded-xl hover:bg-red-100 transition-colors">
