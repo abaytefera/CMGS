@@ -13,13 +13,15 @@ import { useGetComplaintByIdQuery, useUpdateComplaintStatusMutation } from "../.
 
 import Sidebar from "../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar";
 import AuthHeader from "../../../Component/AuthenticateComponent/AuthHeader";
-import AuthFooter from "../../../Component/AuthenticateComponent/AuthFooter";
 import InfoCard from "../../../Component/AuthenticateComponent/OfficerComponet/ComplaintDetailsComponent/InfoCard";
 import StatusHistory from "../../../Component/AuthenticateComponent/OfficerComponet/ComplaintDetailsComponent/StatusHistory";
 
 const ComplaintDetails = () => {
   const { id } = useParams();
   const { user } = useSelector((state) => state.auth);
+  
+  // Updated Authority Logic: Only allow Officer and Supervisor
+  const canUpdateStatus = user?.role === "SUPERVISOR" || user?.role === "OFFICER";
   const isSupervisor = user?.role === "SUPERVISOR";
 
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -27,7 +29,7 @@ const ComplaintDetails = () => {
 
   const complaintId = useMemo(() => (!isNaN(Number(id)) ? Number(id) : null), [id]);
 
-  const { data: complaint, isLoading, isError, error, refetch } = useGetComplaintByIdQuery(complaintId, { skip: !complaintId });
+  const { data: complaint, isLoading, isError, error } = useGetComplaintByIdQuery(complaintId, { skip: !complaintId });
   const [updateStatus, { isLoading: isUpdating }] = useUpdateComplaintStatusMutation();
 
   useEffect(() => {
@@ -91,11 +93,6 @@ const ComplaintDetails = () => {
                     <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border ${complaint.priority === 'HIGH' ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-blue-50 border-blue-100 text-blue-600'}`}>
                       {complaint.priority} PRIORITY
                     </span>
-                    {complaint.isEscalated && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-50 border border-amber-100 text-amber-600">
-                        <AlertTriangle size={10} /> Escalated
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>
@@ -106,8 +103,6 @@ const ComplaintDetails = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
-                
-                {/* 1. Citizen & Location Combined */}
                 <InfoCard title="Core Incident Information">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-2">
                     <div className="space-y-4">
@@ -115,9 +110,9 @@ const ComplaintDetails = () => {
                         <div className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-xl">{complaint.citizen_name?.[0]}</div>
                         <div>
                           <p className="font-black text-slate-900 uppercase tracking-tight">{complaint.citizen_name}</p>
-                          <div className="flex flex-col gap-0.5 mt-1 text-slate-500">
-                            <span className="flex items-center gap-1.5 text-xs"><Phone size={12}/> {complaint.phone_number}</span>
-                            <span className="flex items-center gap-1.5 text-xs"><Mail size={12}/> {complaint.email}</span>
+                          <div className="flex flex-col gap-0.5 mt-1 text-slate-500 text-xs">
+                            <span className="flex items-center gap-1.5"><Phone size={12}/> {complaint.phone_number}</span>
+                            <span className="flex items-center gap-1.5"><Mail size={12}/> {complaint.email}</span>
                           </div>
                         </div>
                       </div>
@@ -135,55 +130,10 @@ const ComplaintDetails = () => {
                   </div>
                 </InfoCard>
 
-                {/* 2. Category Details */}
-                <InfoCard title="Classification Details">
-                   <div className="flex flex-wrap gap-6 bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                      <div className="flex-1 min-w-[150px]">
-                        <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Category Type</p>
-                        <p className="text-sm font-black text-slate-800 uppercase flex items-center gap-2"><Tag size={14}/> {complaint.Category?.name}</p>
-                      </div>
-                      <div className="flex-1 min-w-[150px]">
-                        <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Resolution SLA</p>
-                        <p className="text-sm font-black text-emerald-600 uppercase">{complaint.Category?.resolutionTimeDays} Days</p>
-                      </div>
-                      <div className="flex-1 min-w-[150px]">
-                        <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Escalation SLA</p>
-                        <p className="text-sm font-black text-amber-600 uppercase">{complaint.Category?.escalationTimeDays} Days</p>
-                      </div>
-                   </div>
-                </InfoCard>
-
-                {/* 3. Description */}
                 <InfoCard title="Full Description">
                   <div className="p-6 bg-white border border-slate-100 rounded-2xl italic text-slate-600 leading-relaxed font-medium">
                     "{complaint.description}"
                   </div>
-                </InfoCard>
-
-                {/* 4. Attachments Display */}
-                <InfoCard title="Evidence & Media">
-                  {complaint.Attachments?.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {complaint.Attachments.map((file) => (
-                        <div key={file.id} className="group relative flex items-center gap-4 p-4 border border-slate-200 rounded-2xl bg-white hover:border-emerald-400 transition-all">
-                          <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400">
-                            {file.file_type.includes('image') ? <ImageIcon size={20} /> : <Paperclip size={20} />}
-                          </div>
-                          <div className="flex-1 overflow-hidden">
-                            <p className="text-[11px] font-bold text-slate-700 truncate">{file.original_name}</p>
-                            <p className="text-[9px] text-slate-400 uppercase font-black">{file.file_type.split('/')[1]}</p>
-                          </div>
-                          <a href={file.file_path} target="_blank" className="p-2 bg-emerald-50 text-emerald-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Download size={16} />
-                          </a>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="py-10 text-center border-2 border-dashed border-slate-100 rounded-3xl">
-                       <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">No evidence files attached</p>
-                    </div>
-                  )}
                 </InfoCard>
               </div>
 
@@ -193,8 +143,9 @@ const ComplaintDetails = () => {
                   <StatusHistory history={complaint.StatusLogs || []} />
                 </InfoCard>
 
-                <InfoCard title={isSupervisor ? "Decision Management" : "View Authority"}>
-                  {isSupervisor ? (
+                <InfoCard title={canUpdateStatus ? "Decision Management" : "View Authority"}>
+                  {/* ONLY OFFICER OR SUPERVISOR CAN SEE THIS */}
+                  {canUpdateStatus ? (
                     <div className="space-y-5">
                       <div className="space-y-2">
                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Update Status To</label>
@@ -226,16 +177,21 @@ const ComplaintDetails = () => {
                         Commit Status Change
                       </button>
 
-                      <div className="pt-4 border-t border-slate-100">
-                        <Link to={`/AssignComplain/${complaint.id}`} className="w-full bg-emerald-50 text-emerald-600 font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-100 transition-all text-[10px] uppercase tracking-widest">
-                          <UserPlus size={16} /> Assign Officer
-                        </Link>
-                      </div>
+                      {/* EXTRA OPTION ONLY FOR SUPERVISORS */}
+                      {isSupervisor && (
+                        <div className="pt-4 border-t border-slate-100">
+                          <Link to={`/AssignComplain/${complaint.id}`} className="w-full bg-emerald-50 text-emerald-600 font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-100 transition-all text-[10px] uppercase tracking-widest">
+                            <UserPlus size={16} /> Assign Officer
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   ) : (
+                    /* FORBIDDEN FOR ADMINS */
                     <div className="p-8 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                       <Lock size={20} className="mx-auto text-slate-300 mb-2" />
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Read-Only Access</p>
+                      <p className="text-[9px] text-slate-400 mt-1">Admins cannot modify case status.</p>
                     </div>
                   )}
                 </InfoCard>
@@ -243,7 +199,6 @@ const ComplaintDetails = () => {
             </div>
           </div>
         </main>
-       
       </div>
     </div>
   );
