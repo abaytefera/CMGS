@@ -1,19 +1,65 @@
 import React, { useState } from 'react';
-import { Edit3, Trash2, Mail, Search, X, Building2 } from 'lucide-react';
+import { Edit3, Trash2, Mail, Search, X, Building2, AlertTriangle } from 'lucide-react';
 
 const UserTable = ({ users = [], onEdit, onDelete }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  // Track the user object intended for deletion
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const filteredUsers = users.filter((user) => {
     const search = searchTerm.trim().toLowerCase();
     if (!search) return true;
     return user?.full_name?.toLowerCase().includes(search);
   });
-  console.log(users)
+
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
+  };
+
+  const confirmDelete = () => {
+    if (userToDelete) {
+      onDelete(userToDelete.id || userToDelete._id);
+      setUserToDelete(null); // Close modal
+    }
+  };
 
   return (
     <div className="space-y-6 font-sans relative bottom-18 antialiased text-slate-900 bg-white p-6 rounded-xl">
       
+      {/* ================= CUSTOM CONFIRMATION MODAL ================= */}
+      {userToDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl border border-slate-100 flex flex-col items-center text-center gap-4">
+            <div className="p-4 rounded-full bg-rose-50 text-rose-500">
+              <AlertTriangle size={32} />
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-black text-slate-900 mb-2">Delete User?</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Are you sure you want to remove <span className="font-bold text-slate-900">"{userToDelete.full_name}"</span>? 
+                This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex gap-3 w-full mt-2">
+              <button 
+                onClick={() => setUserToDelete(null)}
+                className="flex-1 py-3.5 rounded-2xl bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-widest border border-slate-100 hover:bg-slate-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="flex-1 py-3.5 rounded-2xl bg-rose-500 text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-rose-200 active:scale-95 transition-all"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* SEARCH INPUT */}
       <div className="relative max-w-md group">
         <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -57,7 +103,7 @@ const UserTable = ({ users = [], onEdit, onDelete }) => {
                   </div>
                   <div className="flex gap-1">
                     <button onClick={() => onEdit(user)} className="p-2 text-emerald-600"><Edit3 size={16} /></button>
-                    <button onClick={() => onDelete(user.id || user._id)} className="p-2 text-rose-600"><Trash2 size={16} /></button>
+                    <button onClick={() => handleDeleteClick(user)} className="p-2 text-rose-600"><Trash2 size={16} /></button>
                   </div>
                 </div>
               </div>
@@ -93,7 +139,7 @@ const UserTable = ({ users = [], onEdit, onDelete }) => {
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
                         <Building2 size={14} className="text-emerald-500" />
-                        <span className="uppercase tracking-tight">{user.departmentName || user.departmentId}</span>
+                        <span className="uppercase tracking-tight">{user.Department?.name || user.departmentName}</span>
                       </div>
                     </td>
                     <td className="px-8 py-5">
@@ -111,7 +157,7 @@ const UserTable = ({ users = [], onEdit, onDelete }) => {
                           <Edit3 size={18} />
                         </button>
                         <button 
-                          onClick={() => onDelete(user.id || user._id)} 
+                          onClick={() => handleDeleteClick(user)} 
                           className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                         >
                           <Trash2 size={18} />

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useSelector } from "react-redux";
-import { Download, ExternalLink, Inbox } from 'lucide-react';
+import { Download, Inbox } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const ComplaintList = ({ Data = [] }) => { // Default to empty array to prevent .map errors
+const ComplaintList = ({ Data = [] }) => { 
   const { Language = "EN" } = useSelector((state) => state.webState || {});
   const navigate = useNavigate();
 
@@ -14,8 +14,8 @@ const ComplaintList = ({ Data = [] }) => { // Default to empty array to prevent 
     colSubject: Language === "AMH" ? "የአቤቱታው ርዕስ" : "Complaint Subject",
     colStatus: Language === "AMH" ? "ሁኔታ" : "Status",
     colPriority: Language === "AMH" ? "ቅድሚያ" : "Priority",
+    view: Language === "AMH" ? "ተመልከት" : "View", // Added View translation
     noData: Language === "AMH" ? "ምንም መዝገብ አልተገኘም" : "No records found",
-    // Helper function for dynamic status labels
     getStatusLabel: (status) => {
         if (Language === "AMH") {
             const labels = { 'New': 'አዲስ', 'In Progress': 'በሂደት ላይ', 'Overdue': 'ጊዜ ያለፈበት' };
@@ -53,7 +53,7 @@ const ComplaintList = ({ Data = [] }) => { // Default to empty array to prevent 
                 <tr
                   key={c._id || c.id}
                   onClick={() => navigate(`/DetailList/${c._id || c.id}`)}
-                  className="hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="hover:bg-gray-50 cursor-pointer transition-colors group"
                 >
                   <td className="px-6 py-4 font-mono text-emerald-600 font-medium">
                     {c.ref_number || c.id}
@@ -70,12 +70,10 @@ const ComplaintList = ({ Data = [] }) => { // Default to empty array to prevent 
                   </td>
                   <td className="px-6 py-4 text-gray-700">{c.priority}</td>
                   <td className="px-6 py-4 text-right">
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); navigate(`/DetailList/${c._id || c.id}`); }}
-                        className="p-2 rounded-md hover:bg-gray-200 text-gray-400 hover:text-gray-600"
-                    >
-                      <ExternalLink size={16} />
-                    </button>
+                    {/* Replaced Icon with "View" Text button */}
+                    <span className="text-emerald-600 font-bold text-xs uppercase tracking-wider group-hover:underline">
+                      {t.view}
+                    </span>
                   </td>
                 </tr>
               ))
