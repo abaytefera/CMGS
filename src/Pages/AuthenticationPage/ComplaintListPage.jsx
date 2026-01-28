@@ -31,6 +31,10 @@ const ComplaintListPage = () => {
   const filteredComplaints = useMemo(() => {
     // 1. Critical Fix: Ensure TotalCompile is an array before spreading
     if (!TotalCompile || !Array.isArray(TotalCompile)) return [];
+    useEffect(()=>{
+console.log("what is happen");
+console.log(TotalCompile);
+    },[TotalCompile])
     
     // 2. Safety: Remove any null/undefined entries that might have come from the API
     let list = TotalCompile.filter(item => item !== null && typeof item === 'object');
