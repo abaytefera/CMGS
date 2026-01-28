@@ -18,7 +18,6 @@ import AdminDashboardChart from '../../../Component/AuthenticateComponent/AdminD
 const AdminDashboard = () => {
   const { Language } = useSelector((state) => state.webState || {});
 
-  // Fetching all required data
   const { data: stats, isLoading: sLoading } = useGetAdminStatsQuery();
   const { data: activities, isLoading: aLoading } = useGetSystemActivityQuery();
   const { data: dep, isLoading: dLoading } = useGetDepartmentsQuery();
@@ -44,13 +43,16 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50/40">
+    // FIX 1: Added h-screen and overflow-hidden to the main container
+    <div className="flex h-screen overflow-hidden bg-gray-50/40">
       <Sidebar role="admin" />
       
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* FIX 2: min-w-0 prevents flex items from pushing the page width */}
+      <div className="flex-1 flex flex-col min-w-0 h-full relative">
         <AuthHeader True={true} />
         
-        <main className="flex-1 pt-32 px-6 lg:px-10 pb-10 space-y-8 overflow-y-auto">
+        {/* FIX 3: Set overflow-y-auto here and pb-24 to ensure the bottom isn't cut off */}
+        <main className="flex-1 overflow-y-auto pt-32 px-6 lg:px-10 pb-24 space-y-8 scroll-smooth">
           <div className="max-w-7xl mx-auto">
             
             {/* Page Header */}
@@ -64,12 +66,13 @@ const AdminDashboard = () => {
             {/* Statistics Row */}
             <AdminStats CompileList={CompileList} />
             
-            {/* Graph & Summary Row */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mt-10">
-              <div className="xl:col-span-2">
+            {/* Graph & Summary Row - FIXED: Grid alignment */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mt-10 items-start">
+              <div className="xl:col-span-2 h-full">
                 <AdminDashboardChart data={CompileList} language={Language} />
               </div>
-              <div className="xl:col-span-1">
+              <div className="xl:col-span-1 h-full">
+                {/* FIX 4: Ensure SystemSummary is wrapped or has internal padding if needed */}
                 <SystemSummary catagory={catagory?.length} dep={dep?.length} />
               </div>
             </div>
@@ -83,34 +86,35 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="overflow-x-auto px-6 pb-6">
-                <table className="w-full text-left">
+              {/* FIX 5: Internal table scroll to prevent container stretching */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left min-w-[600px]">
                   <thead className="text-gray-400 text-[10px] uppercase font-black tracking-widest border-b border-gray-50">
                     <tr>
-                      <th className="px-4 py-6">Tracking ID</th>
-                      <th className="px-4 py-6">Subject</th>
-                      <th className="px-4 py-6">Status</th>
-                      <th className="px-4 py-6 text-right">Action</th>
+                      <th className="px-8 py-6">Tracking ID</th>
+                      <th className="px-8 py-6">Subject</th>
+                      <th className="px-8 py-6">Status</th>
+                      <th className="px-8 py-6 text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {(activities || []).map((item, i) => (
                       <tr key={item.id || i} className="group hover:bg-gray-50/50 transition-all">
-                        <td className="px-4 py-6 font-mono text-emerald-600 text-xs font-black">
+                        <td className="px-8 py-6 font-mono text-emerald-600 text-xs font-black">
                           {item.trackingId || `EPA-${2026}-${i}`}
                         </td>
-                        <td className="px-4 py-6 text-xs font-bold text-gray-800">
+                        <td className="px-8 py-6 text-xs font-bold text-gray-800">
                           {item.subject || "Environmental Monitoring Request"}
                         </td>
-                        <td className="px-4 py-6">
+                        <td className="px-8 py-6">
                           <span className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border ${
                             item.isOverdue ? 'text-rose-600 bg-rose-50 border-rose-100' : 'text-amber-600 bg-amber-50 border-amber-100'
                           }`}>
                             <AlertTriangle size={10} /> {item.isOverdue ? t.overdue : t.pending}
                           </span>
                         </td>
-                        <td className="px-4 py-6 text-right">
-                          <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-gray-100">
+                        <td className="px-8 py-6 text-right">
+                          <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-gray-100 mr-4">
                             <ExternalLink size={14} />
                           </button>
                         </td>
@@ -120,7 +124,6 @@ const AdminDashboard = () => {
                 </table>
               </div>
             </div>
-            
           </div>
         </main>
       </div>
