@@ -207,7 +207,7 @@ const ComplaintListPage = () => {
             </div>
           </div>
         </main>
-        <AuthFooter />
+        
       </div>
     </div>
   );

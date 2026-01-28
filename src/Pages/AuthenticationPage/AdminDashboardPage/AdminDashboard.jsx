@@ -143,7 +143,7 @@ console.log(CompileList);
             </div>
           </div>
         </main>
-        <AuthFooter />
+      
       </div>
     </div>
   );

@@ -56,15 +56,7 @@ const AuthHeader = ({ True }) => {
           {/* Desktop Right Menu */}
           <div className="hidden md:flex items-center space-x-6">
             
-            {/* Language Selector */}
-            <select 
-              onChange={toggleLanguage} 
-              value={Language}
-              className="text-xs font-bold border-none bg-slate-50 rounded-lg px-2 py-1 focus:ring-0 cursor-pointer"
-            >
-              <option value="EN">EN</option>
-              <option value="AMH">AMH</option>
-            </select>
+           
 
             {/* Officer Profile */}
             <div className={`flex ${True && "md:mr-20"} items-center space-x-3 p-1.5 pr-4 rounded-full border border-slate-100 hover:bg-slate-50 transition-all cursor-pointer`}>

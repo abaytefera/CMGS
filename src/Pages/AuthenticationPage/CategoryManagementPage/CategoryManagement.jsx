@@ -142,7 +142,7 @@ const CategoryManagement = () => {
           </div>
         </main>
 
-        <AuthFooter />
+      
       </div>
 
       {/* ===================== MODAL ===================== */}

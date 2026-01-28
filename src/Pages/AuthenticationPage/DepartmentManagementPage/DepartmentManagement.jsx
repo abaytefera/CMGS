@@ -126,7 +126,7 @@ console.log("update info")
             )}
           </div>
         </main>
-        <AuthFooter />
+   
       </div>
 
       {/* ================= MODAL FORM ================= */}
