@@ -22,7 +22,8 @@ const {data:CompileList,isLoading:isLoadingCompiletask}=useGetComplaintsDashboar
     window.scrollTo(0, 0);
   }, []);
   useEffect(()=>{
-
+console.log("what is error")
+console.log(stats);
 console.log(CompileList);
   },[CompileList])
 
