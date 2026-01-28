@@ -5,7 +5,7 @@ export const supervisorApi = APi.injectEndpoints({
   endpoints: (builder) => ({
     getSupervisorStats: builder.query({
       // Correct endpoint for supervisor-level metrics
-      query: () => '/dashboard/management',
+      query: () => 'api/dashboard/management',
       providesTags: ['Complaints', 'Dashboard'],
       // Standardizing response to target the 'data' key
       transformResponse: (res) => res?.data?.stats || { total: 0, pending: 0, assigned: 0 },
@@ -13,7 +13,7 @@ export const supervisorApi = APi.injectEndpoints({
 
     getOfficers: builder.query({
       // Correct endpoint to fetch staff with the officer role
-      query: () => '/users?role=OFFICER',
+      query: () => 'api/users?role=OFFICER',
       providesTags: ['User'],
       transformResponse: (response) => response?.data || [],
     }),
@@ -22,7 +22,7 @@ export const supervisorApi = APi.injectEndpoints({
 updateAssign: builder.mutation({
   query: (assignmentData) => ({
     // Use the absolute path or relative to your baseQuery
-    url: '/workflow/assign', 
+    url: 'api/workflow/assign', 
     method: 'POST', // Ensure your backend is app.post() not app.put()
     body: {
       complaintId: assignmentData.id,
