@@ -138,7 +138,7 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
                       }`}
                       title={dept.is_active ? "Disable" : "Enable"}
                     >
-                      {dept.is_active ? <ShieldAlert size={18} /> : <ShieldCheck size={18} />}
+                      {dept.is_active ? <ShieldX size={18} /> : <CheckCircle2 size={18} />}
                     </button>
                   </div>
                 </td>
