@@ -12,7 +12,7 @@ import AuthHeader from '../../Component/AuthenticateComponent/AuthHeader';
 const ComplaintListPage = () => {
   const { Language } = useSelector((state) => state.webState);
   const { user } = useSelector((state) => state.auth);
-  
+
   // Role Helpers
   const isAdmin = user?.role === "ADMIN";
   const isOfficer = user?.role === "OFFICER";
@@ -22,22 +22,26 @@ const ComplaintListPage = () => {
   const [filterType, setFilterType] = useState("TOTAL");
 
   // RTK Query
-  const { data: TotalCompile, isLoading, isFetching } = useGetComplaintsbyCatagoryQuery({ 
-    role: role, 
-    type: type 
-  }, { skip: !role || !type }); // Prevent calling API if params are missing
+  const { data: TotalCompile, isLoading, isFetching } = useGetComplaintsbyCatagoryQuery({
+    role: role,
+    type: type
+  }, { skip: !role || !type });
+
+  // ✅ FIX: Moved useEffect out of useMemo. 
+  // Hooks must be at the top level of the component.
+  useEffect(() => {
+    if (TotalCompile) {
+      console.log("Data changed or loaded:", TotalCompile);
+    }
+  }, [TotalCompile]);
 
   // Memoized Filtering Logic
   const filteredComplaints = useMemo(() => {
-    // 1. Critical Fix: Ensure TotalCompile is an array before spreading
-    if (!TotalCompile || !Array.isArray(TotalCompile)) return [];
-    useEffect(()=>{
-console.log("what is happen");
-console.log(TotalCompile);
-    },[TotalCompile])
-    
-    // 2. Safety: Remove any null/undefined entries that might have come from the API
-    let list = TotalCompile.filter(item => item !== null && typeof item === 'object');
+    // Ensure we start with an empty array if data isn't loaded yet
+    let list = Array.isArray(TotalCompile) ? [...TotalCompile] : [];
+
+    // Safety: Remove any null/undefined entries
+    list = list.filter(item => item !== null && typeof item === 'object');
 
     // --- OFFICER SPECIFIC FILTER LOGIC ---
     if (isOfficer) {
@@ -66,7 +70,7 @@ console.log(TotalCompile);
         default:
           break;
       }
-    } 
+    }
     else if (isAdmin && filterType === "ACTIVE") {
       list = list.filter(item => !['RESOLVED', 'REJECTED', 'CLOSED'].includes(item?.status?.toUpperCase()));
     }
@@ -74,8 +78,8 @@ console.log(TotalCompile);
     // Apply Search with Optional Chaining
     if (searchTerm) {
       const lowerSearch = searchTerm.toLowerCase();
-      list = list.filter(item => 
-        item?.ref_number?.toLowerCase().includes(lowerSearch) || 
+      list = list.filter(item =>
+        item?.ref_number?.toLowerCase().includes(lowerSearch) ||
         item?.citizen_name?.toLowerCase().includes(lowerSearch)
       );
     }
@@ -103,20 +107,26 @@ console.log(TotalCompile);
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <AuthHeader True={true} />
-        
+
         <main className="flex-grow pt-32 px-6 lg:px-10 overflow-y-auto bg-slate-50/50">
           <div className="max-w-7xl mx-auto">
-            
+
             <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
               <div>
-                
-                
                 <div className="flex flex-wrap gap-2 mt-6">
-                 
+                  {/* Reset/Total Filter Button */}
+                  <button 
+                    onClick={() => setFilterType("TOTAL")}
+                    className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
+                      filterType === "TOTAL" ? "bg-slate-800 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
+                    }`}
+                  >
+                    All Complaints
+                  </button>
 
                   {isOfficer && (
                     <>
-                      <button 
+                      <button
                         onClick={() => setFilterType("IN_PROGRESS")}
                         className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
                           filterType === "IN_PROGRESS" ? "bg-amber-500 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
@@ -125,7 +135,7 @@ console.log(TotalCompile);
                         <PlayCircle size={14} /> In Progress
                       </button>
 
-                      <button 
+                      <button
                         onClick={() => setFilterType("OVERDUE")}
                         className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
                           filterType === "OVERDUE" ? "bg-rose-500 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
@@ -134,7 +144,7 @@ console.log(TotalCompile);
                         <AlertTriangle size={14} /> Overdue
                       </button>
 
-                      <button 
+                      <button
                         onClick={() => setFilterType("RESOLVED")}
                         className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
                           filterType === "RESOLVED" ? "bg-emerald-600 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
@@ -143,7 +153,7 @@ console.log(TotalCompile);
                         <CheckCircle size={14} /> Resolved
                       </button>
 
-                      <button 
+                      <button
                         onClick={() => setFilterType("REJECTED")}
                         className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
                           filterType === "REJECTED" ? "bg-slate-600 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
@@ -155,14 +165,14 @@ console.log(TotalCompile);
                   )}
                 </div>
               </div>
-              
+
               <div className="relative w-full md:w-96">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search tracking ID..." 
+                  placeholder="Search tracking ID..."
                   className="w-full bg-white border border-slate-200 py-3.5 pl-12 pr-4 rounded-2xl outline-none text-sm"
                 />
               </div>
@@ -170,10 +180,10 @@ console.log(TotalCompile);
 
             <div className="bg-white border border-slate-200 rounded-[2.5rem] shadow-sm overflow-hidden mb-10">
               <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
-                 <ListFilter className="text-emerald-600" size={18} />
-                 <span className="text-xs font-black text-slate-800 uppercase tracking-widest italic">
-                    Showing: {filterType.replace('_', ' ')} ({filteredComplaints.length})
-                 </span>
+                <ListFilter className="text-emerald-600" size={18} />
+                <span className="text-xs font-black text-slate-800 uppercase tracking-widest italic">
+                  Showing: {filterType.replace('_', ' ')} ({filteredComplaints.length})
+                </span>
               </div>
 
               <div className="overflow-x-auto">
@@ -204,7 +214,7 @@ console.log(TotalCompile);
             </div>
           </div>
         </main>
-        
+        <AuthFooter />
       </div>
     </div>
   );
