@@ -119,7 +119,7 @@ const Sidebar = () => {
 
           <nav className="flex-1 space-y-7 overflow-y-auto no-scrollbar">
             <section>
-              <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{t.mainMenu}</p>
+              <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{}</p>
               <Link 
                 to={dashboardUrl}
                 onClick={() => setIsOpen(false)}
@@ -131,7 +131,7 @@ const Sidebar = () => {
             </section>
 
             <section>
-              <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{t.quickActions}</p>
+              <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{}</p>
               <div className="space-y-0.5">
                 {quickButtons.map((item, idx) => <NavLink key={idx} item={item} />)}
               </div>

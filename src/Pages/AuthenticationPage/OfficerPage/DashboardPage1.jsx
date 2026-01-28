@@ -1,41 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from "react-redux";
-import toast, { Toaster } from 'react-hot-toast'; 
+import { Toaster } from 'react-hot-toast'; 
 import {
-  LayoutGrid,
-  ClipboardList,
-  Clock,
-  AlertCircle,
-  TrendingUp,
-  CheckCircle,
-  XCircle,
-  Loader2
+  LayoutGrid, ClipboardList, Clock, AlertCircle, 
+  TrendingUp, CheckCircle, XCircle, Loader2 
 } from 'lucide-react';
 
 // API Hooks
 import { useGetOfficerStatsQuery } from '../../../Redux/officerApi';
-import { useGetComplaintsQuery } from '../../../Redux/complaintApi';
+import { useGetComplaintsDashboardQuery } from '../../../Redux/complaintApi';
 
 // Components
 import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
 import StatCard from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/StatCard';
 import ComplaintList from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/ComplaintList';
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
-import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
-import { useGetComplaintsDashboardQuery } from '../../../Redux/complaintApi';
+import OfficerOverviewChart from './OfficerOverviewChart'; // New Import
+
 const OfficerPage1 = () => {
   const { Language } = useSelector((state) => state.webState);
   
-  // Data Fetching
   const { data: stats, isLoading: isLoadingStats } = useGetOfficerStatsQuery();
-const {data:CompileList,isLoading:isLoadingCompiletask}=useGetComplaintsDashboardQuery('officer');
+  const { data: CompileList, isLoading: isLoadingCompiletask } = useGetComplaintsDashboardQuery('officer');
 
-
-  // Translations
   const t = {
     live: Language === "AMH" ? "ቀጥታ" : "Live",
     pageTitle: Language === "AMH" ? "ዳሽቦርድ" : "Dashboard",
-    systemName: Language === "AMH" ? "የቅሬታ አያያዝ ስርዓት" : "Complaint Management System",
     recentWork: Language === "AMH" ? "የቅርብ ጊዜ ስራዎች" : "Recent Work Records",
     statAssigned: Language === "AMH" ? "የተመደቡ" : "Assigned",
     statProgress: Language === "AMH" ? "በሂደት ላይ" : "In Progress",
@@ -44,85 +34,71 @@ const {data:CompileList,isLoading:isLoadingCompiletask}=useGetComplaintsDashboar
     statRejected: Language === "AMH" ? "ውድቅ የተደረጉ" : "Rejected",
   };
 
-
-  // Internal State for Filtered Data
-  const [assigned, setAssigned] = useState([]);
-  const [inProgress, setInProgress] = useState([]);
-  const [resolved, setResolved] = useState([]);
-  const [rejected, setRejected] = useState([]);
-
-
-  useEffect(()=>{
-
-console.log(CompileList);
-
-  },[CompileList])
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  if (isLoadingCompiletask) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <Loader2 className="animate-spin text-emerald-500" size={48} />
+    </div>
+  );
+
   return (
-    <div className="flex min-h-screen bg-gray-50 text-gray-900">
-      {/* Toast Notifications Container */}
+    <div className="flex min-h-screen bg-gray-50/50 text-gray-900">
       <Toaster position="top-right" />
-      
       <Sidebar role="OFFICER" />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <AuthHeader True={true} />
 
         <main className="flex-1 overflow-y-auto pt-32 px-6 lg:px-10 pb-10">
           <div className="max-w-7xl mx-auto">
 
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+            {/* Top Section: Stats & Graph Grid */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-10">
               
+              {/* Left Side: Stats Cards */}
+              <div className="xl:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <StatCard title={t.statAssigned} count={CompileList?.assigned} icon={ClipboardList} type="assigned" />
+                <StatCard title={t.statProgress} count={CompileList?.inProgress} icon={Clock} type="in_progress" />
+                <StatCard title={t.statResolved} count={CompileList?.resolved} icon={CheckCircle} type="resolved" />
+                <StatCard title={t.statRejected} count={CompileList?.rejected} icon={XCircle} type="rejected" />
+                
+                <div className="sm:col-span-2 bg-rose-50 border border-rose-100 p-4 rounded-2xl flex items-center justify-between">
+                   <div className="flex items-center gap-3">
+                      <AlertCircle className="text-rose-500" />
+                      <span className="font-bold text-rose-700 uppercase text-xs tracking-widest">{t.statOverdue}</span>
+                   </div>
+                   <span className="text-2xl font-black text-rose-700">{CompileList?.overdue}</span>
+                </div>
+              </div>
 
-              <div className="px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg text-sm font-bold flex items-center gap-2 shadow-sm">
-                <TrendingUp size={16} />
-                Efficiency: {isLoadingStats ? "..." : "94%"}
+              {/* Right Side: Visual Graph */}
+              <div className="xl:col-span-1">
+                <OfficerOverviewChart data={CompileList} t={t} />
               </div>
             </div>
 
-
-   {/* Stats Grid - FIXED: Passing .length to avoid Object error */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10">
-              <StatCard title={t.statAssigned} type="assigned" count={isLoadingCompiletask ? "…" : CompileList.assigned} icon={ClipboardList} />
-              <StatCard title={t.statProgress} type="in_progress" count={isLoadingCompiletask ? "…" : CompileList.inProgress} icon={Clock} />
-              <StatCard title={t.statOverdue} type="overdue" count={isLoadingCompiletask ? "…" : CompileList.overdue} icon={AlertCircle} />
-              <StatCard title={t.statResolved} type="resolved" count={isLoadingCompiletask ? "…" : CompileList.resolved} icon={CheckCircle} />
-              <StatCard title={t.statRejected} type="rejected" count={isLoadingCompiletask ? "…" : CompileList.rejected} icon={XCircle} />
-            </div>
-
-            {/* Table Section Header */}
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-emerald-600 rounded-lg text-white shadow-md">
-                  <LayoutGrid size={18} />
+            {/* Table Header */}
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-600 rounded-xl text-white shadow-lg shadow-emerald-200">
+                  <LayoutGrid size={20} />
                 </div>
-                <h3 className="font-bold text-gray-800 uppercase text-sm tracking-wider">
+                <h3 className="font-black text-gray-900 uppercase text-xs tracking-widest">
                   {t.recentWork}
                 </h3>
               </div>
-              
-              {isLoadingCompiletask && (
-                <div className="flex items-center gap-2 text-gray-400 text-xs font-bold italic">
-                  <Loader2 size={14} className="animate-spin" /> Updating Records...
-                </div>
-              )}
             </div>
 
             {/* Complaints List Table */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-12">
-              {/* Pass the full 'compile' array to the list for rendering rows */}
+            <div className="bg-white border border-gray-100 rounded-[2rem] shadow-sm overflow-hidden mb-12">
               <ComplaintList Data={[]} />
             </div>
 
           </div>
         </main>
-
-      
       </div>
     </div>
   );
