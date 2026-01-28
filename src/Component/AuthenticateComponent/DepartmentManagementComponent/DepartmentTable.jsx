@@ -4,10 +4,8 @@ import {
   Search, 
   Filter, 
   Building2, 
-  ShieldCheck, 
-  ShieldAlert,
-  ShieldOff, // Added as a valid replacement for ShieldX
-  CheckCircle2, // Added for your new Active status
+  CheckCircle2, 
+  ShieldAlert, // Fixed replacement for ShieldX
   AlertTriangle 
 } from "lucide-react";
 
@@ -35,7 +33,7 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
   return (
     <div className="flex flex-col gap-6 font-sans relative">
       
-      {/* ================= CONFIRMATION MODAL ================= */}
+      {/* ================= MODAL: PROFESSIONAL DESIGN ================= */}
       {confirmToggle && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300">
           <div className="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl border border-slate-100 flex flex-col items-center text-center">
@@ -54,7 +52,7 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
                 onClick={() => setConfirmToggle(null)}
                 className="flex-1 py-4 rounded-2xl bg-slate-100 text-slate-600 font-bold text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all"
               >
-                Cancel
+                Go Back
               </button>
               <button 
                 onClick={confirmAction}
@@ -69,7 +67,7 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
         </div>
       )}
 
-      {/* Search & Header */}
+      {/* SEARCH BAR */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between px-2">
         <div className="relative w-full max-w-md group">
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-600 transition-colors" />
@@ -78,23 +76,19 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
             placeholder="Search departments..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white border border-slate-300 rounded-2xl py-3.5 pl-12 pr-4 text-sm text-slate-900 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm"
+            className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-sm"
           />
-        </div>
-        <div className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] bg-white px-5 py-3 rounded-2xl border border-slate-200 shadow-sm">
-          <Filter size={14} className="inline mr-2 text-emerald-500" /> 
-          Records: {filteredData.length}
         </div>
       </div>
 
-      {/* Desktop Table */}
-      <div className="hidden md:block bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/40">
+      {/* ================= DESKTOP TABLE ================= */}
+      <div className="hidden md:block bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/30">
         <table className="w-full text-left">
           <thead className="bg-slate-50 border-b border-slate-100 text-[10px] uppercase font-black text-slate-400 tracking-widest">
             <tr>
               <th className="px-8 py-6">Department Identity</th>
               <th className="px-8 py-6">Current Status</th>
-              <th className="px-8 py-6 text-right">Actions</th>
+              <th className="px-8 py-6 text-right">Settings</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
@@ -112,33 +106,37 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
                 </td>
 
                 <td className="px-8 py-6">
-                  <div className={`flex items-center gap-2 font-black text-[10px] uppercase tracking-widest ${dept.is_active ? 'text-emerald-600' : 'text-slate-400'}`}>
-                    {dept.is_active ? (
-                      <><ShieldCheck size={16} className="animate-pulse" /> Verified Active</>
-                    ) : (
-                      <><ShieldOff size={16} /> Deactivated</>
-                    )}
-                  </div>
+                  {/* Status Badge Logic from CategoryTable */}
+                  {dept.is_active ? (
+                    <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[10px] uppercase tracking-wider">
+                      <CheckCircle2 size={14} className="animate-pulse" /> Active
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 text-slate-400 font-bold text-[10px] uppercase tracking-wider">
+                      <ShieldAlert size={14} /> Inactive
+                    </div>
+                  )}
                 </td>
 
                 <td className="px-8 py-6 text-right">
-                  <div className="flex justify-end gap-3">
+                  <div className="flex justify-end gap-3 transition-opacity">
                     <button 
                       onClick={() => onEdit(dept)} 
-                      className="p-3 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
+                      className="p-2.5 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
                       title="Edit"
                     >
                       <Edit3 size={18} />
                     </button>
                     <button
                       onClick={() => handleToggleClick(dept)}
-                      className={`p-3 rounded-xl transition-all ${
+                      className={`p-2.5 rounded-xl transition-all ${
                         dept.is_active 
-                          ? "text-slate-400 hover:text-rose-500 hover:bg-rose-50" 
-                          : "bg-emerald-600 text-white shadow-lg shadow-emerald-100"
+                        ? "text-slate-400 hover:text-rose-500 hover:bg-rose-50" 
+                        : "text-emerald-500 bg-emerald-50 hover:bg-emerald-100"
                       }`}
+                      title={dept.is_active ? "Deactivate" : "Activate"}
                     >
-                      {dept.is_active ? <ShieldOff size={18} /> : <ShieldCheck size={18} />}
+                      {dept.is_active ? <ShieldAlert size={18} /> : <CheckCircle2 size={18} />}
                     </button>
                   </div>
                 </td>
@@ -151,8 +149,8 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
       {/* Mobile Card Design */}
       <div className="md:hidden flex flex-col gap-4 px-2">
         {filteredData.map((dept) => (
-          <div key={dept.id || dept._id} className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-lg shadow-slate-200/50">
-             <div className="flex justify-between items-center mb-6">
+          <div key={dept.id || dept._id} className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-md">
+             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${dept.is_active ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-50 text-slate-400'}`}>
                     <Building2 size={18} />
@@ -160,26 +158,23 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
                   <h4 className={`font-bold text-sm uppercase ${dept.is_active ? 'text-slate-900' : 'text-slate-400 line-through'}`}>{dept.name}</h4>
                 </div>
                 
-       
                 {dept.is_active ? (
                   <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[10px] uppercase tracking-wider">
                     <CheckCircle2 size={14} className="animate-pulse" /> Active
                   </div>
                 ) : (
                   <div className="flex items-center gap-1.5 text-slate-400 font-bold text-[10px] uppercase tracking-wider">
-                    <ShieldOff size={14} /> Inactive
+                    <ShieldAlert size={14} /> Inactive
                   </div>
                 )}
-          
-                
              </div>
              <div className="flex gap-3">
-                <button onClick={() => onEdit(dept)} className="flex-1 py-3.5 bg-slate-50 rounded-2xl text-[10px] font-black uppercase text-slate-500 tracking-widest border border-slate-100">Edit</button>
+                <button onClick={() => onEdit(dept)} className="flex-1 py-3 bg-slate-50 rounded-xl text-[10px] font-black uppercase text-slate-500">Edit</button>
                 <button 
                   onClick={() => handleToggleClick(dept)} 
-                  className={`flex-1 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${dept.is_active ? 'bg-rose-50 text-rose-600' : 'bg-emerald-600 text-white shadow-md shadow-emerald-200'}`}
+                  className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase ${dept.is_active ? 'bg-rose-50 text-rose-600' : 'bg-emerald-600 text-white'}`}
                 >
-                  {dept.is_active ? 'Disable' : 'Enable'}
+                  {dept.is_active ? 'Deactivate' : 'Activate'}
                 </button>
              </div>
           </div>
