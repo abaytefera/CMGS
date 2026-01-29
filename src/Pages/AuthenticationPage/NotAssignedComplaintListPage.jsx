@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from "react-redux";
 import { Search, Download, ChevronLeft, ChevronRight, LayoutGrid, Loader2, Inbox, AlertCircle } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { 
   useGetUnassignedComplaintsQuery, 
@@ -14,6 +14,7 @@ import AuthFooter from '../../Component/AuthenticateComponent/AuthFooter';
 import AuthHeader from '../../Component/AuthenticateComponent/AuthHeader';
 
 const NotAssignedComplaintListPage = () => {
+  const navigate = useNavigate(); // ✅ Added navigate
   const { Language } = useSelector((state) => state.webState);
   const { user } = useSelector((state) => state.auth);
   const { role: urlRole, type: urlType } = useParams();
@@ -25,29 +26,37 @@ const NotAssignedComplaintListPage = () => {
   const { 
     data: TotalCompile, 
     isLoading: isLoadingCompile, 
-    isFetching: isFetchingCompile 
+    isFetching: isFetchingCompile,
+    error: errorCompile // ✅ Capture error
   } = useGetComplaintsbyCatagoryQuery({ 
     role: urlRole || user?.role, 
     type: urlType 
-  }, { skip: !urlType }); // Skip if no type is provided in URL
+  }, { skip: !urlType });
 
-  // 2. Fetch Unassigned specifically if that's the primary goal
+  // 2. Fetch Unassigned specifically
   const { 
     data: unassignedData, 
     isLoading: isLoadingUnassigned, 
-    isFetching: isFetchingUnassigned 
+    isFetching: isFetchingUnassigned,
+    error: errorUnassigned // ✅ Capture error
   } = useGetUnassignedComplaintsQuery({
     search: searchTerm,
     page: page,
     limit: 10
-  }, { skip: !!urlType }); // Skip unassigned fetch if we are looking at a specific category
+  }, { skip: !!urlType });
 
-  // 3. Logic to determine which dataset to display
+  // --- 401 REDIRECT LOGIC ---
+  useEffect(() => {
+    if ((errorCompile && errorCompile.status === 401) || (errorUnassigned && errorUnassigned.status === 401)) {
+      navigate('/login', { replace: true });
+    }
+  }, [errorCompile, errorUnassigned, navigate]);
+  // --------------------------
+
   const displayData = useMemo(() => {
     const rawData = urlType ? TotalCompile : unassignedData?.data;
     if (!rawData) return [];
 
-    // Filter by search term locally if the API doesn't handle it for the category fetch
     if (searchTerm && urlType) {
       return rawData.filter(item => 
         item.ref_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -64,7 +73,6 @@ const NotAssignedComplaintListPage = () => {
     title: Language === "AMH" ? "የመዝገቦች ዝርዝር" : urlType ? `${urlType} Cases` : "Unassigned Cases",
     subtitle: Language === "AMH" ? "ለማስተዳደር ዝግጁ የሆኑ ሪፖርቶች" : "Manage environmental reports awaiting action",
     searchPlaceholder: Language === "AMH" ? "በመለያ ቁጥር ይፈልጉ..." : "Search by ID or name...",
-    // ... translations
   };
 
   return (

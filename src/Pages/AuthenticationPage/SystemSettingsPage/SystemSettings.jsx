@@ -5,13 +5,24 @@ import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/Da
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import SettingCard from '../../../Component/AuthenticateComponent/SystemSettingsComponent/SettingCard';
 import { ToggleRow, SettingInput } from '../../../Component/AuthenticateComponent/SystemSettingsComponent/ToggleRow';
+import { useNavigate } from 'react-router-dom';
 
 const SystemSettings = () => {
+  const navigate = useNavigate();
+
   // 1. Fetch Data from Node.js
-  const { data: serverSettings, isLoading } = useGetSystemSettingsQuery();
+  const { data: serverSettings, isLoading, error } = useGetSystemSettingsQuery();
   const [updateSettings, { isLoading: isSaving }] = useUpdateSettingsMutation();
 
   const [form, setForm] = useState({});
+
+  // --- 401 REDIRECT LOGIC ---
+  useEffect(() => {
+    if (error && error.status === 401) {
+      navigate('/login', { replace: true });
+    }
+  }, [error, navigate]);
+  // --------------------------
 
   useEffect(() => {
     window.scrollTo(0, 0);

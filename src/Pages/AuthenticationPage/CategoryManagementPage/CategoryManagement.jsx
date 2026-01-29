@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   useGetCategoriesQuery,
   useCreateCategoryMutation,
@@ -18,21 +19,36 @@ import { Loader2, Database, Layers, Plus, X } from 'lucide-react';
 const CategoryManagement = () => {
   const [editingCat, setEditingCat] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate();
 
   /* ===================== RTK QUERY ===================== */
   const {
     data: categories = [],
     isLoading,
     isError,
+    error: cError,
   } = useGetCategoriesQuery();
 
-  const [createCategory, { isLoading: isCreating }] =
+  const [createCategory, { isLoading: isCreating, error: createError }] =
     useCreateCategoryMutation();
 
-  const [OneUpdate, { isLoading: isUpdating }] =
+  const [OneUpdate, { isLoading: isUpdating, error: updateError }] =
     useOneUpdateMutation();
 
-  const { data: departments } = useGetDepartmentsQuery();
+  const { data: departments, error: dError } = useGetDepartmentsQuery();
+
+  /* ===================== 401 REDIRECT (ONLY ADDITION) ===================== */
+  useEffect(() => {
+    const errors = [cError, createError, updateError, dError];
+
+    const isUnauthorized = errors.some(
+      (err) => err?.status === 401
+    );
+
+    if (isUnauthorized) {
+      navigate('/login', { replace: true });
+    }
+  }, [cError, createError, updateError, dError, navigate]);
 
   /* ===================== SAVE ===================== */
   const handleSave = async (payload) => {
@@ -98,8 +114,6 @@ const CategoryManagement = () => {
               <h1 className="text-2xl relative top-10 font-black capitalize">
                 Category <span className="text-emerald-600">Management</span>
               </h1>
-
-              
             </header>
 
             {/* REGISTER BUTTON */}
@@ -141,14 +155,12 @@ const CategoryManagement = () => {
             )}
           </div>
         </main>
-
-      
       </div>
 
       {/* ===================== MODAL ===================== */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl mx-4 rounded-[3rem]  p-4">
+          <div className="relative w-full max-w-2xl mx-4 rounded-[3rem] p-4">
 
             {/* CLOSE */}
             <button

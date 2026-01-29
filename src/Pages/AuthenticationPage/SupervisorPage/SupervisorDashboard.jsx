@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { useSelector } from "react-redux";
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   ShieldAlert, TrendingUp, BarChart3, UserPlus, 
   CheckCircle2, Users, XCircle, Loader2 
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 // API Hooks
 import { useGetSupervisorStatsQuery } from '../../../Redux/supervisorApi';
@@ -18,10 +18,19 @@ import EfficiencyChart from '../../../Component/AuthenticateComponent/Supervisor
 
 const SupervisorDashboard = () => {
   const { Language } = useSelector((state) => state.webState);
+  const navigate = useNavigate();
   
   // Data Fetching
-  const { data: stats, isLoading: statsLoading } = useGetSupervisorStatsQuery();
-  const { data: CompileList, isLoading: listLoading } = useGetComplaintsDashboardQuery('supervisor');
+  const { data: stats, isLoading: statsLoading, error: statsError } = useGetSupervisorStatsQuery();
+  const { data: CompileList, isLoading: listLoading, error: listError } = useGetComplaintsDashboardQuery('supervisor');
+
+  // --- 401 REDIRECT LOGIC ---
+  useEffect(() => {
+    if ((statsError && statsError.status === 401) || (listError && listError.status === 401)) {
+      navigate('/login', { replace: true });
+    }
+  }, [statsError, listError, navigate]);
+  // ---------------------------------
 
   useEffect(() => {
     window.scrollTo(0, 0);

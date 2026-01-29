@@ -7,6 +7,8 @@ import {
   useUpdateDepartmentMutation
 } from '../../../Redux/departmentApi';
 
+import { useNavigate } from 'react-router-dom'; // ✅ ADDED
+
 import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import DepartmentForm from '../../../Component/AuthenticateComponent/DepartmentManagementComponent/DepartmentForm';
@@ -20,18 +22,46 @@ const DepartmentPage = () => {
   const [editingDept, setEditingDept] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  // RTK Query Hooks
-  const { data: departmentsData, isLoading, isError } = useGetDepartmentsQuery();
-  const [addDepartment, { isLoading: isAdding }] = useAddDepartmentMutation();
-  const [updateDepartment, { isLoading: isUpdating }] = useUpdateDepartmentMutation();
-  const { data: user } = useGetUsersQuery();
- useEffect(()=>{
-console.log("update info")
-  console.log(user);
+  const navigate = useNavigate(); // ✅ ADDED
 
- },[user])
+  // RTK Query Hooks
+  const { 
+    data: departmentsData, 
+    isLoading, 
+    isError,
+    error: deptError // ✅ ADDED
+  } = useGetDepartmentsQuery();
+
+  const [addDepartment, { isLoading: isAdding }] =
+    useAddDepartmentMutation();
+
+  const [updateDepartment, { isLoading: isUpdating }] =
+    useUpdateDepartmentMutation();
+
+  const { 
+    data: user,
+    error: userError // ✅ ADDED
+  } = useGetUsersQuery();
+
+  useEffect(() => {
+    console.log("update info");
+    console.log(user);
+  }, [user]);
 
   const departments = departmentsData || [];
+
+  // ✅ 401 REDIRECT HANDLER (ONLY ADDITION)
+  useEffect(() => {
+    const errors = [deptError, userError];
+
+    const isUnauthorized = errors.some(
+      (err) => err?.status === 401
+    );
+
+    if (isUnauthorized) {
+      navigate('/login', { replace: true });
+    }
+  }, [deptError, userError, navigate]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -39,22 +69,36 @@ console.log("update info")
 
   // Save or update department
   const handleSave = async (formData) => {
-    const toastId = toast.loading(editingDept ? "Updating department..." : "Adding department...");
+    const toastId = toast.loading(
+      editingDept ? "Updating department..." : "Adding department..."
+    );
+
     try {
       if (editingDept) {
         await updateDepartment({ 
           id: editingDept._id || editingDept.id, 
           ...formData
         }).unwrap();
+
         toast.success("Department updated successfully!", { id: toastId });
       } else {
         await addDepartment(formData).unwrap();
         toast.success("Department added successfully!", { id: toastId });
       }
+
       setEditingDept(null);
       setShowForm(false);
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to save department", { id: toastId });
+      // ✅ 401 REDIRECT (ONLY ADDITION)
+      if (err?.status === 401) {
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      toast.error(
+        err?.data?.message || "Failed to save department",
+        { id: toastId }
+      );
     }
   };
 
@@ -64,6 +108,12 @@ console.log("update info")
       await updateDepartment({ id, is_active: !is_active }).unwrap();
       toast.success(`Department ${!is_active ? 'Activated' : 'Deactivated'}`);
     } catch (err) {
+      // ✅ 401 REDIRECT (ONLY ADDITION)
+      if (err?.status === 401) {
+        navigate('/login', { replace: true });
+        return;
+      }
+
       toast.error("Failed to update status");
     }
   };
@@ -86,14 +136,9 @@ console.log("update info")
         <main className="flex-1 pt-32 px-6 lg:px-10 pb-20">
           <div className="max-w-5xl mx-auto">
 
-              
-          
-               <h1 className="text-2xl relative bottom-2 font-black capitalize">
-                Department <span className="text-emerald-600">Management</span>
-              </h1>
-               
-          
-          
+            <h1 className="text-2xl relative bottom-2 font-black capitalize">
+              Department <span className="text-emerald-600">Management</span>
+            </h1>
 
             {/* REGISTER BUTTON */}
             <div className="flex justify-end mb-6">
@@ -126,16 +171,12 @@ console.log("update info")
             )}
           </div>
         </main>
-   
       </div>
 
       {/* ================= MODAL FORM ================= */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl mx-4  rounded-[3rem]  p-6">
-            {/* CLOSE BUTTON */}
-           
-
+          <div className="relative w-full max-w-2xl mx-4 rounded-[3rem] p-6">
             <DepartmentForm
               editingDept={editingDept}
               onSave={handleSave}

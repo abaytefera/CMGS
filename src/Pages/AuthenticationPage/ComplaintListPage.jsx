@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from "react-redux";
 import { Search, ListFilter, CheckCircle, XCircle, AlertTriangle, PlayCircle, Loader2 } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { useGetComplaintsbyCatagoryQuery } from '../../Redux/complaintApi';
 import Sidebar from '../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
@@ -10,6 +10,7 @@ import AuthFooter from '../../Component/AuthenticateComponent/AuthFooter';
 import AuthHeader from '../../Component/AuthenticateComponent/AuthHeader';
 
 const ComplaintListPage = () => {
+  const navigate = useNavigate();
   const { Language } = useSelector((state) => state.webState);
   const { user } = useSelector((state) => state.auth);
 
@@ -22,28 +23,29 @@ const ComplaintListPage = () => {
   const [filterType, setFilterType] = useState("TOTAL");
 
   // RTK Query
-  const { data: TotalCompile, isLoading, isFetching } = useGetComplaintsbyCatagoryQuery({
+  const { data: TotalCompile, isLoading, isFetching, error } = useGetComplaintsbyCatagoryQuery({
     role: role,
     type: type
   }, { skip: !role || !type });
 
-  // ✅ FIX: Moved useEffect out of useMemo. 
-  // Hooks must be at the top level of the component.
+  // --- 401 REDIRECT LOGIC ---
+  useEffect(() => {
+    if (error && error.status === 401) {
+      navigate('/login', { replace: true });
+    }
+  }, [error, navigate]);
+  // --------------------------
+
   useEffect(() => {
     if (TotalCompile) {
       console.log("Data changed or loaded:", TotalCompile);
     }
   }, [TotalCompile]);
 
-  // Memoized Filtering Logic
   const filteredComplaints = useMemo(() => {
-    // Ensure we start with an empty array if data isn't loaded yet
     let list = Array.isArray(TotalCompile) ? [...TotalCompile] : [];
-
-    // Safety: Remove any null/undefined entries
     list = list.filter(item => item !== null && typeof item === 'object');
 
-    // --- OFFICER SPECIFIC FILTER LOGIC ---
     if (isOfficer) {
       switch (filterType) {
         case "IN_PROGRESS":
@@ -70,12 +72,10 @@ const ComplaintListPage = () => {
         default:
           break;
       }
-    }
-    else if (isAdmin && filterType === "ACTIVE") {
+    } else if (isAdmin && filterType === "ACTIVE") {
       list = list.filter(item => !['RESOLVED', 'REJECTED', 'CLOSED'].includes(item?.status?.toUpperCase()));
     }
 
-    // Apply Search with Optional Chaining
     if (searchTerm) {
       const lowerSearch = searchTerm.toLowerCase();
       list = list.filter(item =>
@@ -87,7 +87,6 @@ const ComplaintListPage = () => {
     return list;
   }, [TotalCompile, filterType, searchTerm, isOfficer, isAdmin]);
 
-  // Loading State UI
   if (isLoading || !user) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50">
@@ -114,9 +113,6 @@ const ComplaintListPage = () => {
             <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
               <div>
                 <div className="flex flex-wrap gap-2 mt-6">
-                  {/* Reset/Total Filter Button */}
-                 
-
                   {isOfficer && (
                     <>
                       <button

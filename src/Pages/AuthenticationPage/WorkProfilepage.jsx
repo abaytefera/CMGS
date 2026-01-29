@@ -4,7 +4,6 @@ import {
   Mail, Building, Loader2, Calendar, ShieldCheck, 
   BadgeCheck, Camera, CheckCircle2 
 } from 'lucide-react';
-// 1. Import Toaster and toast
 import toast, { Toaster } from 'react-hot-toast';
 import { useGetProfileQuery, useUpdateProfileMutation } from '../../Redux/profileApi';
 
@@ -20,7 +19,7 @@ const WorkProfile = () => {
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
-  const { data: user, isLoading } = useGetProfileQuery();
+  const { data: user, isLoading, error } = useGetProfileQuery(); // ✅ capture error
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
 
   const [tempUser, setTempUser] = useState({ name: "", phone: "" });
@@ -34,6 +33,14 @@ const WorkProfile = () => {
     }
   }, [user]);
 
+  // ✅ 401 REDIRECT
+  useEffect(() => {
+    if (error?.status === 401) {
+      navigate('/login', { replace: true });
+    }
+  }, [error, navigate]);
+  // -----------------
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -46,16 +53,13 @@ const WorkProfile = () => {
     }
   };
 
-  // 2. Updated HandleUpdate with Toast Feedback
   const handleUpdate = async () => {
-    // Create the promise for the update
     const updatePromise = updateProfile({ 
       full_name: tempUser.name, 
       phone_number: tempUser.phone, 
       profileImage 
     }).unwrap();
 
-    // Show toast feedback for the process
     toast.promise(updatePromise, {
       loading: 'Synchronizing profile with server...',
       success: () => {
@@ -87,14 +91,10 @@ const WorkProfile = () => {
 
   return (
     <div className="flex min-h-screen bg-white text-slate-800 font-sans">
-      {/* 3. Add Toaster component at the top level */}
       <Toaster position="top-right" reverseOrder={false} />
-      
       <Sidebar role="manager" />
-      
       <div className="flex-1 flex flex-col min-w-0">
         <AuthHeader True={true} />
-        
         <main className="flex-1 flex flex-col items-center pt-32 pb-20 px-4 md:px-8 bg-slate-50/50">
           <div className="w-full max-w-4xl">
             <div className="bg-white border border-slate-200 rounded-[3rem] shadow-sm overflow-hidden relative">
@@ -182,7 +182,6 @@ const WorkProfile = () => {
             </div>
           </div>
         </main>
-       
       </div>
     </div>
   );

@@ -15,8 +15,11 @@ import UserForm from '../../../Component/AuthenticateComponent/UserManagementPag
 import UserTable from '../../../Component/AuthenticateComponent/UserManagementPageComponent/UserTable';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 import { Loader2, Database, Search, UserPlus, Users, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const UserManagementPage = () => {
+  const navigate = useNavigate();
+
   const [departments] = useState([
     "Environmental Quality", "Water Resources", "Waste Management", "Administrative"
   ]);
@@ -25,12 +28,19 @@ const UserManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserForm, setShowUserForm] = useState(false);
 
-  const { data: DataUsers, isLoading, isError } = useGetUsersQuery();
+  const { data: DataUsers, isLoading, isError, error } = useGetUsersQuery();
   const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const [deleteUser] = useDeleteUserMutation();
 
-  
+  // --- 401 REDIRECT LOGIC ---
+  useEffect(() => {
+    if (error && error.status === 401) {
+      navigate('/login', { replace: true });
+    }
+  }, [error, navigate]);
+  // --------------------------
+
   useEffect(() => { console.log(DataUsers); }, [DataUsers]);
 
   const rawUsers = (DataUsers && DataUsers.length > 0) ? DataUsers : [];
@@ -42,10 +52,8 @@ const UserManagementPage = () => {
     const loadId = toast.loading(editingUser ? 'Updating...' : 'Registering...');
     try {
       if (editingUser) {
-        console.log(userData.id);
-      const { id, ...restOfData } = userData; 
-    
-    await updateUser({ id: id, ...restOfData }).unwrap();
+        const { id, ...restOfData } = userData; 
+        await updateUser({ id: id, ...restOfData }).unwrap();
         toast.success('Staff profile updated!', { id: loadId });
         setEditingUser(null);
       } else {
@@ -92,17 +100,12 @@ const UserManagementPage = () => {
               <h1 className="text-2xl relative top-10 font-black capitalize">
                 User <span className="text-emerald-600">Management</span>
               </h1>
-             
             </header>
 
             {/* Onboarding + Directory */}
             <div className="flex flex-col gap-12">
-
-              {/* Onboarding Header */}
               <section className="space-y-4">
                 <div className="flex items-center gap-3 px-2">
-                 
-                 
                   <button
                     onClick={() => setShowUserForm(true)}
                     className="ml-auto flex px-5 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest"
@@ -112,13 +115,9 @@ const UserManagementPage = () => {
                 </div>
               </section>
 
-              {/* Directory & Search */}
               <section className="space-y-6">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-2">
-                  <div className="flex items-center gap-3">
-                   
-                  </div>
-              
+                  <div className="flex items-center gap-3"></div>
                 </div>
 
                 {isLoading ? (
@@ -135,17 +134,12 @@ const UserManagementPage = () => {
           {/* ================= POPUP FORM ================= */}
           {showUserForm && (
             <>
-              {/* Backdrop */}
               <div
                 className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
                 onClick={() => setShowUserForm(false)}
               />
-
-              {/* Full-screen popup container */}
               <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
                 <div className="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl h-[90vh] flex flex-col">
-
-                  {/* Header & Cancel */}
                   <div className="flex justify-between items-center p-6 border-b border-slate-200 flex-shrink-0">
                     <h2 className="text-xl font-black text-slate-900 uppercase italic flex items-center gap-2">
                       <div className="w-1.5 h-8 bg-emerald-600 rounded-full" />
@@ -163,7 +157,6 @@ const UserManagementPage = () => {
                     </button>
                   </div>
 
-                  {/* Scrollable form */}
                   <div className="overflow-auto px-6 py-4 flex-1">
                     <UserForm
                       editingUser={editingUser}
@@ -184,8 +177,6 @@ const UserManagementPage = () => {
             </>
           )}
         </main>
-
-        
       </div>
     </div>
   );

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, RefreshCcw, CheckCircle2, Loader2 } from 'lucide-react';
-// 1. Import toast and Toaster
 import toast, { Toaster } from 'react-hot-toast';
+
+import { useNavigate } from 'react-router-dom'; // ✅ ADDED
 
 import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
@@ -17,9 +18,12 @@ const ChangePasswordPage = () => {
   const [confirmPass, setConfirmPass] = useState('');
   const [strength, setStrength] = useState(0);
 
-  const [updateUserPassword, { isLoading }] = useUpdateUserPasswordMutation();
+  const navigate = useNavigate(); // ✅ ADDED
 
-  // Password Strength Logic
+  const [updateUserPassword, { isLoading }] =
+    useUpdateUserPasswordMutation();
+
+  /* ================= PASSWORD STRENGTH ================= */
   useEffect(() => {
     let s = 0;
     if (newPass.length >= 8) s++;
@@ -29,10 +33,10 @@ const ChangePasswordPage = () => {
     setStrength(newPass ? s : 0);
   }, [newPass]);
 
+  /* ================= UPDATE PASSWORD ================= */
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    // 2. Replaced alerts with toast.error
     if (newPass !== confirmPass) {
       toast.error('Passwords do not match', {
         style: { borderRadius: '10px', background: '#333', color: '#fff', fontSize: '12px' }
@@ -47,38 +51,48 @@ const ChangePasswordPage = () => {
       return;
     }
 
-    // 3. Integrated toast.promise for API feedback
     const updatePromise = updateUserPassword({
       currentPassword: currentPass,
       newPassword: newPass,
     }).unwrap();
 
-    toast.promise(updatePromise, {
-      loading: 'Updating security credentials...',
-      success: () => {
-        // Reset form on success
-        setCurrentPass('');
-        setNewPass('');
-        setConfirmPass('');
-        setStrength(0);
-        return 'Password updated successfully!';
+    toast.promise(
+      updatePromise,
+      {
+        loading: 'Updating security credentials...',
+        success: () => {
+          setCurrentPass('');
+          setNewPass('');
+          setConfirmPass('');
+          setStrength(0);
+          return 'Password updated successfully!';
+        },
+        error: (err) => {
+          // ✅ ONLY ADDITION — 401 REDIRECT
+          if (err?.status === 401) {
+            navigate('/login', { replace: true });
+            return 'Session expired';
+          }
+
+          return err?.data?.message || 'Failed to update password.';
+        },
       },
-      error: (err) => err?.data?.message || 'Failed to update password.',
-    }, {
-      style: {
-        minWidth: '250px',
-        borderRadius: '15px',
-        background: '#1e293b',
-        color: '#fff',
-        fontSize: '12px',
-        fontWeight: 'bold',
-        textTransform: 'uppercase'
-      },
-      success: {
-        duration: 5000,
-        iconTheme: { primary: '#10b981', secondary: '#fff' },
-      },
-    });
+      {
+        style: {
+          minWidth: '250px',
+          borderRadius: '15px',
+          background: '#1e293b',
+          color: '#fff',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          textTransform: 'uppercase'
+        },
+        success: {
+          duration: 5000,
+          iconTheme: { primary: '#10b981', secondary: '#fff' },
+        },
+      }
+    );
   };
 
   useEffect(() => {
@@ -87,7 +101,6 @@ const ChangePasswordPage = () => {
 
   return (
     <div className="flex min-h-screen bg-white text-slate-800">
-      {/* 4. Added the Toaster container */}
       <Toaster position="top-center" reverseOrder={false} />
 
       <Sidebar role="all" url="/settings" />

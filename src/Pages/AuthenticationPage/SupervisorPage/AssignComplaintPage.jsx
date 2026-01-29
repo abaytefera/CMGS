@@ -108,6 +108,15 @@ const AssignComplaintPage = () => {
   const { data: profile, isLoading: loadingProfile } = useGetProfileQuery();
   const { data: allUsers, isLoading: loadingUsers } = useGetUsersQuery();
   
+  // --- NEW 401 REDIRECT LOGIC ---
+  useEffect(() => {
+    if ((profile?.status === 401 || profile?.error?.status === 401) ||
+        (allUsers?.status === 401 || allUsers?.error?.status === 401)) {
+      navigate('/login', { replace: true });
+    }
+  }, [profile, allUsers, navigate]);
+  // ---------------------------------
+
   // Local state management
   const [isDeploying, setIsDeploying] = useState(false);
   const [officerId, setOfficerId] = useState('');
@@ -123,19 +132,13 @@ const AssignComplaintPage = () => {
       .map(user => ({ label: user.full_name || user.username, value: user.id }));
   }, [allUsers, profile]);
 
-  /**
-   * Main Submission Handler using Fetch and AuthToken
-   */
   const handleDeploy = async () => {
-    // Basic validation
     if (!officerId || !endDate) {
       toast.error(Language === "AMH" ? "እባክዎ ባለሙያ እና ቀን ይምረጡ" : "Required: Officer and End Date");
       return;
     }
 
-    // Retrieve the token from localStorage
     const token = localStorage.getItem('authToken');
-
     if (!token) {
       toast.error(Language === "AMH" ? "እባክዎ መጀመሪያ ይግቡ" : "Unauthorized: Please login first.");
       return;
@@ -159,32 +162,27 @@ const AssignComplaintPage = () => {
         }),
       });
 
-      // Handle cases where server returns HTML (like a 404 page) instead of JSON
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.indexOf("application/json") === -1) {
         throw new Error("SERVER_NOT_FOUND");
       }
 
       const data = await response.json();
-
       if (!response.ok) {
         if (response.status === 401) throw new Error("EXPIRED_SESSION");
         throw new Error(data.message || 'Operation failed');
       }
 
       toast.success(Language === "AMH" ? 'ምደባው ተሳክቷል!' : 'Assigned successfully!', { id: toastId });
-      
-      // Navigate back after a short delay
       setTimeout(() => navigate('/SupervisorDashboard'), 1500);
 
     } catch (err) {
       console.error("Assignment Error:", err);
       let errorMsg = Language === "AMH" ? 'ምደባው አልተሳካም!' : 'Failed to assign complaint.';
       
-      if (err.message === "SERVER_NOT_FOUND") {
-        errorMsg = "Critical Error: Endpoint /api/workflow/assign not found on server.";
-      } else if (err.message === "EXPIRED_SESSION") {
-        errorMsg = "Session Expired: Please log out and back in.";
+      if (err.message === "EXPIRED_SESSION") {
+        navigate('/login', { replace: true });
+        return;
       }
 
       toast.error(errorMsg, { id: toastId });
@@ -197,9 +195,7 @@ const AssignComplaintPage = () => {
 
   return (
     <div className="flex min-h-screen bg-white">
-      {/* Toast Host for notifications */}
       <Toaster position="top-right" reverseOrder={false} />
-
       <Sidebar role="supervisor" />
       
       <div className="flex-1 flex flex-col">
@@ -223,7 +219,6 @@ const AssignComplaintPage = () => {
             </header>
 
             <div className="space-y-10">
-              {/* Officer Selection */}
               <div>
                 {isDataLoading ? (
                    <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
@@ -240,32 +235,23 @@ const AssignComplaintPage = () => {
                 )}
               </div>
 
-              {/* Priority Selection */}
               <PriorityToggle selected={priority} onSelect={setPriority} />
 
-              {/* Timeline Selection */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 p-8 rounded-[2.5rem] border border-slate-100">
                 <RealEthioPicker label="Start Date" value={startDate} onChange={setStartDate} language={Language} />
                 <RealEthioPicker label="End Date" value={endDate} onChange={setEndDate} language={Language} />
               </div>
 
-              {/* Action Button */}
               <button 
                 onClick={handleDeploy}
                 disabled={isDeploying || !officerId || !endDate || isDataLoading}
                 className="w-full bg-green-900 hover:bg-emerald-600 text-white font-black py-5 rounded-[2rem] flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-20 uppercase tracking-[0.2em] text-xs shadow-lg shadow-green-900/10"
               >
-                {isDeploying ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  Language === "AMH" ? "መድብ" : "Confirm Assignment"
-                )}
+                {isDeploying ? <Loader2 className="animate-spin" /> : (Language === "AMH" ? "መድብ" : "Confirm Assignment")}
               </button>
             </div>
           </div>
         </main>
-        
-        
       </div>
     </div>
   );

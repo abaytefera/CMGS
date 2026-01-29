@@ -18,7 +18,7 @@ export const reportApi = APi.injectEndpoints({
     // Added Export to Excel (Keeping names consistent with your query style)
     exportToExcel: builder.mutation({
       query: (params) => ({
-        url: '/reports/excel',
+        url: '/api/reports/excel',
         method: 'GET',
         params: params,
         responseHandler: (response) => response.blob(), // Handles binary file data
@@ -28,7 +28,7 @@ export const reportApi = APi.injectEndpoints({
     // Added Export to PDF
     exportToPdf: builder.mutation({
       query: (params) => ({
-        url: '/reports/pdf',
+        url: '/api/reports/pdf',
         method: 'GET',
         params: params,
         responseHandler: (response) => response.blob(), // Handles binary file data

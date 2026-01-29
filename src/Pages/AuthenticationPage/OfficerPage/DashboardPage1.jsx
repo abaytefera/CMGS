@@ -5,6 +5,7 @@ import {
   LayoutGrid, ClipboardList, Clock, AlertCircle, 
   TrendingUp, CheckCircle, XCircle, Loader2 
 } from 'lucide-react';
+import { useNavigate } from "react-router-dom"; // ✅ ADDED
 
 // API Hooks
 import { useGetOfficerStatsQuery } from '../../../Redux/officerApi';
@@ -19,9 +20,10 @@ import OfficerOverviewChart from './OfficerOverviewChart'; // New Import
 
 const OfficerPage1 = () => {
   const { Language } = useSelector((state) => state.webState);
-  
-  const { data: stats, isLoading: isLoadingStats } = useGetOfficerStatsQuery();
-  const { data: CompileList, isLoading: isLoadingCompiletask } = useGetComplaintsDashboardQuery('officer');
+  const navigate = useNavigate(); // ✅ ADDED
+
+  const { data: stats, isLoading: isLoadingStats, error: statsError } = useGetOfficerStatsQuery();
+  const { data: CompileList, isLoading: isLoadingCompiletask, error: compileError } = useGetComplaintsDashboardQuery('officer');
 
   const t = {
     live: Language === "AMH" ? "ቀጥታ" : "Live",
@@ -37,6 +39,13 @@ const OfficerPage1 = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // ✅ ADD 401 ERROR REDIRECT (ONLY ADDITION)
+  useEffect(() => {
+    if (statsError?.status === 401 || compileError?.status === 401) {
+      navigate("/login", { replace: true });
+    }
+  }, [statsError, compileError, navigate]);
 
   if (isLoadingCompiletask) return (
     <div className="min-h-screen bg-white flex items-center justify-center">
