@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Activity, ShieldCheck, TrendingUp, Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // ✅ ADDED
+import { Activity, ShieldCheck, TrendingUp, Loader2, Heart } from 'lucide-react'; // Added Heart icon
+import { useNavigate } from 'react-router-dom';
 
 import {
   useGetManagementStatsQuery,
@@ -12,38 +12,33 @@ import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import TrendChart from '../../../Component/AuthenticateComponent/ManagementDashboardComponent/TrendChart';
 import ResolutionPie from '../../../Component/AuthenticateComponent/ManagementDashboardComponent/ResolutionPie';
 import StatCard from '../../../Component/AuthenticateComponent/ManagementDashboardComponent/StatCard';
-import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 import { useGetComplaintsDashboardQuery } from '../../../Redux/complaintApi';
 
 const ManagementDashboard = () => {
-  const navigate = useNavigate(); // ✅ ADDED
+  const navigate = useNavigate();
 
   const {
     data: stats,
     isLoading: statsLoading,
-    error: statsError // ✅ ADDED
+    error: statsError 
   } = useGetManagementStatsQuery();
 
   const {
     data: charts,
     isLoading: chartsLoading,
-    error: chartsError // ✅ ADDED
+    error: chartsError 
   } = useGetDashboardChartsQuery();
 
   const {
     data: CompileList,
     isLoading: isloadingcompile,
-    error: compileError // ✅ ADDED
+    error: compileError 
   } = useGetComplaintsDashboardQuery('management');
 
-  // ✅ 401 REDIRECT HANDLER (ONLY ADDITION)
+  // 401 REDIRECT HANDLER
   useEffect(() => {
     const errors = [statsError, chartsError, compileError];
-
-    const isUnauthorized = errors.some(
-      (err) => err?.status === 401
-    );
-
+    const isUnauthorized = errors.some((err) => err?.status === 401);
     if (isUnauthorized) {
       navigate('/login', { replace: true });
     }
@@ -53,18 +48,19 @@ const ManagementDashboard = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  useEffect(() => {
-    console.log("update list");
-    console.log(CompileList);
-  }, [CompileList]);
+  // --- DATA MAPPING FROM COMPILELIST ---
+  // We use optional chaining and logical OR to prevent "undefined" errors
+  const totalComplaints = CompileList?.summary?.total ?? stats?.total ?? "0";
+  const slaCompliance = `${CompileList?.percentage ?? stats?.sla ?? 0}%`;
+  
+  // Data for the Pie Chart based on CompileList summary
+  const resolutionData = {
+    resolved: CompileList?.summary?.resolved ?? 0,
+    pending: CompileList?.summary?.unresolved ?? 0,
+    overdue: charts?.resolution?.overdue ?? 0 // Falls back to chart API for overdue
+  };
 
-  const totalComplaints = stats?.total || "0";
-  const slaCompliance = stats?.sla || "0%";
-  const trendValue = stats?.trend || 0;
-  const resolutionData =
-    charts?.resolution || { resolved: 0, pending: 0, overdue: 0 };
-
-  if (statsLoading || chartsLoading) {
+  if (statsLoading || chartsLoading || isloadingcompile) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="animate-spin text-emerald-600" size={48} />
@@ -87,7 +83,7 @@ const ManagementDashboard = () => {
               <StatCard
                 title="Total Complaints"
                 value={totalComplaints}
-                trend={trendValue}
+                trend={stats?.trend || 0}
                 icon={Activity}
                 colorClass="bg-blue-600"
               />
@@ -99,25 +95,23 @@ const ManagementDashboard = () => {
                 colorClass="bg-emerald-600"
               />
 
+              {/* System Health / Satisfaction Card */}
               <div className="lg:col-span-2 bg-white border border-slate-200 rounded-[2.5rem] p-6 flex items-center justify-between shadow-sm">
                 <div>
                   <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    System Health
+                    User Satisfaction
                   </h4>
                   <p className="text-xl font-black text-slate-800 italic mt-1 uppercase">
-                    Optimal Performance
+                    {CompileList?.satisfaction?.averageSatisfaction ?? "No Feedback"}
                   </p>
                   <div className="flex gap-2 mt-4">
                     <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-[9px] font-black rounded-lg uppercase border border-emerald-200">
-                      Active
-                    </span>
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-[9px] font-black rounded-lg uppercase border border-blue-200">
-                      Secured
+                      {CompileList?.percentage === 100 ? 'Excellent' : 'Stable'}
                     </span>
                   </div>
                 </div>
-                <div className="h-16 w-32 opacity-20">
-                  <TrendingUp className="text-emerald-600 w-full h-full" />
+                <div className="h-16 w-16 opacity-20">
+                  <Heart className="text-rose-600 w-full h-full" fill="currentColor" />
                 </div>
               </div>
             </div>
@@ -139,6 +133,8 @@ const ManagementDashboard = () => {
                 <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em] mb-10 w-full">
                   Resolution Status
                 </h3>
+                
+                {/* Now using mapped data from CompileList */}
                 <ResolutionPie data={resolutionData} />
 
                 <div className="w-full mt-8 space-y-4">
@@ -146,24 +142,16 @@ const ManagementDashboard = () => {
                     <span className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded bg-emerald-500" /> Resolved
                     </span>
-                    <span className="text-slate-900">
+                    <span className="text-slate-900 font-bold">
                       {resolutionData.resolved}
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-[10px] font-black uppercase text-slate-600">
                     <span className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded bg-blue-500" /> Pending
+                      <div className="w-2 h-2 rounded bg-blue-500" /> Unresolved (Pending)
                     </span>
-                    <span className="text-slate-900">
+                    <span className="text-slate-900 font-bold">
                       {resolutionData.pending}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-[10px] font-black uppercase text-slate-600">
-                    <span className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded bg-rose-500" /> Overdue
-                    </span>
-                    <span className="text-slate-900">
-                      {resolutionData.overdue}
                     </span>
                   </div>
                 </div>
