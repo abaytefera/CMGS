@@ -42,7 +42,7 @@ const SystemSummary = ({ catagory, dep }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1 gap-6 mb-10">
       {summaries.map((item, i) => (
         <Link
           to={item.url}
