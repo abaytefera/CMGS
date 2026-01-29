@@ -75,7 +75,7 @@ const AdminDashboard = () => {
 
             {/* Page Header */}
             <div className="mb-10">
-              <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase">
+              <h1 className="text-4xl font-black text-gray-900 tracking-tight capitalize">
                 {t.title}
               </h1>
               <p className="text-gray-500 font-bold text-[10px] uppercase tracking-[0.2em] mt-2 flex items-center gap-3">
