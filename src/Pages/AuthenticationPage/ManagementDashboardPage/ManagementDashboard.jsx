@@ -19,6 +19,7 @@ const ManagementDashboard = () => {
   }, []);
 
   useEffect(()=>{
+    console.log("update list");
 console.log(CompileList)
 
   },[CompileList])
