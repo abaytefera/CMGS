@@ -18,10 +18,10 @@ const AdminDashboardChart = ({ data, language }) => {
            <BarChart3 size={22} />
         </div>
         <div>
-          <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest">
+          <h3 className="text-xs font-black text-gray-900 capitalize tracking-widest">
             {language === "AMH" ? "የአቤቱታዎች የሁኔታ ትንተና" : "Complaint Status Analytics"}
           </h3>
-          <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">Live System Insights</p>
+          <p className="text-[10px] text-gray-400 font-bold capitalize mt-0.5">Live System Insights</p>
         </div>
       </div>
       
