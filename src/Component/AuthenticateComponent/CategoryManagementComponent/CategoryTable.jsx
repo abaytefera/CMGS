@@ -58,7 +58,7 @@ const CategoryTable = ({ categories = [], onEdit, onToggle }) => {
               </button>
               <button 
                 onClick={confirmAction}
-                className={`flex-1 py-4 rounded-2xl text-white font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all ${
+                className={`flex-1 py-4  rounded-2xl text-white font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all ${
                   confirmToggle.is_active ? 'bg-slate-900 shadow-slate-200' : 'bg-emerald-600 shadow-emerald-200'
                 }`}
               >

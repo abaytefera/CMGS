@@ -13,7 +13,7 @@ import { useGetComplaintsDashboardQuery } from '../../../Redux/complaintApi';
 const ManagementDashboard = () => {
   const { data: stats, isLoading: statsLoading } = useGetManagementStatsQuery();
   const { data: charts, isLoading: chartsLoading } = useGetDashboardChartsQuery();
-   const  {data:CompileList,isLoading:isloadingcompile} =useGetComplaintsDashboardQuery ('manager');
+   const  {data:CompileList,isLoading:isloadingcompile} =useGetComplaintsDashboardQuery ('management');
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
