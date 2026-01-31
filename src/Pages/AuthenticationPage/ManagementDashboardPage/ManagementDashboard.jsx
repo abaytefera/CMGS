@@ -83,13 +83,14 @@ const  Dispath=useDispatch()
 
             {/* Dashboard Hero Section (Stats Cards) */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">
-              <StatCard
-                title="Total Complaints"
-                value={totalComplaints}
-                trend={stats?.trend || 0}
-                icon={Activity}
-                colorClass="bg-blue-600"
-              />
+             <StatCard
+  title="Complaints"
+  value={totalComplaints}
+  trend={stats?.trend || 0}
+  icon={Activity}
+  colorClass="bg-blue-600"
+  onClick={() => navigate("/Complaintlist/manager/list/")}
+/>
               <StatCard
                 title="SLA Compliance"
                 value={slaCompliance}
