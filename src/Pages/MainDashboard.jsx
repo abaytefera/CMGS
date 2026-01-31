@@ -27,6 +27,7 @@ const Dashboard = () => {
   useEffect(()=>{
   
     if(!user){
+  localStorage.setItem('authToken', null);
 navigator('/')
 
     }
