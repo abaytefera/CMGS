@@ -29,7 +29,8 @@ const Dashboard = () => {
   
     if(!user){
 Dispatch(logout());
-localStorage.removeItem('authToken');
+  localStorage.removeItem('authToken');
+   Dispatch(logout());
 navigator('/')
 
     }
