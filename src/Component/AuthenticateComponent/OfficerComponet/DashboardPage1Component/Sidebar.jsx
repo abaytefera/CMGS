@@ -43,7 +43,7 @@ const Sidebar = () => {
 
   const quickButtons = [
     { icon: Users, label: "Users", url: "/userMg", visible: role === 'ADMIN' },
-    { icon: FileText, label: "Total Complaints", url: "/Complaintlist/admin/list/", visible: role === 'ADMIN' },
+    { icon: FileText, label: "Complaints", url: "/Complaintlist/admin/list/", visible: role === 'ADMIN' },
     { icon: Activity, label: "Active Case", url: "/Complaintlist/admin/active", visible: role === 'ADMIN' },
     { icon: CheckCircle2, label: "Close Case", url: "/Complaintlist/admin/closed", visible: role === 'ADMIN' },
     { icon: FolderTree, label: "Categories", url:"/CatagoryMg", visible: role === 'ADMIN' },
@@ -60,7 +60,7 @@ const Sidebar = () => {
     { icon: AlertTriangle, label: "Overdue", url: "/Complaintlist/officer/overdue", visible: role === 'OFFICER' },
     { icon: CheckCircle2, label: "Resolved", url: "/Complaintlist/officer/resolved", visible: role === 'OFFICER' },
     { icon: XCircle, label: "Rejected", url: "/Complaintlist/officer/rejected", visible: role === 'OFFICER' },
-    { icon: FileText, label: "Total Complaints", url: "", visible: role === 'MANAGER' },
+    { icon: FileText, label: "Complaints", url: "", visible: role === 'MANAGER' },
     { icon: ShieldCheck, label: "SLA Compilation", url: "", visible: role === 'MANAGER' },
     { icon: BarChart3, label: "Reports", url: "/Report", visible: role === 'MANAGER' },
   ];
