@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Toaster } from 'react-hot-toast'; 
 import {
   LayoutGrid, ClipboardList, Clock, AlertCircle, 
@@ -17,11 +17,11 @@ import StatCard from '../../../Component/AuthenticateComponent/OfficerComponet/D
 import ComplaintList from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/ComplaintList';
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import OfficerOverviewChart from './OfficerOverviewChart'; // New Import
-
+import { logout } from '../../../Redux/auth';
 const OfficerPage1 = () => {
   const { Language } = useSelector((state) => state.webState);
   const navigate = useNavigate(); // ✅ ADDED
-
+      const Dispath=useDispatch()
   const { data: stats, isLoading: isLoadingStats, error: statsError } = useGetOfficerStatsQuery();
   const { data: CompileList, isLoading: isLoadingCompiletask, error: compileError } = useGetComplaintsDashboardQuery('officer');
 
@@ -43,7 +43,8 @@ const OfficerPage1 = () => {
   // ✅ ADD 401 ERROR REDIRECT (ONLY ADDITION)
   useEffect(() => {
     if (statsError?.status === 401 || compileError?.status === 401) {
-        localStorage.setItem('authToken', null);
+  localStorage.removeItem('authToken');
+        Dispath(logout())
       navigate("/login", { replace: true });
     }
   }, [statsError, compileError, navigate]);

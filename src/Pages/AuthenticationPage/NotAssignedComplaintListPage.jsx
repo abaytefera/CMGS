@@ -12,13 +12,14 @@ import Sidebar from '../../Component/AuthenticateComponent/OfficerComponet/Dashb
 import ComplaintRowNotAssigned from '../../Component/AuthenticateComponent/ComplainListNotAssigned/ComplaintRow';
 import AuthFooter from '../../Component/AuthenticateComponent/AuthFooter';
 import AuthHeader from '../../Component/AuthenticateComponent/AuthHeader';
-
+import { logout } from '../../Redux/auth';
+import { useDispatch } from 'react-redux';
 const NotAssignedComplaintListPage = () => {
   const navigate = useNavigate(); // ✅ Added navigate
   const { Language } = useSelector((state) => state.webState);
   const { user } = useSelector((state) => state.auth);
   const { role: urlRole, type: urlType } = useParams();
-
+const Dispath=useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
 
@@ -48,7 +49,8 @@ const NotAssignedComplaintListPage = () => {
   // --- 401 REDIRECT LOGIC ---
   useEffect(() => {
     if ((errorCompile && errorCompile.status === 401) || (errorUnassigned && errorUnassigned.status === 401)) {
-                localStorage.setItem('authToken', null);
+      localStorage.removeItem('authToken');
+      Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [errorCompile, errorUnassigned, navigate]);

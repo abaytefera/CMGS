@@ -17,7 +17,8 @@ import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 
 import { Loader2, ServerOff, Globe, Plus, X } from 'lucide-react';
 import { useGetUsersQuery } from '../../../Redux/userApi';
-
+import { useDispatch } from 'react-redux';
+import { logout } from '../../../Redux/auth';
 const DepartmentPage = () => {
   const [editingDept, setEditingDept] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -49,7 +50,7 @@ const DepartmentPage = () => {
   }, [user]);
 
   const departments = departmentsData || [];
-
+const Dispath=useDispatch()
   // ✅ 401 REDIRECT HANDLER (ONLY ADDITION)
   useEffect(() => {
     const errors = [deptError, userError];
@@ -59,6 +60,8 @@ const DepartmentPage = () => {
     );
 
     if (isUnauthorized) {
+      localStorage.removeItem('authToken');
+                   Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [deptError, userError, navigate]);
@@ -91,6 +94,8 @@ const DepartmentPage = () => {
     } catch (err) {
       // ✅ 401 REDIRECT (ONLY ADDITION)
       if (err?.status === 401) {
+           localStorage.removeItem('authToken');
+                     Dispath(logout())
         navigate('/login', { replace: true });
         return;
       }

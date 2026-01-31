@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Calendar as CalendarIcon, 
@@ -21,7 +21,7 @@ import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 // RTK Query Hooks (for fetching dropdown data)
 import { useGetProfileQuery } from '../../../Redux/profileApi';
 import { useGetUsersQuery } from '../../../Redux/userApi';
-
+import { logout } from '../../../Redux/auth';
 // Environment variable for backend URL
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -35,7 +35,7 @@ const RealEthioPicker = ({ label, value, onChange, language }) => {
   const monthsEN = ["Meskerem", "Tikimt", "Hidar", "Tahsas", "Tir", "Yekatit", "Megabit", "Miazia", "Ginbot", "Sene", "Hamle", "Nehasse", "Pagume"];
   const months = language === "AMH" ? monthsAMH : monthsEN;
   const [viewDate, setViewDate] = useState({ month: 1, year: 2018 });
-
+  const Dispath=useDispatch()
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) setIsOpen(false);
@@ -112,7 +112,8 @@ const AssignComplaintPage = () => {
   useEffect(() => {
     if ((profile?.status === 401 || profile?.error?.status === 401) ||
         (allUsers?.status === 401 || allUsers?.error?.status === 401)) {
-         localStorage.setItem('authToken', null);
+     localStorage.removeItem('authToken');
+      Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [profile, allUsers, navigate]);

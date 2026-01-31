@@ -13,10 +13,11 @@ import TrendChart from '../../../Component/AuthenticateComponent/ManagementDashb
 import ResolutionPie from '../../../Component/AuthenticateComponent/ManagementDashboardComponent/ResolutionPie';
 import StatCard from '../../../Component/AuthenticateComponent/ManagementDashboardComponent/StatCard';
 import { useGetComplaintsDashboardQuery } from '../../../Redux/complaintApi';
-
+import { useDispatch } from 'react-redux';
+import { logout } from '../../../Redux/auth';
 const ManagementDashboard = () => {
   const navigate = useNavigate();
-
+const  Dispath=useDispatch()
   const {
     data: stats,
     isLoading: statsLoading,
@@ -40,7 +41,8 @@ const ManagementDashboard = () => {
     const errors = [statsError, chartsError, compileError];
     const isUnauthorized = errors.some((err) => err?.status === 401);
     if (isUnauthorized) {
-       localStorage.setItem('authToken', null);
+      localStorage.removeItem('authToken');
+             Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [statsError, chartsError, compileError, navigate]);

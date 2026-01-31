@@ -16,7 +16,8 @@ import UserTable from '../../../Component/AuthenticateComponent/UserManagementPa
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 import { Loader2, Database, Search, UserPlus, Users, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
+import { logout } from '../../../Redux/auth';
+import { useDispatch } from 'react-redux';
 const UserManagementPage = () => {
   const navigate = useNavigate();
 
@@ -27,7 +28,7 @@ const UserManagementPage = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserForm, setShowUserForm] = useState(false);
-
+       const Dispath=useDispatch()
   const { data: DataUsers, isLoading, isError, error } = useGetUsersQuery();
   const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
@@ -36,7 +37,8 @@ const UserManagementPage = () => {
   // --- 401 REDIRECT LOGIC ---
   useEffect(() => {
     if (error && error.status === 401) {
-       localStorage.setItem('authToken', null);
+           localStorage.removeItem('authToken');
+          Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [error, navigate]);

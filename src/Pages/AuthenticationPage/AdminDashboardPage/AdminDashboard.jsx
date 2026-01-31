@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
 import { Loader2, ExternalLink, AlertTriangle, Shield } from 'lucide-react';
 
@@ -15,10 +15,11 @@ import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import AdminStats from '../../../Component/AuthenticateComponent/AdminDashboardComponent/AdminStats';
 import SystemSummary from '../../../Component/AuthenticateComponent/AdminDashboardComponent/SystemSummary';
 import AdminDashboardChart from '../../../Component/AuthenticateComponent/AdminDashboardComponent/AdminDashboardChart';
-
+import { logout } from '../../../Redux/auth';
 const AdminDashboard = () => {
   const { Language } = useSelector((state) => state.webState || {});
   const navigate = useNavigate();
+  const Dispath=useDispatch()
 
   const { data: stats, isLoading: sLoading, error: sError } = useGetAdminStatsQuery();
   const { data: activities, isLoading: aLoading, error: aError } = useGetSystemActivityQuery();
@@ -43,7 +44,8 @@ const AdminDashboard = () => {
     );
 
     if (isUnauthorized) {
-                localStorage.setItem('authToken', null);
+            localStorage.removeItem('authToken');
+                                Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [sError, aError, dError, cError, clError, navigate]);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom"; // ✅ ADDED useNavigate
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   ChevronLeft, RefreshCcw, CheckCircle, Clock, AlertCircle,
   FileText, History, ShieldCheck, UserPlus, Lock,
@@ -18,7 +18,7 @@ import Sidebar from "../../../Component/AuthenticateComponent/OfficerComponet/Da
 import AuthHeader from "../../../Component/AuthenticateComponent/AuthHeader";
 import InfoCard from "../../../Component/AuthenticateComponent/OfficerComponet/ComplaintDetailsComponent/InfoCard";
 import StatusHistory from "../../../Component/AuthenticateComponent/OfficerComponet/ComplaintDetailsComponent/StatusHistory";
-
+import { logout } from "../../../Redux/auth";
 const ComplaintDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate(); // ✅ ADDED
@@ -27,7 +27,7 @@ const ComplaintDetails = () => {
   // Updated Authority Logic: Only allow Officer and Supervisor
   const canUpdateStatus = user?.role === "SUPERVISOR" || user?.role === "OFFICER";
   const isSupervisor = user?.role === "SUPERVISOR";
-
+ const Dispath=useDispatch()
   const [selectedStatus, setSelectedStatus] = useState("");
   const [comment, setComment] = useState("");
 
@@ -49,7 +49,8 @@ const ComplaintDetails = () => {
   // ✅ 401 REDIRECT HANDLER (ONLY ADDITION)
   useEffect(() => {
     if (error?.status === 401) {
-       localStorage.setItem('authToken', null);
+ localStorage.removeItem('authToken');
+        Dispath(logout())
       navigate("/login", { replace: true });
     }
   }, [error, navigate]);

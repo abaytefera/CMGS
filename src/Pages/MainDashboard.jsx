@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 
 // Double check these paths match your folder structure exactly
 import AdminDashboard from './AuthenticationPage/AdminDashboardPage/AdminDashboard';
@@ -7,10 +7,11 @@ import OfficerPage1 from './AuthenticationPage/OfficerPage/DashboardPage1';
 import SupervisorDashboard from './AuthenticationPage/SupervisorPage/SupervisorDashboard';
 import ManagementDashboard from './AuthenticationPage/ManagementDashboardPage/ManagementDashboard';
 import { useNavigate } from 'react-router-dom';
-
+import { logout } from '../Redux/auth';
 const Dashboard = () => {
   // Pull loading state and user from auth slice
   const { user, isloading } = useSelector((state) => state.auth );
+  const Dispatch=useDispatch()
   const navigator=useNavigate();
   
   // 1. Show a loader while checking authentication state
@@ -27,7 +28,8 @@ const Dashboard = () => {
   useEffect(()=>{
   
     if(!user){
-  localStorage.setItem('authToken', null);
+Dispatch(logout());
+localStorage.removeItem('authToken');
 navigator('/')
 
     }

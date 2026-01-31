@@ -14,12 +14,13 @@ import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/Da
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 import ReportFilters from '../../../Component/AuthenticateComponent/ReportsPageComponent/ReportFilters';
-
+import { useDispatch } from 'react-redux';
+import { logout } from '../../../Redux/auth';
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ReportsPage = () => {
   const navigate = useNavigate(); // ✅ ADDED
-
+const  Dispath=useDispatch()
   const departments = [
     'Environmental Quality',
     'Water Resources',
@@ -44,7 +45,8 @@ const ReportsPage = () => {
   // ✅ ADD 401 ERROR REDIRECT (ONLY ADDITION)
   useEffect(() => {
     if (error?.status === 401) {
-                localStorage.setItem('authToken', null);
+                  localStorage.removeItem('authToken');
+                     Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [error, navigate]);

@@ -6,10 +6,11 @@ import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import SettingCard from '../../../Component/AuthenticateComponent/SystemSettingsComponent/SettingCard';
 import { ToggleRow, SettingInput } from '../../../Component/AuthenticateComponent/SystemSettingsComponent/ToggleRow';
 import { useNavigate } from 'react-router-dom';
-
+import { logout } from '../../../Redux/auth';
+import { useDispatch } from 'react-redux';
 const SystemSettings = () => {
   const navigate = useNavigate();
-
+  const Dispath=useDispatch()
   // 1. Fetch Data from Node.js
   const { data: serverSettings, isLoading, error } = useGetSystemSettingsQuery();
   const [updateSettings, { isLoading: isSaving }] = useUpdateSettingsMutation();
@@ -19,7 +20,8 @@ const SystemSettings = () => {
   // --- 401 REDIRECT LOGIC ---
   useEffect(() => {
     if (error && error.status === 401) {
-      localStorage.setItem('authToken', null);
+      localStorage.removeItem('authToken');
+            Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [error, navigate]);

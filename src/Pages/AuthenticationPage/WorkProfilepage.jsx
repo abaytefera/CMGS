@@ -12,12 +12,14 @@ import AuthHeader from '../../Component/AuthenticateComponent/AuthHeader';
 import ProfileField from '../../Component/AuthenticateComponent/WorkProfileComponent/ProfileField';
 import AuthFooter from '../../Component/AuthenticateComponent/AuthFooter';
 import { useNavigate } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux';
+import { logout } from '../../Redux/auth';
 const WorkProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+  const Dispatch=useDispatch()
 
   const { data: user, isLoading, error } = useGetProfileQuery(); // ✅ capture error
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
@@ -36,7 +38,8 @@ const WorkProfile = () => {
   // ✅ 401 REDIRECT
   useEffect(() => {
     if (error?.status === 401) {
-          localStorage.setItem('authToken', null);
+        Dispatch(logout());
+        localStorage.removeItem('authToken');
       navigate('/login', { replace: true });
     }
   }, [error, navigate]);

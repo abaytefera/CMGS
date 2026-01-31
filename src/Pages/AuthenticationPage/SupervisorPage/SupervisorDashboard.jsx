@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   ShieldAlert, TrendingUp, BarChart3, UserPlus, 
@@ -15,11 +15,11 @@ import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/Da
 import SLAWarning from '../../../Component/AuthenticateComponent/SupervisorComponent/SLAWarning';
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import EfficiencyChart from '../../../Component/AuthenticateComponent/SupervisorComponent/EfficiencyChart';
-
+import { logout } from '../../../Redux/auth';
 const SupervisorDashboard = () => {
   const { Language } = useSelector((state) => state.webState);
   const navigate = useNavigate();
-  
+   const Dispath=useDispatch()
   // Data Fetching
   const { data: stats, isLoading: statsLoading, error: statsError } = useGetSupervisorStatsQuery();
   const { data: CompileList, isLoading: listLoading, error: listError } = useGetComplaintsDashboardQuery('supervisor');
@@ -27,7 +27,8 @@ const SupervisorDashboard = () => {
   // --- 401 REDIRECT LOGIC ---
   useEffect(() => {
     if ((statsError && statsError.status === 401) || (listError && listError.status === 401)) {
-        localStorage.setItem('authToken', null); 
+     localStorage.removeItem('authToken');
+                Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [statsError, listError, navigate]);

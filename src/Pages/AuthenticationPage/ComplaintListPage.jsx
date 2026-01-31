@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Search, ListFilter, CheckCircle, XCircle, AlertTriangle, PlayCircle, Loader2 } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
-
+import { logout } from '../../Redux/auth';
 import { useGetComplaintsbyCatagoryQuery } from '../../Redux/complaintApi';
 import Sidebar from '../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
 import ComplaintRow from '../../Component/AuthenticateComponent/ComplaintListPageComponent/ComplaintRow';
@@ -13,7 +13,7 @@ const ComplaintListPage = () => {
   const navigate = useNavigate();
   const { Language } = useSelector((state) => state.webState);
   const { user } = useSelector((state) => state.auth);
-
+  const  Dispath=useDispatch()
   // Role Helpers
   const isAdmin = user?.role === "ADMIN";
   const isOfficer = user?.role === "OFFICER";
@@ -31,7 +31,8 @@ const ComplaintListPage = () => {
   // --- 401 REDIRECT LOGIC ---
   useEffect(() => {
     if (error && error.status === 401) {
-                localStorage.setItem('authToken', null);
+        localStorage.removeItem('authToken');
+         Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [error, navigate]);

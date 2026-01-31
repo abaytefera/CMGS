@@ -9,15 +9,16 @@ import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import PasswordField from '../../../Component/AuthenticateComponent/ChangePasswordPageComponent/PasswordField';
 import StrengthMeter from '../../../Component/AuthenticateComponent/ChangePasswordPageComponent/StrengthMeter';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
-
+import { logout } from '../../../Redux/auth';
 import { useUpdateUserPasswordMutation } from '../../../Redux/userApi';
+import { useDispatch } from 'react-redux';
 
 const ChangePasswordPage = () => {
   const [currentPass, setCurrentPass] = useState('');
   const [newPass, setNewPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [strength, setStrength] = useState(0);
-
+const Dispath=useDispatch()
   const navigate = useNavigate(); // ✅ ADDED
 
   const [updateUserPassword, { isLoading }] =
@@ -70,7 +71,8 @@ const ChangePasswordPage = () => {
         error: (err) => {
           // ✅ ONLY ADDITION — 401 REDIRECT
           if (err?.status === 401) {
-            localStorage.setItem('authToken', null);
+      localStorage.removeItem('authToken');
+                 Dispath(logout())
             navigate('/login', { replace: true });
             return 'Session expired';
           }

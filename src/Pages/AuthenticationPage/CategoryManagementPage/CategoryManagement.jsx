@@ -15,12 +15,13 @@ import CategoryTable from '../../../Component/AuthenticateComponent/CategoryMana
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 
 import { Loader2, Database, Layers, Plus, X } from 'lucide-react';
-
+import { useDispatch } from 'react-redux';
+import { logout } from '../../../Redux/auth';
 const CategoryManagement = () => {
   const [editingCat, setEditingCat] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
-
+const Dispath=useDispatch()
   /* ===================== RTK QUERY ===================== */
   const {
     data: categories = [],
@@ -46,7 +47,8 @@ const CategoryManagement = () => {
     );
 
     if (isUnauthorized) {
-      localStorage.setItem('authToken', null);
+     localStorage.removeItem('authToken');
+                     Dispath(logout())
       navigate('/login', { replace: true });
     }
   }, [cError, createError, updateError, dError, navigate]);
