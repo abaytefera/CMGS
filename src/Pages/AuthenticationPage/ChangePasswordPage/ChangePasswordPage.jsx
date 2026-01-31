@@ -70,6 +70,7 @@ const ChangePasswordPage = () => {
         error: (err) => {
           // ✅ ONLY ADDITION — 401 REDIRECT
           if (err?.status === 401) {
+            localStorage.setItem('authToken', null);
             navigate('/login', { replace: true });
             return 'Session expired';
           }

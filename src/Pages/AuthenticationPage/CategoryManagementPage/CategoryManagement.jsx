@@ -46,6 +46,7 @@ const CategoryManagement = () => {
     );
 
     if (isUnauthorized) {
+      localStorage.setItem('authToken', null);
       navigate('/login', { replace: true });
     }
   }, [cError, createError, updateError, dError, navigate]);

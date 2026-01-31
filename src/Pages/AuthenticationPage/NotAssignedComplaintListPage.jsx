@@ -48,6 +48,7 @@ const NotAssignedComplaintListPage = () => {
   // --- 401 REDIRECT LOGIC ---
   useEffect(() => {
     if ((errorCompile && errorCompile.status === 401) || (errorUnassigned && errorUnassigned.status === 401)) {
+                localStorage.setItem('authToken', null);
       navigate('/login', { replace: true });
     }
   }, [errorCompile, errorUnassigned, navigate]);

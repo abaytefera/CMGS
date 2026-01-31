@@ -27,6 +27,7 @@ const SupervisorDashboard = () => {
   // --- 401 REDIRECT LOGIC ---
   useEffect(() => {
     if ((statsError && statsError.status === 401) || (listError && listError.status === 401)) {
+        localStorage.setItem('authToken', null); 
       navigate('/login', { replace: true });
     }
   }, [statsError, listError, navigate]);

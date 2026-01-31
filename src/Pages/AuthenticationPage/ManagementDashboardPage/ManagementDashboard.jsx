@@ -40,6 +40,7 @@ const ManagementDashboard = () => {
     const errors = [statsError, chartsError, compileError];
     const isUnauthorized = errors.some((err) => err?.status === 401);
     if (isUnauthorized) {
+       localStorage.setItem('authToken', null);
       navigate('/login', { replace: true });
     }
   }, [statsError, chartsError, compileError, navigate]);

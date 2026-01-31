@@ -43,6 +43,7 @@ const OfficerPage1 = () => {
   // ✅ ADD 401 ERROR REDIRECT (ONLY ADDITION)
   useEffect(() => {
     if (statsError?.status === 401 || compileError?.status === 401) {
+        localStorage.setItem('authToken', null);
       navigate("/login", { replace: true });
     }
   }, [statsError, compileError, navigate]);

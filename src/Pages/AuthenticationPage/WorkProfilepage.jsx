@@ -36,6 +36,7 @@ const WorkProfile = () => {
   // ✅ 401 REDIRECT
   useEffect(() => {
     if (error?.status === 401) {
+          localStorage.setItem('authToken', null);
       navigate('/login', { replace: true });
     }
   }, [error, navigate]);

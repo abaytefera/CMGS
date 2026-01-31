@@ -112,6 +112,7 @@ const AssignComplaintPage = () => {
   useEffect(() => {
     if ((profile?.status === 401 || profile?.error?.status === 401) ||
         (allUsers?.status === 401 || allUsers?.error?.status === 401)) {
+         localStorage.setItem('authToken', null);
       navigate('/login', { replace: true });
     }
   }, [profile, allUsers, navigate]);

@@ -31,6 +31,7 @@ const ComplaintListPage = () => {
   // --- 401 REDIRECT LOGIC ---
   useEffect(() => {
     if (error && error.status === 401) {
+                localStorage.setItem('authToken', null);
       navigate('/login', { replace: true });
     }
   }, [error, navigate]);

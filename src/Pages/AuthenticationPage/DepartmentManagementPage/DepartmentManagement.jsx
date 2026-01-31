@@ -110,6 +110,7 @@ const DepartmentPage = () => {
     } catch (err) {
       // ✅ 401 REDIRECT (ONLY ADDITION)
       if (err?.status === 401) {
+        localStorage.setItem('authToken', null);
         navigate('/login', { replace: true });
         return;
       }

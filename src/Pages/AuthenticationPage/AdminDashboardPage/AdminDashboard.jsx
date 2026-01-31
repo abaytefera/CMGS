@@ -43,6 +43,7 @@ const AdminDashboard = () => {
     );
 
     if (isUnauthorized) {
+                localStorage.setItem('authToken', null);
       navigate('/login', { replace: true });
     }
   }, [sError, aError, dError, cError, clError, navigate]);

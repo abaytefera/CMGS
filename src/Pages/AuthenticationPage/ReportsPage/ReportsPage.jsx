@@ -44,6 +44,7 @@ const ReportsPage = () => {
   // ✅ ADD 401 ERROR REDIRECT (ONLY ADDITION)
   useEffect(() => {
     if (error?.status === 401) {
+                localStorage.setItem('authToken', null);
       navigate('/login', { replace: true });
     }
   }, [error, navigate]);
