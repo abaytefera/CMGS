@@ -89,10 +89,14 @@ const  Dispath=useDispatch()
   trend={stats?.trend || 0}
   icon={Activity}
   colorClass="bg-blue-600"
-  onClick={() =>{
+onClick={() =>{
+
     console.log("what is this")
+
      navigate("/Complaintlist/admin/list/")
+
   }}
+  
 />
               <StatCard
                 title="SLA Compliance"
@@ -100,6 +104,7 @@ const  Dispath=useDispatch()
                 trend={stats?.slaTrend || 0}
                 icon={ShieldCheck}
                 colorClass="bg-emerald-600"
+               
               />
 
               {/* System Health / Satisfaction Card */}

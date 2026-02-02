@@ -1,8 +1,10 @@
 import React from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-const StatCard = ({ title, value, trend, icon: Icon, colorClass }) => (
-  <div className="bg-white border border-slate-200 p-6 rounded-[2.5rem] relative overflow-hidden group hover:shadow-md transition-all">
+const StatCard = ({ title, value, trend, icon: Icon, colorClass,onClick }) => (
+  <div 
+  onClick={onClick}
+   className="bg-white border border-slate-200 p-6 rounded-[2.5rem] relative overflow-hidden group hover:shadow-md transition-all">
     {/* Subtle glow effect adjusted for white background */}
     <div className={`absolute -right-4 -top-4 w-24 h-24 blur-3xl opacity-10 ${colorClass}`} />
     
