@@ -1,15 +1,63 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { BarChart3 } from 'lucide-react';
 
-const AdminDashboardChart = ({ data, language }) => {
+const API_URL = import.meta.env.VITE_API_URL;
+
+const AdminDashboardChart = ({ language }) => {
+  const [apiData, setApiData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAdminStats = async () => {
+      try {
+        const token = localStorage.getItem('authToken'); // Retrieve your auth token
+        const response = await fetch(`${API_URL}/api/dashboard/admin?period=last7days`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch');
+        
+        const result = await response.json();
+        setApiData(result);
+      } catch (error) {
+        console.error("Error fetching admin stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdminStats();
+  }, []);
+
+  // Mapping API data to Chart categories
   const chartData = [
-    { name: language === "AMH" ? "ጠቅላላ" : "Total", value: data?.totalComplaints || 0, color: '#10b981' },
-    { name: language === "AMH" ? "ተመድቧል" : "Assigned", value: data?.assigned || 0, color: '#3b82f6' },
-    { name: language === "AMH" ? "ያልተመደበ" : "Unassigned", value: data?.notAssigned || 0, color: '#f59e0b' },
-    { name: language === "AMH" ? "መፍትሔ ያገኘ" : "Resolved", value: data?.resolved || 0, color: '#059669' },
-    { name: language === "AMH" ? "ውድቅ የተደረገ" : "Rejected", value: data?.rejected || 0, color: '#ef4444' },
+    { 
+      name: language === "AMH" ? "ጠቅላላ" : "Total", 
+      value: apiData?.totalComplaints || 0, 
+      color: '#10b981' 
+    },
+    { 
+      name: language === "AMH" ? "አክቲቭ" : "Active", 
+      value: apiData?.activeComplaints || 0, 
+      color: '#3b82f6' 
+    },
+    { 
+      name: language === "AMH" ? "የተዘጉ" : "Closed", 
+      value: apiData?.closedComplaints || 0, 
+      color: '#059669' 
+    },
+    { 
+      name: language === "AMH" ? "ተጠቃሚዎች" : "Users", 
+      value: apiData?.totalUsers || 0, 
+      color: '#f59e0b' 
+    },
   ];
+
+  if (loading) return <div className="h-[400px] flex items-center justify-center text-gray-400">Loading Analytics...</div>;
 
   return (
     <div className="bg-white border border-gray-100 rounded-[2rem] p-8 shadow-sm h-full">
@@ -21,7 +69,9 @@ const AdminDashboardChart = ({ data, language }) => {
           <h3 className="text-xs font-black text-gray-900 capitalize tracking-widest">
             {language === "AMH" ? "የአቤቱታዎች የሁኔታ ትንተና" : "Complaint Status Analytics"}
           </h3>
-          <p className="text-[10px] text-gray-400 font-bold capitalize mt-0.5">Live System Insights</p>
+          <p className="text-[10px] text-gray-400 font-bold capitalize mt-0.5">
+            {apiData?.period || 'Live'} System Insights
+          </p>
         </div>
       </div>
       
