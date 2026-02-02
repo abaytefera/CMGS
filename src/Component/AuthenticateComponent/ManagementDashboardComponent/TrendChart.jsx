@@ -21,6 +21,8 @@ const TrendChart = () => {
         }));
 
         setChartData(formatted);
+        console.log("what happen");
+        console.log(formatted)
       } catch (error) {
         console.error("Error loading chart data:", error);
       }
