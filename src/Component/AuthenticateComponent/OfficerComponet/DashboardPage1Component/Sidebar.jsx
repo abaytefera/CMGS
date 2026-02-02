@@ -60,7 +60,7 @@ const Sidebar = () => {
     { icon: AlertTriangle, label: "Overdue", url: "/Complaintlist/officer/overdue", visible: role === 'OFFICER' },
     { icon: CheckCircle2, label: "Resolved", url: "/Complaintlist/officer/resolved", visible: role === 'OFFICER' },
     { icon: XCircle, label: "Rejected", url: "/Complaintlist/officer/rejected", visible: role === 'OFFICER' },
-    { icon: FileText, label: "Complaints", url: "", visible: role === 'MANAGER' },
+    { icon: FileText, label: "Complaints", url: "/Complaintlist/admin/list/", visible: role === 'MANAGER' },
     { icon: ShieldCheck, label: "SLA Compilation", url: "", visible: role === 'MANAGER' },
     { icon: BarChart3, label: "Reports", url: "/Report", visible: role === 'MANAGER' },
   ];

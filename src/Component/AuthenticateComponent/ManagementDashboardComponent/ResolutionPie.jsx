@@ -1,6 +1,7 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
+
 const data = [
   { name: 'Resolved', value: 942 },
   { name: 'Pending', value: 242 },
