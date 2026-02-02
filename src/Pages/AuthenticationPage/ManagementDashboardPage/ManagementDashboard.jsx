@@ -51,8 +51,7 @@ const  Dispath=useDispatch()
     window.scrollTo(0, 0);
   }, []);
 
-  // --- DATA MAPPING FROM COMPILELIST ---
-  // We use optional chaining and logical OR to prevent "undefined" errors
+ 
   const totalComplaints = CompileList?.summary?.total ?? stats?.total ?? "0";
   const slaCompliance = `${CompileList?.percentage ?? stats?.sla ?? 0}%`;
   

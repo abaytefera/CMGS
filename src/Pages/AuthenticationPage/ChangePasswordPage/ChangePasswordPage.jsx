@@ -191,8 +191,7 @@ const Dispath=useDispatch()
             </div>
           </div>
         </main>
-
-        <AuthFooter />
+   
       </div>
     </div>
   );
