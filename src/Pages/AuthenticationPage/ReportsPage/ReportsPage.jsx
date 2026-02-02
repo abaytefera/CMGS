@@ -101,7 +101,7 @@ const  Dispath=useDispatch()
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`, // remove if not needed
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`, // remove if not needed
         },
       });
 
