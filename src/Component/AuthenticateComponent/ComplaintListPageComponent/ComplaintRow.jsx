@@ -89,10 +89,10 @@ const ComplaintRow = ({ complaint }) => {
               e.stopPropagation();
               navigate(`/DetailList/${complaint?._id || complaint?.id}`);
             }}
-            className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md hover:shadow-green-200"
+            className="flex items-center gap-2 px-6 py-2.5   text-black font-bold rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md hover:shadow-green-200"
           >
             <Eye size={14} />
-            Open
+           
           </button>
 
           <button 
