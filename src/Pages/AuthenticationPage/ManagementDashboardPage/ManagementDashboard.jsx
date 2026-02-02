@@ -91,7 +91,7 @@ const  Dispath=useDispatch()
   colorClass="bg-blue-600"
   onClick={() =>{
     console.log("what is this")
-     navigate("/Complaintlist/manager/list/")
+     navigate("/Complaintlist/admin/list/")
   }}
 />
               <StatCard
