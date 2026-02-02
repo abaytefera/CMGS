@@ -29,14 +29,7 @@ const SystemSummary = ({ catagory, dep }) => {
       color: "text-emerald-600",
       bgColor: "bg-emerald-50",
     },
-    {
-      title: t.uptime,
-      value: '99.9% Online',
-      icon: Server,
-      url: "", // No URL for status
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
+    
   ];
 
   return (

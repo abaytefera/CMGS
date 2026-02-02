@@ -100,61 +100,8 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Recent Activity */}
-            <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-sm mt-10 overflow-hidden">
-              <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-900 rounded-xl text-white">
-                    <Shield size={18} />
-                  </div>
-                  <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest">
-                    {t.recentActivity}
-                  </h3>
-                </div>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-left min-w-[600px]">
-                  <thead className="text-gray-400 text-[10px] uppercase font-black tracking-widest border-b border-gray-50">
-                    <tr>
-                      <th className="px-8 py-6">Tracking ID</th>
-                      <th className="px-8 py-6">Subject</th>
-                      <th className="px-8 py-6">Status</th>
-                      <th className="px-8 py-6 text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {(activities || []).map((item, i) => (
-                      <tr key={item.id || i} className="group hover:bg-gray-50/50 transition-all">
-                        <td className="px-8 py-6 font-mono text-emerald-600 text-xs font-black">
-                          {item.trackingId || `EPA-${2026}-${i}`}
-                        </td>
-                        <td className="px-8 py-6 text-xs font-bold text-gray-800">
-                          {item.subject || "Environmental Monitoring Request"}
-                        </td>
-                        <td className="px-8 py-6">
-                          <span
-                            className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border ${
-                              item.isOverdue
-                                ? 'text-rose-600 bg-rose-50 border-rose-100'
-                                : 'text-amber-600 bg-amber-50 border-amber-100'
-                            }`}
-                          >
-                            <AlertTriangle size={10} />
-                            {item.isOverdue ? t.overdue : t.pending}
-                          </span>
-                        </td>
-                        <td className="px-8 py-6 text-right">
-                          <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-gray-100 mr-4">
-                            <ExternalLink size={14} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            
+            
 
           </div>
         </main>
