@@ -113,7 +113,7 @@ const Sidebar = () => {
         <div className="flex flex-col h-full p-4 overflow-hidden">
           <div className="flex-shrink-0 mb-8 px-2">
             <Link to={dashboardUrl} onClick={() => setIsOpen(false)}>
-              <img src="/EEPA1 (1).jpg" alt="Logo" className="w-30 h-auto" />
+              <img src="/logo2.jpg" alt="Logo" className="w-30 h-auto" />
             </Link>
           </div>
 

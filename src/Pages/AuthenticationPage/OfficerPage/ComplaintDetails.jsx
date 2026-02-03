@@ -178,7 +178,7 @@ const ComplaintDetails = () => {
               </div>
 
               <div className="space-y-8">
-                <InfoCard title="Case Timeline">
+                <InfoCard title="Status History ">
                
                   <StatusHistory history={complaint.StatusLogs || []} />
                 </InfoCard>
