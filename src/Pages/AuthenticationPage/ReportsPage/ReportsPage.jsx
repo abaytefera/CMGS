@@ -1,137 +1,151 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ ADDED
-import { useGetReportsQuery } from '../../../Redux/reportApi';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+// import { useGetReportsQuery } from '../../../Redux/reportApi'; // Removed RTK Query
+import { logout } from '../../../Redux/auth';
+import toast, { Toaster } from 'react-hot-toast';
 import {
   FileBarChart,
   ArrowUpRight,
   Loader2,
   Database,
-  ShieldCheck,
   FileDown,
 } from 'lucide-react';
 
 import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
-import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 import ReportFilters from '../../../Component/AuthenticateComponent/ReportsPageComponent/ReportFilters';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../../Redux/auth';
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ReportsPage = () => {
-  const navigate = useNavigate(); // ✅ ADDED
-const  Dispath=useDispatch()
-  const departments = [
-    'Environmental Quality',
-    'Water Resources',
-    'Waste Management',
-  ];
-  const locations = ['Arada', 'Kirkos', 'Bole', 'Akaki Kality'];
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // Filters
+  // --- STATE MANAGEMENT ---
+  const [departments, setDepartments] = useState([]);
+  const [deptsLoading, setDeptsLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
+
+  // Replacement states for RTK Query
+  const [reportsData, setReportsData] = useState({ data: [], totalCount: 0 });
+  const [isFetching, setIsFetching] = useState(false);
+  const [fetchError, setFetchError] = useState(null);
+
   const [filters, setFilters] = useState({
     period: 'This Month',
     department: '',
-    location: '',
   });
 
-  // Download loading state
-  const [downloading, setDownloading] = useState(false);
-
-  // Reports query
-  const { data, isLoading, isFetching, isError, error } =
-    useGetReportsQuery(filters);
-
-  // ✅ ADD 401 ERROR REDIRECT (ONLY ADDITION)
+  // --- FETCH DEPARTMENTS ---
   useEffect(() => {
-    if (error?.status === 401) {
-                  localStorage.removeItem('authToken');
-                     Dispath(logout())
-      navigate('/login', { replace: true });
-    }
-  }, [error, navigate]);
+    const fetchDepartments = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/departments`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          },
+        });
+        if (!response.ok) throw new Error();
+        const result = await response.json();
+        setDepartments(result.data || result);
+      } catch (err) {
+        toast.error("Could not load departments list");
+      } finally {
+        setDeptsLoading(false);
+      }
+    };
+    fetchDepartments();
+  }, []);
 
-  // Sample fallback
-  const sampleData = {
-    totalCount: 3,
-    data: [
-      {
-        _id: 'rep-001',
-        trackingId: 'EPA-2026-001',
-        category: 'Air Quality',
-        department: 'Environmental Quality',
-        createdAt: '2026-01-15T10:30:00Z',
-      },
-      {
-        _id: 'rep-002',
-        trackingId: 'EPA-2026-042',
-        category: 'Water Pollution',
-        department: 'Water Resources',
-        createdAt: '2026-01-18T14:20:00Z',
-      },
-      {
-        _id: 'rep-003',
-        trackingId: 'EPA-2026-088',
-        category: 'Toxic Waste',
-        department: 'Waste Management',
-        createdAt: '2026-01-20T09:15:00Z',
-      },
-    ],
-  };
-
-  const activeData =
-    data && data?.data?.length > 0 ? data : sampleData;
-
-  const reports = activeData.data;
-  const totalCount = activeData.totalCount;
-
-  // 🔽 DOWNLOAD HANDLER (PDF / EXCEL)
-  const downloadFile = async (type) => {
+  // --- FETCH REPORTS (Manual fetch replacement) ---
+  const fetchReports = useCallback(async () => {
+    setIsFetching(true);
+    setFetchError(null);
     try {
-      setDownloading(true);
-
-      const endpoint =
-        type === 'pdf'
-          ? '/api/reports/pdf'
-          : '/api/reports/excel';
-
-      const filename =
-        type === 'pdf' ? 'reports.pdf' : 'reports.xlsx';
-
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      const queryParams = new URLSearchParams(filters).toString();
+      const response = await fetch(`${API_URL}/api/reports?${queryParams}`, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`, // remove if not needed
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
         },
       });
 
-      if (!response.ok) throw new Error('Download failed');
+      if (response.status === 401) {
+        handleAuthError();
+        return;
+      }
+
+      if (!response.ok) throw new Error('Failed to fetch reports');
+
+      const result = await response.json();
+      setReportsData({
+        data: result.data || [],
+        totalCount: result.totalCount || 0
+      });
+    } catch (err) {
+      setFetchError(err);
+      toast.error("Failed to load reports");
+    } finally {
+      setIsFetching(false);
+    }
+  }, [filters]);
+
+ 
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
+
+
+  const handleAuthError = () => {
+    toast.error("Session expired. Please login again.");
+    localStorage.removeItem('authToken');
+    dispatch(logout());
+    navigate('/login', { replace: true });
+  };
+
+  const reports = reportsData.data;
+  const totalCount = reportsData.totalCount;
+
+  
+  const downloadFile = async (type) => {
+    const downloadToast = toast.loading(`Generating ${type.toUpperCase()}...`);
+    try {
+      setDownloading(true);
+      const queryParams = new URLSearchParams(filters).toString();
+      const endpoint = type === 'pdf' ? '/api/reports/pdf' : '/api/reports/excel';
+      
+      const response = await fetch(`${API_URL}${endpoint}?${queryParams}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+
+      if (!response.ok) throw new Error();
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-
       const link = document.createElement('a');
       link.href = url;
-      link.download = filename;
+      link.download = `Report_${filters.period.replace(/\s+/g, '_')}.${type === 'pdf' ? 'pdf' : 'xlsx'}`;
       document.body.appendChild(link);
       link.click();
-
       link.remove();
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error(error);
-      alert('File download failed');
+      
+      toast.success(`${type.toUpperCase()} downloaded successfully`, { id: downloadToast });
+    } catch (err) {
+      toast.error("Download failed", { id: downloadToast });
     } finally {
       setDownloading(false);
     }
   };
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <div className="flex min-h-screen bg-white text-slate-900">
+      <Toaster position="top-right" />
       <Sidebar role="manager" />
 
       <div className="flex-1 flex flex-col">
@@ -139,28 +153,17 @@ const  Dispath=useDispatch()
 
         <main className="flex-1 pt-32 px-6 lg:px-10 pb-10 bg-slate-50/30">
           <div className="max-w-7xl mx-auto">
+            
             {/* HEADER */}
             <header className="mb-12 flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-black">
-                  Data <span className="text-blue-600 italic">Vault</span>
+                <h1 className="text-3xl font-black ">
+                  Data <span className="text-blue-600">Vault</span>
                 </h1>
-
-                <div className="flex gap-2 mt-4">
-                  <div
-                    className={`px-2 py-0.5 rounded-md border text-[9px] font-black uppercase ${
-                      isError
-                        ? 'border-rose-200 text-rose-600 bg-rose-50'
-                        : 'border-blue-200 text-blue-600 bg-blue-50'
-                    }`}
-                  >
-                    {isError ? 'Offline Archive' : 'Secure Connection'}
-                  </div>
-                </div>
               </div>
 
-              <div className="hidden lg:block p-4 bg-white border rounded-3xl">
-                {isFetching ? (
+              <div className="hidden lg:block p-4 bg-white border rounded-3xl shadow-sm">
+                {isFetching || deptsLoading ? (
                   <Loader2 className="animate-spin text-blue-600" />
                 ) : (
                   <FileBarChart className="text-blue-600" />
@@ -168,104 +171,87 @@ const  Dispath=useDispatch()
               </div>
             </header>
 
-            {/* FILTERS */}
             <ReportFilters
               filters={filters}
               setFilters={setFilters}
               departments={departments}
-              locations={locations}
             />
 
-            {/* EXPORT BUTTONS */}
+            {/* ACTION BUTTONS */}
             <div className="flex gap-4 mt-8">
               <button
                 onClick={() => downloadFile('pdf')}
-                disabled={downloading}
-                className="px-6 py-3 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-black rounded-2xl flex items-center gap-2"
+                disabled={downloading || reports.length === 0}
+                className="px-8 py-3 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-black rounded-2xl flex items-center gap-2 transition-all shadow-md"
               >
-                <FileDown size={14} />
-                {downloading ? 'Preparing PDF...' : 'Download PDF'}
+                <FileDown size={14} /> Export PDF
               </button>
 
               <button
                 onClick={() => downloadFile('excel')}
-                disabled={downloading}
-                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-black rounded-2xl flex items-center gap-2"
+                disabled={downloading || reports.length === 0}
+                className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-black rounded-2xl flex items-center gap-2 transition-all shadow-md"
               >
-                <FileDown size={14} />
-                {downloading
-                  ? 'Preparing Excel...'
-                  : 'Download Excel'}
+                <FileDown size={14} /> Export Excel
               </button>
             </div>
 
-            {/* TABLE */}
-            <div className="bg-white border rounded-[2.5rem] mt-8 overflow-hidden">
-              <div className="px-8 py-6 flex justify-between border-b">
-                <h3 className="text-[10px] font-black uppercase">
-                  Previewing: {filters.period}
+            {/* TABLE PREVIEW */}
+            <div className="bg-white border border-slate-200 rounded-[2.5rem] mt-8 overflow-hidden relative shadow-sm">
+              {isFetching && (
+                <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-10 flex items-center justify-center">
+                  <Loader2 className="animate-spin text-blue-600" size={32} />
+                </div>
+              )}
+
+              <div className="px-8 py-6 flex justify-between border-b border-slate-100">
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Preview: <span className="text-slate-900">{filters.period}</span>
+                  {filters.department && <span className="text-blue-600"> / {filters.department}</span>}
                 </h3>
-                <span className="text-[10px] font-black text-blue-600">
+                <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100">
                   {totalCount} Records Found
                 </span>
               </div>
 
-              <table className="w-full">
-                <thead className="bg-slate-50 text-[9px] uppercase">
-                  <tr>
-                    <th className="px-8 py-4">Report ID</th>
-                    <th className="px-8 py-4">Category</th>
-                    <th className="px-8 py-4">Department</th>
-                    <th className="px-8 py-4">Date</th>
-                    <th className="px-8 py-4 text-right">Action</th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y">
-                  {reports.length ? (
-                    reports.map((item) => (
-                      <tr
-                        key={item._id}
-                        className="hover:bg-slate-100"
-                      >
-                        <td className="px-8 py-5 text-blue-600 font-mono">
-                          #{item.trackingId}
-                        </td>
-                        <td className="px-8 py-5">
-                          {item.category}
-                        </td>
-                        <td className="px-8 py-5">
-                          {item.department}
-                        </td>
-                        <td className="px-8 py-5">
-                          {new Date(
-                            item.createdAt
-                          ).toLocaleDateString()}
-                        </td>
-                        <td className="px-8 py-5 text-right">
-                          <ArrowUpRight size={16} />
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50 text-[9px] uppercase font-black text-slate-500 tracking-wider">
+                    <tr>
+                      <th className="px-8 py-5">Report ID</th>
+                      <th className="px-8 py-5">Category</th>
+                      <th className="px-8 py-5">Department</th>
+                      <th className="px-8 py-5 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {reports.length > 0 ? (
+                      reports.map((item) => (
+                        <tr key={item._id} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-8 py-5 text-blue-600 font-mono font-bold text-xs">
+                            #{item.trackingId}
+                          </td>
+                          <td className="px-8 py-5 text-sm font-medium">{item.category}</td>
+                          <td className="px-8 py-5 text-sm">{item.department}</td>
+                          <td className="px-8 py-5 text-right">
+                            <ArrowUpRight size={16} className="inline text-slate-300" />
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="py-24 text-center">
+                          <Database size={40} className="mx-auto text-slate-200 mb-4" />
+                          <p className="text-[10px] font-black uppercase text-slate-400">Archive Empty</p>
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5" className="py-20 text-center">
-                        <Database
-                          size={32}
-                          className="mx-auto text-slate-300 mb-4"
-                        />
-                        <p className="text-[10px] font-black uppercase text-slate-400">
-                          No records found
-                        </p>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </main>
-
       </div>
     </div>
   );
