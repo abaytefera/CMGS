@@ -91,22 +91,8 @@ const OfficerPage1 = () => {
               </div>
             </div>
 
-            {/* Table Header */}
-            <div className="mb-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-600 rounded-xl text-white shadow-lg shadow-emerald-200">
-                  <LayoutGrid size={20} />
-                </div>
-                <h3 className="font-black text-gray-900 uppercase text-xs tracking-widest">
-                  {t.recentWork}
-                </h3>
-              </div>
-            </div>
-
-            {/* Complaints List Table */}
-            <div className="bg-white border border-gray-100 rounded-[2rem] shadow-sm overflow-hidden mb-12">
-              <ComplaintList Data={[]} />
-            </div>
+        
+          
 
           </div>
         </main>
