@@ -69,14 +69,14 @@ const UserManagementPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Permanent Action: Delete this user?")) {
+ 
       const delId = toast.loading('Removing user...');
       try {
         await deleteUser(id).unwrap();
         toast.success('User deleted from database', { id: delId });
       } catch {
         toast.error('Delete failed', { id: delId });
-      }
+      
     }
   };
 

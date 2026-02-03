@@ -89,18 +89,18 @@ const ComplaintListPage = () => {
     return list;
   }, [TotalCompile, filterType, searchTerm, isOfficer, isAdmin]);
 
-  if (isLoading || !user) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-12 w-12 animate-spin text-emerald-600" />
-          <p className="font-bold text-slate-500 animate-pulse uppercase tracking-widest text-xs">
-            {Language === "AMH" ? "በመጫን ላይ..." : "Loading Records..."}
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoading || !user) {
+  //   return (
+  //     <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+  //       <div className="flex flex-col items-center gap-4">
+  //         <Loader2 className="h-12 w-12 animate-spin text-emerald-600" />
+  //         <p className="font-bold text-slate-500 animate-pulse uppercase tracking-widest text-xs">
+  //           {Language === "AMH" ? "በመጫን ላይ..." : "Loading Records..."}
+  //         </p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex min-h-screen bg-white text-slate-800">

@@ -112,7 +112,7 @@ const ComplaintDetails = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
-                <InfoCard title="Core Incident Information">
+                <InfoCard title="Citizen Information">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-2">
                     <div className="space-y-4">
                       <div className="flex items-center gap-4">
