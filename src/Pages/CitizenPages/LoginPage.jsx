@@ -85,7 +85,7 @@ const handleLogin = async (e) => {
         <div className={`w-full max-w-md bg-white border border-gray-100 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 p-10 flex flex-col items-center z-10 transition-all duration-300 ${showSuccess ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}>
           
          <div className='flex flex-col'>
-          <img src="/logo2.jpg" alt="" />
+          <img src="/logo2.jpg" alt="" className='w-20 h-auto' />
           
           </div>
           <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-8">
