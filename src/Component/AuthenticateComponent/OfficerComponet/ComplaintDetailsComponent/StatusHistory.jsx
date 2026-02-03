@@ -2,6 +2,7 @@ import React from 'react';
 import { Clock, CheckCircle2 } from "lucide-react";
 
 const StatusHistory = ({ history }) => {
+  // 1. Safety check for the history array itself
   if (!history || history.length === 0) {
     return <p className="text-[10px] font-bold text-slate-400 uppercase text-center py-4 tracking-widest">No history recorded</p>;
   }
@@ -24,10 +25,12 @@ const StatusHistory = ({ history }) => {
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-tight">
-                {log.status.replace('_', ' ')}
+        
+                {(log.status || "UNKNOWN").replace('_', ' ')}
               </h4>
               <span className="text-[9px] font-bold text-slate-400 uppercase">
-                {new Date(log.createdAt).toLocaleDateString()}
+          
+                {log.createdAt ? new Date(log.createdAt).toLocaleDateString() : "N/A"}
               </span>
             </div>
             {log.comment && (
