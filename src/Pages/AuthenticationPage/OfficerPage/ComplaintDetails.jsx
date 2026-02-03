@@ -33,7 +33,10 @@ const ComplaintDetails = () => {
   const [updateStatus, { isLoading: isUpdating }] = useUpdateComplaintStatusMutation();
 
   useEffect(() => {
-    if (complaint) setSelectedStatus(complaint.status);
+    if (complaint) {
+      console.log("status update")
+      console.log(complaint)
+      setSelectedStatus(complaint.status);}
   }, [complaint]);
 
   const statusConfig = {
