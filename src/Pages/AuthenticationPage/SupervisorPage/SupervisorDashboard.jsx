@@ -110,42 +110,7 @@ const SupervisorDashboard = () => {
               </div>
             </div>
 
-            {/* --- RECENT ESCALATIONS --- */}
-            <div className="bg-white border border-gray-100 p-8 rounded-[2.5rem] shadow-sm">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-2 bg-rose-50 rounded-lg">
-                  <ShieldAlert className="text-rose-500" size={20} />
-                </div>
-                <h3 className="text-gray-900 font-bold uppercase tracking-widest text-xs">{t.escalations}</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(stats?.recentEscalations || []).length > 0 ? (
-                  stats.recentEscalations.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-5 rounded-2xl bg-gray-50/50 border border-gray-100 hover:border-emerald-200 hover:bg-white transition-all group">
-                      <div className="flex items-center gap-4">
-                        <span className="text-emerald-600 font-bold text-xs">#{item.id}</span>
-                        <div>
-                          <p className="text-sm font-bold text-gray-900 mb-1 group-hover:text-emerald-700">{item.subject}</p>
-                          <p className="text-[10px] text-gray-500 flex items-center gap-1 font-bold uppercase">
-                            <Users size={12} className="text-gray-400" /> {t.officer}: {item.officerName}
-                          </p>
-                        </div>
-                      </div>
-                      <span className={`px-3 py-1 text-[9px] font-black rounded-lg uppercase ${
-                        item.priority === 'Critical' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-600'
-                      }`}>
-                        {item.priority}
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="md:col-span-2 py-12 text-center text-gray-400 text-[10px] font-bold uppercase tracking-widest border-2 border-dashed border-gray-100 rounded-3xl">
-                    No Recent Escalations Found
-                  </div>
-                )}
-              </div>
-            </div>
+          
           </div>
         </main>
       </div>
