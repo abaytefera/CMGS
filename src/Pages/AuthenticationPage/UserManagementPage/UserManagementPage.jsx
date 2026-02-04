@@ -5,179 +5,126 @@ import {
   useUpdateUserMutation, 
   useDeleteUserMutation 
 } from '../../../Redux/userApi';
-
-// Toast
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../../../Redux/auth';
 import toast, { Toaster } from 'react-hot-toast';
+import { Loader2, Plus } from 'lucide-react';
 
 import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import UserForm from '../../../Component/AuthenticateComponent/UserManagementPageComponent/UserForm';
 import UserTable from '../../../Component/AuthenticateComponent/UserManagementPageComponent/UserTable';
-import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
-import { Loader2, Database, Search, UserPlus, Users, Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { logout } from '../../../Redux/auth';
-import { useDispatch } from 'react-redux';
+
 const UserManagementPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [departments] = useState([
-    "Environmental Quality", "Water Resources", "Waste Management", "Administrative"
-  ]);
+  // Get current user and role from Redux
+  const { user: currentUser } = useSelector((state) => state.auth);
+  const isAdmin = currentUser?.role === 'ADMIN';
 
   const [editingUser, setEditingUser] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const [showUserForm, setShowUserForm] = useState(false);
-       const Dispath=useDispatch()
-  const { data: DataUsers, isLoading, isError, error } = useGetUsersQuery();
+
+  const { data: DataUsers, isLoading, error } = useGetUsersQuery();
   const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const [deleteUser] = useDeleteUserMutation();
 
-  // --- 401 REDIRECT LOGIC ---
   useEffect(() => {
     if (error && error.status === 401) {
-           localStorage.removeItem('authToken');
-          Dispath(logout())
-      navigate('/login', { replace: true });
+      dispatch(logout());
+      navigate('/login');
     }
-  }, [error, navigate]);
-  // --------------------------
+  }, [error, navigate, dispatch]);
 
-  useEffect(() => { console.log(DataUsers); }, [DataUsers]);
-
-  const rawUsers = (DataUsers && DataUsers.length > 0) ? DataUsers : [];
-  const filteredUsers = rawUsers.filter(user => 
-    user.fullName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // --- FILTERING LOGIC ---
+  // 1. Convert to array 
+  // 2. Filter out the logged-in user (Self-exclusion)
+  const rawUsers = Array.isArray(DataUsers) ? DataUsers : [];
+  const filteredUsers = rawUsers.filter(u => u.id !== currentUser?.id && u._id !== currentUser?.id);
 
   const handleSave = async (userData) => {
     const loadId = toast.loading(editingUser ? 'Updating...' : 'Registering...');
     try {
       if (editingUser) {
-        const { id, ...restOfData } = userData; 
-        await updateUser({ id: id, ...restOfData }).unwrap();
+        await updateUser({ id: editingUser.id || editingUser._id, ...userData }).unwrap();
         toast.success('Staff profile updated!', { id: loadId });
-        setEditingUser(null);
       } else {
         await createUser(userData).unwrap();
         toast.success('New staff registered!', { id: loadId });
       }
-    } catch (error) {
-      toast.error(error?.data?.message || "Critical Validation Error", { id: loadId });
+      setShowUserForm(false);
+      setEditingUser(null);
+    } catch (err) {
+      toast.error(err?.data?.message || "Action Failed", { id: loadId });
     }
   };
 
   const handleDelete = async (id) => {
- 
-      const delId = toast.loading('Removing user...');
-      try {
-        await deleteUser(id).unwrap();
-        toast.success('User deleted from database', { id: delId });
-      } catch {
-        toast.error('Delete failed', { id: delId });
-      
+    try {
+      await deleteUser(id).unwrap();
+      toast.success('User deleted successfully');
+    } catch {
+      toast.error('Failed to delete user');
     }
   };
 
-  const handleEdit = (user) => {
-    setEditingUser(user);
-    toast('Switched to Edit Mode', { icon: '📝' });
-    setShowUserForm(true);
-  };
-
-  useEffect(() => { window.scrollTo(0, 0); }, []);
-
   return (
-    <div className="flex min-h-screen bg-white text-slate-800">
+    <div className="flex min-h-screen bg-slate-50/50">
       <Toaster position="top-right" />
-      <Sidebar role="admin" />
+      <Sidebar role={currentUser?.role} />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col">
         <AuthHeader True={true} />
 
-        <main className="flex-1 pt-32 px-6 lg:px-10 pb-10 bg-slate-50/50 relative">
-          <div className="max-w-5xl mx-auto">
-            {/* Header */}
-            <header className="mb-10">
-              <h1 className="text-2xl relative top-10 font-black capitalize">
-                User <span className="text-emerald-600">Management</span>
-              </h1>
+        <main className="flex-1 pt-32 px-6 pb-10">
+          <div className="max-w-6xl mx-auto">
+            <header className="flex justify-between items-center mb-8">
+              <h1 className="text-2xl font-black">Staff <span className="text-emerald-600">Directory</span></h1>
+              
+              {/* Only show "Register" button to Admins */}
+              {isAdmin && (
+                <button
+                  onClick={() => { setEditingUser(null); setShowUserForm(true); }}
+                  className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200"
+                >
+                  <Plus size={18} /> Register Staff
+                </button>
+              )}
             </header>
 
-            {/* Onboarding + Directory */}
-            <div className="flex flex-col gap-12">
-              <section className="space-y-4">
-                <div className="flex items-center gap-3 px-2">
-                  <button
-                    onClick={() => setShowUserForm(true)}
-                    className="ml-auto flex px-5 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest"
-                  >
-                     <Plus size={16} /> Register User
-                  </button>
-                </div>
-              </section>
-
-              <section className="space-y-6">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-2">
-                  <div className="flex items-center gap-3"></div>
-                </div>
-
-                {isLoading ? (
-                  <div className="flex justify-center py-24">
-                    <Loader2 className="animate-spin" size={44} />
-                  </div>
-                ) : (
-                  <UserTable users={rawUsers} onEdit={handleEdit} onDelete={handleDelete} />
-                )}
-              </section>
-            </div>
+            {isLoading ? (
+              <div className="flex justify-center py-20"><Loader2 className="animate-spin text-emerald-600" size={40} /></div>
+            ) : (
+              <UserTable 
+                users={filteredUsers} 
+                onEdit={(u) => { setEditingUser(u); setShowUserForm(true); }}
+                onDelete={handleDelete}
+                isAdmin={isAdmin} // Passing role status to table
+              />
+            )}
           </div>
 
-          {/* ================= POPUP FORM ================= */}
+          {/* User Registration/Edit Modal */}
           {showUserForm && (
-            <>
-              <div
-                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
-                onClick={() => setShowUserForm(false)}
-              />
-              <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
-                <div className="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl h-[90vh] flex flex-col">
-                  <div className="flex justify-between items-center p-6 border-b border-slate-200 flex-shrink-0">
-                    <h2 className="text-xl font-black text-slate-900 uppercase italic flex items-center gap-2">
-                      <div className="w-1.5 h-8 bg-emerald-600 rounded-full" />
-                      {editingUser ? 'Update Staff' : 'Staff Registration'}
-                    </h2>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowUserForm(false);
-                        setEditingUser(null);
-                      }}
-                      className="text-slate-400 hover:text-slate-600 p-2 rounded-full transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  <div className="overflow-auto px-6 py-4 flex-1">
-                    <UserForm
-                      editingUser={editingUser}
-                      departments={departments}
-                      onSave={(data) => {
-                        handleSave(data);
-                        setShowUserForm(false);
-                      }}
-                      onCancel={() => {
-                        setShowUserForm(false);
-                        setEditingUser(null);
-                      }}
-                      isLoading={isCreating || isUpdating}
-                    />
-                  </div>
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+              <div className="bg-white rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl">
+                <div className="p-6 border-b flex justify-between items-center">
+                  <h2 className="font-black uppercase tracking-tight">{editingUser ? 'Edit Staff' : 'New Registration'}</h2>
+                  <button onClick={() => setShowUserForm(false)}>✕</button>
+                </div>
+                <div className="p-6 overflow-y-auto max-h-[80vh]">
+                  <UserForm 
+                    editingUser={editingUser} 
+                    onSave={handleSave} 
+                    onCancel={() => setShowUserForm(false)} 
+                    isLoading={isCreating || isUpdating}
+                  />
                 </div>
               </div>
-            </>
+            </div>
           )}
         </main>
       </div>

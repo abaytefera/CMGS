@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toEthiopian, toGregorian } from "ethiopian-date";
 
 const MONTHS = [
@@ -8,11 +8,17 @@ const MONTHS = [
 ];
 
 const EthioDatePicker = ({ label, value, onChange }) => {
-  const [month, setMonth] = useState(1);
-  const [year, setYear] = useState(2016);
-  const [showYearPicker, setShowYearPicker] = useState(false);
+  // 2. DYNAMICALLY FIND CURRENT ETHIOPIAN YEAR
+  const today = new Date();
+  const [currentEthYear] = toEthiopian(today.getFullYear(), today.getMonth() + 1, today.getDate());
 
-  // Sync internal UI state when a 'value' is passed from outside
+  const [month, setMonth] = useState(1);
+  const [year, setYear] = useState(currentEthYear); 
+  const [showYearPicker, setShowYearPicker] = useState(false);
+  
+  const yearPickerRef = useRef(null);
+
+  // Sync internal UI state when 'value' prop changes
   useEffect(() => {
     if (value && !isNaN(value.getTime())) {
       const [y, m, d] = toEthiopian(value.getFullYear(), value.getMonth() + 1, value.getDate());
@@ -21,10 +27,18 @@ const EthioDatePicker = ({ label, value, onChange }) => {
     }
   }, [value]);
 
-  // Pagume has 6 days in leap years, 5 in others
+  // Scroll to active year when year picker opens
+  useEffect(() => {
+    if (showYearPicker && yearPickerRef.current) {
+      const activeBtn = yearPickerRef.current.querySelector(".active-year");
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    }
+  }, [showYearPicker]);
+
   const daysInMonth = month === 13 ? (year % 4 === 3 ? 6 : 5) : 30;
 
-  // Format for internal comparison logic
   const formattedValue = value && !isNaN(value.getTime())
     ? (() => {
         const [y, m, d] = toEthiopian(value.getFullYear(), value.getMonth() + 1, value.getDate());
@@ -32,8 +46,8 @@ const EthioDatePicker = ({ label, value, onChange }) => {
       })()
     : "";
 
-  // Generate Year Range: 1950 to 2060
-  const years = Array.from({ length: 111 }, (_, i) => 1950 + i);
+  // Generate Year Range dynamically based on current year
+  const years = Array.from({ length: 100 }, (_, i) => (currentEthYear - 80) + i);
 
   return (
     <div className="w-full relative">
@@ -42,7 +56,6 @@ const EthioDatePicker = ({ label, value, onChange }) => {
       </label>
 
       <div className="mt-2 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm min-h-[280px]">
-        {/* Header Display */}
         <div className="mb-3 text-xs font-bold text-emerald-700 border-b border-slate-100 pb-2 flex justify-between">
           <span>{formattedValue || "Pick a date"}</span>
           {formattedValue && (
@@ -50,7 +63,6 @@ const EthioDatePicker = ({ label, value, onChange }) => {
           )}
         </div>
 
-        {/* Controls */}
         <div className="flex justify-between items-center mb-4">
           <button 
             onClick={() => setShowYearPicker(!showYearPicker)}
@@ -66,14 +78,18 @@ const EthioDatePicker = ({ label, value, onChange }) => {
           </div>
         </div>
 
-        {/* Quick Year Picker Overlay */}
         {showYearPicker && (
-          <div className="absolute inset-x-4 top-[85px] bottom-4 bg-white z-20 grid grid-cols-4 gap-1 overflow-y-auto p-2 border rounded-xl shadow-xl border-emerald-100">
+          <div 
+            ref={yearPickerRef}
+            className="absolute inset-x-4 top-[85px] bottom-4 bg-white z-20 grid grid-cols-4 gap-1 overflow-y-auto p-2 border rounded-xl shadow-xl border-emerald-100"
+          >
             {years.map(y => (
               <button 
                 key={y} 
                 onClick={() => { setYear(y); setShowYearPicker(false); }}
-                className={`text-[10px] py-2 rounded-lg font-bold transition-colors ${y === year ? 'bg-emerald-600 text-white' : 'hover:bg-slate-100 text-slate-500'}`}
+                className={`text-[10px] py-2 rounded-lg font-bold transition-colors ${
+                  y === year ? 'bg-emerald-600 text-white active-year' : 'hover:bg-slate-100 text-slate-500'
+                }`}
               >
                 {y}
               </button>
@@ -81,7 +97,6 @@ const EthioDatePicker = ({ label, value, onChange }) => {
           </div>
         )}
 
-        {/* Days Grid */}
         <div className="grid grid-cols-7 gap-1">
           {Array.from({ length: daysInMonth }, (_, i) => {
             const day = i + 1;

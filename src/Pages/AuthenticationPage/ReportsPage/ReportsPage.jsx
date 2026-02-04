@@ -32,12 +32,19 @@ const ReportsPage = () => {
   });
 
   // --- 1. Synchronized Parameter Logic ---
-  // This generates the query string once whenever filters change.
-  // Shared by both fetchReports and downloadFile.
+  // Replaces '+' with spaces and removes empty filters
   const queryString = useMemo(() => {
-    const activeParams = Object.fromEntries(
-      Object.entries(filters).filter(([_, value]) => value !== "")
-    );
+    const activeParams = {};
+    
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value && value !== "") {
+        // Step 1: Convert to string
+        // Step 2: Replace all '+' with a literal space ' '
+        // Step 3: Trim whitespace
+        activeParams[key] = String(value).replace(/\+/g, ' ').trim();
+      }
+    });
+
     return new URLSearchParams(activeParams).toString();
   }, [filters]);
 
@@ -65,7 +72,8 @@ const ReportsPage = () => {
         ? `${API_URL}/api/reports/export?${queryString}` 
         : `${API_URL}/api/reports/export`;
 
-        console.log(queryString )
+      console.log("Current Query:", queryString);
+      
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -191,7 +199,7 @@ const ReportsPage = () => {
                   Records Found: <span className="text-slate-900">{reportsData.count}</span>
                 </h3>
                 <div className="text-[10px] font-black text-blue-600 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 uppercase">
-                   {filters.period || "All History"}
+                   {filters.period ? filters.period.replace(/\+/g, ' ') : "All History"}
                 </div>
               </div>
 

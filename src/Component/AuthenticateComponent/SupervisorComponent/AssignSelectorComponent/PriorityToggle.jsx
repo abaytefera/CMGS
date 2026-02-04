@@ -2,9 +2,9 @@ import React from 'react';
 
 const PriorityToggle = ({ selected, onSelect }) => {
   const priorities = [
-    { label: 'Low', color: 'bg-slate-700', active: 'bg-blue-500 shadow-blue-500/40' },
-    { label: 'Medium', color: 'bg-slate-700', active: 'bg-amber-500 shadow-amber-500/40' },
-    { label: 'High', color: 'bg-slate-700', active: 'bg-rose-500 shadow-rose-500/40' }
+    { label: 'LOW', color: 'bg-slate-700', active: 'bg-blue-500 shadow-blue-500/40' },
+    { label: 'MEDIUM', color: 'bg-slate-700', active: 'bg-amber-500 shadow-amber-500/40' },
+    { label: 'HIGH', color: 'bg-slate-700', active: 'bg-rose-500 shadow-rose-500/40' }
   ];
 
   return (

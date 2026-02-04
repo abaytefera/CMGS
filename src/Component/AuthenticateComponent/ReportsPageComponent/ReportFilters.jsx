@@ -9,6 +9,7 @@ const ReportFilters = ({ filters, setFilters, departments }) => {
       ...prev,
       [name]: value
     }));
+  
   };
 
   const handleReset = () => {

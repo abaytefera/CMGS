@@ -1,182 +1,98 @@
 import React, { useState } from 'react';
 import { Edit3, Trash2, Mail, Search, X, Building2, AlertTriangle } from 'lucide-react';
 
-const UserTable = ({ users = [], onEdit, onDelete }) => {
+const UserTable = ({ users = [], onEdit, onDelete, isAdmin }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  // Track the user object intended for deletion
   const [userToDelete, setUserToDelete] = useState(null);
 
-  const filteredUsers = users.filter((user) => {
-    const search = searchTerm.trim().toLowerCase();
-    if (!search) return true;
-    return user?.full_name?.toLowerCase().includes(search);
+  const filteredBySearch = users.filter((u) => {
+    const name = (u.fullName || u.full_name || "").toLowerCase();
+    return name.includes(searchTerm.toLowerCase());
   });
 
-  const handleDeleteClick = (user) => {
-    setUserToDelete(user);
-  };
-
-  const confirmDelete = () => {
-    if (userToDelete) {
-      onDelete(userToDelete.id || userToDelete._id);
-      setUserToDelete(null); // Close modal
-    }
-  };
-
   return (
-    <div className="space-y-6 font-sans relative bottom-18 antialiased text-slate-900 bg-white p-6 rounded-xl">
-      
-      {/* ================= CUSTOM CONFIRMATION MODAL ================= */}
-      {userToDelete && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl border border-slate-100 flex flex-col items-center text-center gap-4">
-            <div className="p-4 rounded-full bg-rose-50 text-rose-500">
+    <div className="space-y-4">
+      {/* SEARCH BAR */}
+      <div className="relative max-w-sm">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+        <input
+          type="text"
+          placeholder="Filter by name..."
+          className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <div className="bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-sm">
+        <table className="w-full text-left">
+          <thead className="bg-slate-50/50 border-b border-slate-100">
+            <tr className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+              <th className="px-8 py-5">Staff Member</th>
+              <th className="px-8 py-5">Department</th>
+              <th className="px-8 py-5">Contact</th>
+              {/* ACTION HEADER HIDDEN FOR MANAGERS */}
+              {isAdmin && <th className="px-8 py-5 text-right">Actions</th>}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {filteredBySearch.map((user) => (
+              <tr key={user.id || user._id} className="group hover:bg-slate-50/50 transition-colors">
+                <td className="px-8 py-5">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                      {(user.fullName || user.full_name || "U").charAt(0).toUpperCase()}
+                    </div>
+                    <span className="font-bold text-slate-700">{user.fullName || user.full_name}</span>
+                  </div>
+                </td>
+                <td className="px-8 py-5">
+                   <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                      <Building2 size={14} className="text-emerald-500" />
+                      {user.department || user.Department?.name || "N/A"}
+                   </div>
+                </td>
+                <td className="px-8 py-5 text-xs text-slate-400">
+                   <div className="flex items-center gap-2">
+                      <Mail size={14} /> {user.email || user.username}
+                   </div>
+                </td>
+                
+                {/* ACTION BUTTONS HIDDEN FOR MANAGERS */}
+                {isAdmin && (
+                  <td className="px-8 py-5 text-right">
+                    <div className="flex justify-end gap-1">
+                      <button onClick={() => onEdit(user)} className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"><Edit3 size={18}/></button>
+                      <button onClick={() => setUserToDelete(user)} className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"><Trash2 size={18}/></button>
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {filteredBySearch.length === 0 && (
+          <div className="py-20 text-center text-slate-400 italic">No staff members found.</div>
+        )}
+      </div>
+
+      {/* DELETE CONFIRMATION (Admin Only) */}
+      {isAdmin && userToDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+          <div className="bg-white p-8 rounded-[2rem] max-w-sm w-full text-center shadow-2xl">
+            <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle size={32} />
             </div>
-            
-            <div>
-              <h3 className="text-xl font-black text-slate-900 mb-2">Delete User?</h3>
-              <p className="text-slate-500 text-sm leading-relaxed">
-                Are you sure you want to remove <span className="font-bold text-slate-900">"{userToDelete.full_name}"</span>? 
-                This action cannot be undone.
-              </p>
-            </div>
-
-            <div className="flex gap-3 w-full mt-2">
-              <button 
-                onClick={() => setUserToDelete(null)}
-                className="flex-1 py-3.5 rounded-2xl bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-widest border border-slate-100 hover:bg-slate-100 transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={confirmDelete}
-                className="flex-1 py-3.5 rounded-2xl bg-rose-500 text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-rose-200 active:scale-95 transition-all"
-              >
-                Delete
-              </button>
+            <h3 className="text-xl font-black mb-2">Are you sure?</h3>
+            <p className="text-slate-500 text-sm mb-6">You are about to remove <span className="font-bold text-slate-900">{userToDelete.fullName}</span> from the system.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setUserToDelete(null)} className="flex-1 py-3 bg-slate-100 rounded-xl font-bold text-xs uppercase">Cancel</button>
+              <button onClick={() => { onDelete(userToDelete.id || userToDelete._id); setUserToDelete(null); }} className="flex-1 py-3 bg-rose-500 text-white rounded-xl font-bold text-xs uppercase">Confirm</button>
             </div>
           </div>
         </div>
       )}
-
-      {/* SEARCH INPUT */}
-      <div className="relative max-w-md group">
-        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-          <Search size={18} className="text-slate-400 group-focus-within:text-emerald-600 transition-colors" />
-        </div>
-        <input
-          type="text"
-          placeholder="Search by full name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-slate-50 border border-slate-300 rounded-2xl py-3.5 pl-12 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all placeholder:text-slate-400 text-slate-900"
-        />
-        {searchTerm.trim() !== "" && (
-          <button 
-            onClick={() => setSearchTerm("")}
-            className="absolute inset-y-0 right-4 flex items-center text-slate-400 hover:text-slate-900"
-          >
-            <X size={16} />
-          </button>
-        )}
-      </div>
-
-      <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-        
-        {/* MOBILE VIEW */}
-        <div className="block md:hidden">
-          {filteredUsers.length > 0 ? (
-            filteredUsers.map((user) => (
-              <div key={user.id || user._id} className="p-6 border-b border-slate-100 space-y-3">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">
-                      {user?.full_name?.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold capitalize text-slate-900">{user?.full_name}</p>
-                      <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold uppercase tracking-tight">
-                        <Building2 size={10} /> {user?.Department?.name}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-1">
-                    <button onClick={() => onEdit(user)} className="p-2 text-emerald-600"><Edit3 size={16} /></button>
-                    <button onClick={() => handleDeleteClick(user)} className="p-2 text-rose-600"><Trash2 size={16} /></button>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="p-10 text-center text-slate-400">No results found.</div>
-          )}
-        </div>
-
-        {/* DESKTOP VIEW */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-50 text-slate-500 text-[11px] uppercase font-bold tracking-wider border-b border-slate-200">
-              <tr>
-                <th className="px-8 py-4">Staff Member</th>
-                <th className="px-8 py-4">Department</th>
-                <th className="px-8 py-4">Contact</th>
-                <th className="px-8 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <tr key={user.id || user._id} className="group hover:bg-emerald-50/30 transition-colors">
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold shadow-sm">
-                          {user?.full_name?.charAt(0).toUpperCase()}
-                        </div>
-                        <p className="text-sm font-semibold capitalize text-slate-900">{user.full_name}</p>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
-                        <Building2 size={14} className="text-emerald-500" />
-                        <span className="uppercase tracking-tight">{user.Department?.name || user.departmentName}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-2 text-slate-500 text-xs">
-                        <Mail size={13} />
-                        {user.username || user.email}
-                      </div>
-                    </td>
-                    <td className="px-8 py-5 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button 
-                          onClick={() => onEdit(user)} 
-                          className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
-                        >
-                          <Edit3 size={18} />
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteClick(user)} 
-                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="px-8 py-16 text-center text-slate-400 italic">
-                    No results for "{searchTerm}"
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 };

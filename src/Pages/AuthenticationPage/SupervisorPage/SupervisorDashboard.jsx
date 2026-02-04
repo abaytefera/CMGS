@@ -23,7 +23,7 @@ const SupervisorDashboard = () => {
 
   const { data: stats, isLoading: statsLoading, error: statsError } = useGetSupervisorStatsQuery();
   const { data: CompileList, isLoading: listLoading, error: listError } = useGetComplaintsDashboardQuery('supervisor');
-
+ 
   useEffect(() => {
     if ((statsError && statsError.status === 401) || (listError && listError.status === 401)) {
       localStorage.removeItem('authToken');
@@ -97,7 +97,7 @@ const SupervisorDashboard = () => {
                 <Link to="/Complaintlist/supervisor/unassigned"><SLAWarning title={t.notAssigned} count={CompileList?.notAssigned} severity="high" icon={UserPlus} /></Link>
                 <Link to="/Complaintlist/supervisor/resolved"><SLAWarning title={t.resolved} count={CompileList?.resolved} severity="low" icon={CheckCircle2} /></Link>
                 <Link to="/Complaintlist/supervisor/rejected"><SLAWarning title={t.rejected} count={CompileList?.rejected} severity="medium" icon={XCircle} /></Link>
-                <div className="sm:col-span-2"><SLAWarning title="Active Officers" count={CompileList?.activeOfficers} severity="low" icon={Users} /></div>
+                <Link  to="/userMg"  className="sm:col-span-2"><SLAWarning title="Active Officers" count={CompileList?.activeOfficers} severity="low" icon={Users} /></Link>
               </div>
 
               {/* --- SOLID PIE CHART WITH PERCENTAGES --- */}

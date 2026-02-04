@@ -27,13 +27,11 @@ const AssignComplaintPage = () => {
 
   const [officerId, setOfficerId] = useState("");
   const [priority, setPriority] = useState("Medium");
-  const [startDate, setStartDate] = useState(null); 
-  const [endDate, setEndDate] = useState(null);    
+  
+  // 1. AUTOMATICALLY START FROM TODAY
+  const [startDate, setStartDate] = useState(new Date()); 
+  const [endDate, setEndDate] = useState(new Date());    
   const [isDeploying, setIsDeploying] = useState(false);
-
-  useEffect(() => {
-    setStartDate(new Date()); 
-  }, []);
 
   /* ---------------- AUTH CHECK ---------------- */
   useEffect(() => {
@@ -55,11 +53,8 @@ const AssignComplaintPage = () => {
       }));
   }, [allUsers, profile]);
 
-  /* ---------------- FIXED ISO CONVERSION ---------------- */
   const ethioDateToISO = (dateObj) => {
-    // Check if the date is valid to prevent RangeError
     if (!dateObj || isNaN(dateObj.getTime())) return null;
-    
     return dateObj.toISOString(); 
   };
 
@@ -69,15 +64,20 @@ const AssignComplaintPage = () => {
       toast.error(Language === "AMH" ? "እባክዎ ባለሙያ እና ቀን ይምረጡ" : "Officer and End Date required");
       return;
     }
-console.log(officerId)
-console.log(id)
 
     const token = localStorage.getItem("authToken");
     if (!token) return;
 
     setIsDeploying(true);
     const toastId = toast.loading("Processing...");
-
+console.log({
+          complaintId: Number(id),
+          officerId: Number(officerId),
+          priority,
+          timeline: {
+            start: ethioDateToISO(startDate),
+            end: ethioDateToISO(endDate),
+          }});
     try {
       const response = await fetch(`${API_URL}/api/workflow/assign`, {
         method: "POST",
@@ -88,8 +88,12 @@ console.log(id)
         body: JSON.stringify({
           complaintId: Number(id),
           officerId: Number(officerId),
-          
-        }),
+          priority,
+          timeline: {
+            start: ethioDateToISO(startDate),
+            end: ethioDateToISO(endDate),
+          }
+        })
       });
 
       if (!response.ok) throw new Error("FAILED");
