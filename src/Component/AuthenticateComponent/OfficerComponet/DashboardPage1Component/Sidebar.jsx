@@ -52,8 +52,7 @@ const Sidebar = () => {
     { icon: ListTodo, label: "Not Assigned", url: "/NotAssignComplainList/supervisor/unassigned", visible: role === 'SUPERVISOR' },
     { icon: XCircle, label: "Rejected", url: "/Complaintlist/supervisor/rejected", visible: role === 'SUPERVISOR' },
     { icon: CheckCircle2, label: "Resolved", url: "/Complaintlist/supervisor/resolved", visible: role === 'SUPERVISOR' },
-    { icon: AlertTriangle, label: "SLA Breach", url: "", visible: role === 'SUPERVISOR' },
-    { icon: Clock, label: "Approaching", url: "", visible: role === 'SUPERVISOR' },
+ 
     { icon: UserCheck, label: "Active Officer", url: "", visible: role === 'SUPERVISOR' },
     { icon: Briefcase, label: "Assigned", url: "/Complaintlist/officer/assigned", visible: role === 'OFFICER' },
     { icon: PlayCircle, label: "In Progress", url: "/Complaintlist/officer/in_progress", visible: role === 'OFFICER' },

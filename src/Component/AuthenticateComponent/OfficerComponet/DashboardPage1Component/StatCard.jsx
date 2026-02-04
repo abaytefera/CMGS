@@ -5,20 +5,30 @@ import { Link } from 'react-router-dom';
 const StatCard = ({ title, type, count, icon: Icon, delay = 0 }) => {
   const getTheme = () => {
     // These cases now match your exact "type" props from the parent
-    switch (type) {
-      case 'assigned':
-        return { text: 'text-emerald-600', bg: 'bg-emerald-50' };
-      case 'in_progress':
-        return { text: 'text-amber-600', bg: 'bg-amber-50' };
-      case 'resolved':
-        return { text: 'text-blue-600', bg: 'bg-blue-50' };
-      case 'rejected':
-        return { text: 'text-slate-500', bg: 'bg-slate-100' };
-      case 'overdue': 
-        return { text: 'text-red-600', bg: 'bg-red-50' };
-      default:
-        return { text: 'text-emerald-600', bg: 'bg-emerald-50' };
-    }
+  switch (type) {
+  case 'assigned':
+    // Matches #9333ea (Purple 600)
+    return { text: 'text-purple-600', bg: 'bg-purple-50' };
+    
+  case 'in_progress':
+    // Matches #f59e0b (Amber 500/600)
+    return { text: 'text-amber-600', bg: 'bg-amber-50' };
+    
+  case 'resolved':
+    // Matches #10b981 (Emerald 500/600)
+    return { text: 'text-emerald-600', bg: 'bg-emerald-50' };
+    
+  case 'rejected':
+    // Matches #ef4444 (Red 500/600)
+    return { text: 'text-red-600', bg: 'bg-red-50' };
+    
+  case 'overdue': 
+    // Matches #e11d48 (Rose 600)
+    return { text: 'text-rose-600', bg: 'bg-rose-50' };
+    
+  default:
+    return { text: 'text-purple-600', bg: 'bg-purple-50' };
+}
   };
 
   const theme = getTheme();

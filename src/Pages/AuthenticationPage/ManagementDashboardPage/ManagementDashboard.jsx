@@ -59,8 +59,9 @@ const  Dispath=useDispatch()
   const resolutionData = {
     resolved: CompileList?.summary?.resolved ?? 0,
     pending: CompileList?.summary?.unresolved ?? 0,
-    overdue: charts?.resolution?.overdue ?? 0 // Falls back to chart API for overdue
+  
   };
+ 
 
   if (statsLoading || chartsLoading || isloadingcompile) {
     return (

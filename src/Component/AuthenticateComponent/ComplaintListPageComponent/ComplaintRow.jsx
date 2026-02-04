@@ -95,12 +95,7 @@ const ComplaintRow = ({ complaint }) => {
            
           </button>
 
-          <button 
-            onClick={(e) => e.stopPropagation()} 
-            className="p-2 text-slate-300 hover:text-slate-600 rounded-lg transition-colors"
-          >
-            <MoreHorizontal size={20} />
-          </button>
+          
         </div>
       </td>
     </tr>

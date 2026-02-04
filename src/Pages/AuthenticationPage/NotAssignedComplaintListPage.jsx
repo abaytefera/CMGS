@@ -23,15 +23,17 @@ const Dispath=useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
 
+
+
   // 1. Fetch data based on Category/Role params
   const { 
     data: TotalCompile, 
     isLoading: isLoadingCompile, 
     isFetching: isFetchingCompile,
-    error: errorCompile // ✅ Capture error
+    error: errorCompile 
   } = useGetComplaintsbyCatagoryQuery({ 
-    role: urlRole || user?.role, 
-    type: urlType 
+    role: urlRole , 
+    type: "unassigned" 
   }, { skip: !urlType });
 
   // 2. Fetch Unassigned specifically
@@ -45,6 +47,11 @@ const Dispath=useDispatch();
     page: page,
     limit: 10
   }, { skip: !!urlType });
+
+  useEffect(()=>{
+console.log(unassignedData)
+
+  },[unassignedData])
 
   // --- 401 REDIRECT LOGIC ---
   useEffect(() => {

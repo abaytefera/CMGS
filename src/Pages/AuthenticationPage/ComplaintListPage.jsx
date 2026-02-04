@@ -11,9 +11,10 @@ import AuthHeader from '../../Component/AuthenticateComponent/AuthHeader';
 
 const ComplaintListPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { Language } = useSelector((state) => state.webState);
   const { user } = useSelector((state) => state.auth);
-  const  Dispath=useDispatch()
+
   // Role Helpers
   const isAdmin = user?.role === "ADMIN";
   const isOfficer = user?.role === "OFFICER";
@@ -31,18 +32,11 @@ const ComplaintListPage = () => {
   // --- 401 REDIRECT LOGIC ---
   useEffect(() => {
     if (error && error.status === 401) {
-        localStorage.removeItem('authToken');
-         Dispath(logout())
+      localStorage.removeItem('authToken');
+      dispatch(logout());
       navigate('/login', { replace: true });
     }
-  }, [error, navigate]);
-  // --------------------------
-
-  useEffect(() => {
-    if (TotalCompile) {
-      console.log("Data changed or loaded:", TotalCompile);
-    }
-  }, [TotalCompile]);
+  }, [error, navigate, dispatch]);
 
   const filteredComplaints = useMemo(() => {
     let list = Array.isArray(TotalCompile) ? [...TotalCompile] : [];
@@ -89,18 +83,8 @@ const ComplaintListPage = () => {
     return list;
   }, [TotalCompile, filterType, searchTerm, isOfficer, isAdmin]);
 
-  // if (isLoading || !user) {
-  //   return (
-  //     <div className="flex h-screen w-full items-center justify-center bg-slate-50">
-  //       <div className="flex flex-col items-center gap-4">
-  //         <Loader2 className="h-12 w-12 animate-spin text-emerald-600" />
-  //         <p className="font-bold text-slate-500 animate-pulse uppercase tracking-widest text-xs">
-  //           {Language === "AMH" ? "በመጫን ላይ..." : "Loading Records..."}
-  //         </p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  // Prevent crash if user is null during auth transition
+  if (!user) return null;
 
   return (
     <div className="flex min-h-screen bg-white text-slate-800">
@@ -188,7 +172,19 @@ const ComplaintListPage = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {filteredComplaints.length > 0 ? (
+                    {/* TABLE ONLY LOADING LOGIC */}
+                    {isLoading || isFetching ? (
+                      <tr>
+                        <td colSpan="4" className="px-8 py-24 text-center">
+                          <div className="flex flex-col items-center justify-center gap-4">
+                            <Loader2 className="h-10 w-10 animate-spin text-emerald-600" />
+                            <p className="font-bold text-slate-400 animate-pulse uppercase tracking-[0.2em] text-[10px]">
+                              {Language === "AMH" ? "በመጫን ላይ..." : "Loading Records..."}
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : filteredComplaints.length > 0 ? (
                       filteredComplaints.map((item) => (
                         <ComplaintRow key={item?.id || item?._id} complaint={item} />
                       ))
@@ -205,7 +201,6 @@ const ComplaintListPage = () => {
             </div>
           </div>
         </main>
-        
       </div>
     </div>
   );

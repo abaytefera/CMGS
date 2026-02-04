@@ -1,38 +1,57 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   ChevronLeft, RefreshCcw, CheckCircle, Clock, AlertCircle,
   FileText, History, ShieldCheck, Lock,
-  Send, Loader2, Paperclip, Mail, Phone, 
-  Image as ImageIcon, ExternalLink, Video, Music, FileCode
+  Send, Loader2, Mail, Phone, 
+  ImageIcon, ExternalLink, Video, Music, FileCode,
+  UserPlus, MessageSquare
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
-import { useGetComplaintByIdQuery, useUpdateComplaintStatusMutation } from "../../../Redux/complaintApi";
+import { complaintApi } from "../../../Redux/complaintApi";
+import { toEthiopian } from "ethiopian-date";
 
 import Sidebar from "../../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar";
 import AuthHeader from "../../../Component/AuthenticateComponent/AuthHeader";
 import InfoCard from "../../../Component/AuthenticateComponent/OfficerComponet/ComplaintDetailsComponent/InfoCard";
-import StatusHistory from "../../../Component/AuthenticateComponent/OfficerComponet/ComplaintDetailsComponent/StatusHistory";
 
 const ComplaintDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const userRole = user?.role;
 
-  const canUpdateStatus = user?.role === "SUPERVISOR" || user?.role === "OFFICER";
-  
+  // Permissions
+  const canUpdateStatus = ["SUPERVISOR", "OFFICER"].includes(userRole);
+  const canAddInternalNote = ["SUPERVISOR", "OFFICER", "MANAGER"].includes(userRole);
+
+  // Local State
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [comment, setComment] = useState("");
+  const [statusComment, setStatusComment] = useState("");
+  const [internalNote, setInternalNote] = useState("");
 
   const complaintId = useMemo(() => (!isNaN(Number(id)) ? Number(id) : null), [id]);
-  const { data: complaint, isLoading, isError } = useGetComplaintByIdQuery(complaintId, { skip: !complaintId });
-  const [updateStatus, { isLoading: isUpdating }] = useUpdateComplaintStatusMutation();
+
+  // API Queries
+  const { data: complaint, isLoading, isError, refetch: refetchComplaint } = complaintApi.useGetComplaintByIdQuery(complaintId, { skip: !complaintId });
+  const { data: historyLogs, isLoading: isHistoryLoading, refetch: refetchHistory } = complaintApi.useGetComplaintHistoryQuery(complaintId, { skip: !complaintId });
+  const { data: internalNotes, refetch: refetchInternalNotes } = complaintApi.useGetInternalNotesQuery({ complaintId }, { skip: !complaintId });
+
+  // API Mutations
+  const [updateStatus, { isLoading: isUpdating }] = complaintApi.useUpdateComplaintStatusMutation();
+  const [createInternalNote, { isLoading: isCreatingNote }] = complaintApi.useCreateInternalNoteMutation();
 
   useEffect(() => {
-    if (complaint?.status) {
-      setSelectedStatus(complaint.status);
-    }
+    if (complaint?.status) setSelectedStatus(complaint.status);
   }, [complaint]);
+
+  const formatEthiopianDate = (dateStr) => {
+    if (!dateStr) return "N/A";
+    const date = new Date(dateStr);
+    const [year, month, day] = toEthiopian(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    return `${day}/${month}/${year}`;
+  };
 
   const statusConfig = {
     "SUBMITTED": { label: "Submitted", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100", icon: <FileText size={16} /> },
@@ -44,49 +63,79 @@ const ComplaintDetails = () => {
     "REJECTED": { label: "Rejected", color: "text-rose-600", bg: "bg-rose-50", border: "border-rose-100", icon: <AlertCircle size={16} /> },
   };
 
+  // Logic to prevent showing statuses that aren't allowed for specific roles
+  const filteredStatusKeys = useMemo(() => {
+    const keys = Object.keys(statusConfig);
+    return keys.filter((key) => {
+      if (key === complaint?.status) return true; 
+      if (userRole === "OFFICER") return !["SUBMITTED", "ASSIGNED", "UNDER_REVIEW", "CLOSED"].includes(key);
+      if (userRole === "SUPERVISOR") return !["SUBMITTED", "ASSIGNED"].includes(key);
+      return true;
+    });
+  }, [userRole, complaint?.status]);
+
   const getFileDisplay = (type) => {
-    
     const mime = (type || "").toLowerCase();
-    const parts = mime.includes('/') ? mime.split('/') : ["file", "unknown"];
-    
-    if (mime.startsWith('image/')) return { icon: <ImageIcon size={20} className="text-emerald-600" />, label: parts[1] };
-    if (mime.startsWith('video/')) return { icon: <Video size={20} className="text-rose-600" />, label: parts[1] };
-    if (mime.startsWith('audio/')) return { icon: <Music size={20} className="text-amber-600" />, label: parts[1] };
-    if (mime.includes('pdf')) return { icon: <FileText size={20} className="text-red-600" />, label: "PDF" };
+    const parts = mime.includes("/") ? mime.split("/") : ["file", "unknown"];
+    if (mime.startsWith("image/")) return { icon: <ImageIcon size={20} className="text-emerald-600" />, label: parts[1] };
+    if (mime.startsWith("video/")) return { icon: <Video size={20} className="text-rose-600" />, label: parts[1] };
+    if (mime.startsWith("audio/")) return { icon: <Music size={20} className="text-amber-600" />, label: parts[1] };
+    if (mime.includes("pdf")) return { icon: <FileText size={20} className="text-red-600" />, label: "PDF" };
     return { icon: <FileCode size={20} className="text-blue-600" />, label: parts[1] || "FILE" };
   };
 
   const handleStatusUpdate = async () => {
-    if (!comment.trim()) return toast.error("Comment is required.");
+    if (!statusComment.trim()) return toast.error("Please provide a reason for this status change.");
+    
     try {
       await toast.promise(
-        updateStatus({ id: complaintId, status: selectedStatus, comment }).unwrap(),
-        { loading: 'Updating...', success: 'Status Sync Complete', error: 'Update Failed' }
+        updateStatus({ id: complaintId, status: selectedStatus, comment: statusComment }).unwrap(),
+        { 
+          loading: "Updating status...", 
+          success: "Case status successfully updated", 
+          error: (err) => err?.data?.message || "Invalid status transition" 
+        }
       );
-      setComment("");
-    } catch (err) { }
+      setStatusComment("");
+      refetchComplaint();
+      refetchHistory();
+    } catch (err) {
+      console.error("Update failed:", err);
+    }
+  };
+
+  const handleAddInternalNote = async () => {
+    if (!internalNote.trim()) return toast.error("Note cannot be empty.");
+    try {
+      await toast.promise(
+        createInternalNote({ complaintId, note: internalNote }).unwrap(),
+        { loading: "Posting note...", success: "Internal note added", error: "Failed to post note" }
+      );
+      setInternalNote("");
+      refetchInternalNotes();
+    } catch (err) { console.error(err); }
   };
 
   if (isLoading) return <div className="h-screen flex items-center justify-center bg-white"><Loader2 className="animate-spin text-emerald-600" size={40} /></div>;
-  if (isError || !complaint) return <div className="h-screen flex items-center justify-center">Complaint not found or API Error.</div>;
+  if (isError || !complaint) return <div className="h-screen flex items-center justify-center font-bold text-rose-500">Complaint not found or API Error.</div>;
 
   const activeConfig = statusConfig[complaint?.status] || statusConfig["SUBMITTED"];
 
   return (
     <div className="flex min-h-screen font-sans text-slate-800 bg-white">
       <Toaster position="top-right" />
-      {/* Safe role check */}
-      <Sidebar role={user?.role?.toLowerCase() || "officer"} />
-
+      <Sidebar role={userRole?.toLowerCase() || "officer"} />
+      
       <div className="flex-1 flex flex-col min-w-0">
         <AuthHeader True={true} />
-
-        <main className="flex-grow pt-32 pb-20 px-6 lg:px-10">
+        
+        <main className="flex-grow pt-32 pb-20 px-6 lg:px-10 overflow-x-hidden">
           <div className="max-w-7xl mx-auto">
+            
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
               <div className="flex items-center gap-4">
-                <button onClick={() => window.history.back()} className="p-2 bg-white border border-slate-200 rounded-full hover:bg-slate-50 transition-colors">
+                <button onClick={() => navigate(-1)} className="p-2 bg-white border border-slate-200 rounded-full hover:bg-slate-50 transition-colors shadow-sm">
                   <ChevronLeft size={20} />
                 </button>
                 <div>
@@ -96,25 +145,33 @@ const ComplaintDetails = () => {
                   </span>
                 </div>
               </div>
-              <div className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-black text-[11px] uppercase tracking-widest border bg-white ${activeConfig.color} ${activeConfig.border}`}>
-                {activeConfig.icon} {activeConfig.label}
+              
+              <div className="flex items-center gap-3">
+                {userRole === "SUPERVISOR" && (
+                  <button onClick={() => navigate(`/AssignComplain/${id}`)} className="flex items-center gap-2 px-5 py-2.5 rounded-2xl font-black text-[11px] uppercase tracking-widest border border-emerald-100 bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm">
+                    <UserPlus size={16} /> Assign Officer
+                  </button>
+                )}
+                <div className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-black text-[11px] uppercase tracking-widest border bg-white ${activeConfig.color} ${activeConfig.border}`}>
+                  {activeConfig.icon} {activeConfig.label}
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left Column: Details & Notes */}
               <div className="lg:col-span-2 space-y-8">
-                
                 <InfoCard title="Citizen Information">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-2">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-xl">
+                      <div className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-xl uppercase">
                         {(complaint.citizen_name || "?")[0]}
                       </div>
                       <div>
                         <p className="font-black text-slate-900 uppercase tracking-tight">{complaint.citizen_name || "Unknown Citizen"}</p>
                         <div className="flex flex-col gap-0.5 mt-1 text-slate-500 text-xs font-bold">
-                          <span className="flex items-center gap-1.5"><Phone size={12} /> {complaint.phone_number || "N/A"}</span>
-                          <span className="flex items-center gap-1.5"><Mail size={12} /> {complaint.email || "N/A"}</span>
+                          <span className="flex items-center gap-1.5 text-emerald-600 truncate"><Phone size={12} /> {complaint.phone_number || "N/A"}</span>
+                          <span className="flex items-center gap-1.5 truncate"><Mail size={12} /> {complaint.email || "N/A"}</span>
                         </div>
                       </div>
                     </div>
@@ -124,8 +181,8 @@ const ComplaintDetails = () => {
                         <p className="text-sm font-bold text-slate-700">{complaint.sub_city || "-"}, {complaint.woreda || "-"}</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Submitted</p>
-                        <p className="text-sm font-bold text-slate-700">{complaint.createdAt ? new Date(complaint.createdAt).toLocaleDateString() : "N/A"}</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Date Submitted</p>
+                        <p className="text-sm font-bold text-slate-700">{formatEthiopianDate(complaint.createdAt)}</p>
                       </div>
                     </div>
                   </div>
@@ -137,85 +194,177 @@ const ComplaintDetails = () => {
                   </div>
                 </InfoCard>
 
-                <InfoCard title="Evidence & Attachments">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {complaint.Attachments && complaint.Attachments.length > 0 ? (
-                      complaint.Attachments.map((file) => {
-                    
-                        const fileDisplay = getFileDisplay(file?.file_type);
-                        return (
-                          <div key={file.id} className="group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500 transition-all shadow-sm">
-                            <div className="flex items-center gap-3 overflow-hidden">
-                              <div className="p-2 bg-slate-50 rounded-lg">
-                                {fileDisplay.icon}
-                              </div>
-                              <div className="flex flex-col overflow-hidden">
-                                <span className="text-[11px] font-black text-slate-900 truncate uppercase">
-                                  {file.original_name || "Untitled"}
-                                </span>
-                                <span className="text-[9px] text-slate-400 font-bold uppercase">
-                                  {fileDisplay.label || "FILE"}
-                                </span>
-                              </div>
+                <InfoCard title="Internal Collaboration Notes">
+                  <div className="space-y-6 max-h-[450px] overflow-y-auto pr-2 custom-scrollbar">
+                    {internalNotes?.length > 0 ? (
+                      internalNotes.map((note) => (
+                        <div key={note.id} className="relative pl-6 border-l-2 border-slate-100 py-1 hover:border-emerald-500 transition-colors">
+                          <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-white border-2 border-emerald-500 shadow-sm" />
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] font-black text-slate-900 uppercase tracking-tight">
+                                {note.user_name || note.User?.username}
+                              </span>
+                              <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-[8px] font-black text-slate-500 uppercase border border-slate-200">
+                                {note.User?.role || "Staff"}
+                              </span>
                             </div>
-                            <button 
-                              onClick={() => file.file_path && window.open(file.file_path, '_blank')}
-                              className="p-2 bg-slate-900 text-white rounded-xl hover:bg-emerald-600 transition-colors"
-                            >
-                              <ExternalLink size={14} />
-                            </button>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">
+                              {formatEthiopianDate(note.createdAt)}
+                            </span>
                           </div>
-                        );
-                      })
+                          <div className="bg-slate-50 p-4 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm">
+                            <p className="text-sm font-medium text-slate-700 leading-relaxed">
+                              {note.note}
+                            </p>
+                          </div>
+                        </div>
+                      ))
                     ) : (
-                      <div className="col-span-full py-6 text-center border-2 border-dashed border-slate-100 rounded-3xl">
-                        <Paperclip size={20} className="mx-auto text-slate-300 mb-2" />
-                        <p className="text-[10px] font-black text-slate-400 uppercase">No attachments found</p>
+                      <div className="text-center py-10 opacity-40">
+                        <MessageSquare size={32} className="mx-auto mb-2" />
+                        <p className="text-[10px] font-black uppercase tracking-widest">No internal discussions recorded</p>
                       </div>
                     )}
                   </div>
+
+                  {canAddInternalNote && (
+                    <div className="mt-8 pt-6 border-t border-slate-100">
+                      <div className="relative">
+                        <textarea
+                          value={internalNote}
+                          onChange={(e) => setInternalNote(e.target.value)}
+                          className="w-full bg-slate-50 p-4 pb-14 rounded-3xl text-sm font-medium border border-slate-200 min-h-[120px] outline-none focus:border-emerald-500 focus:bg-white transition-all resize-none shadow-inner"
+                          placeholder="Type an internal update for colleagues..."
+                        />
+                        <div className="absolute bottom-3 right-3 flex items-center gap-3">
+                          <span className="text-[9px] font-black text-slate-400 uppercase hidden sm:block italic">Visible to staff only</span>
+                          <button
+                            onClick={handleAddInternalNote}
+                            disabled={isCreatingNote || !internalNote.trim()}
+                            className="bg-emerald-600 text-white p-3 rounded-2xl hover:bg-emerald-700 transition-all shadow-lg disabled:opacity-50"
+                          >
+                            {isCreatingNote ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </InfoCard>
               </div>
 
+              {/* Right Column: Timeline & Actions */}
               <div className="space-y-8">
-                <InfoCard title="Status History ">
-               
-                  <StatusHistory history={complaint.StatusLogs || []} />
+                <InfoCard title="Progress Timeline">
+                  {isHistoryLoading ? (
+                    <div className="flex justify-center p-8"><Loader2 className="animate-spin text-slate-300" /></div>
+                  ) : (
+                    <div className="space-y-4">
+                      {historyLogs && historyLogs.length > 0 ? (
+                        historyLogs.map((log) => (
+                          <div key={log.id} className="relative pl-6 border-l border-slate-200 pb-5 last:pb-0">
+                            <div className="absolute -left-[5.5px] top-1 w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.1)]" />
+                            <div className="flex flex-col gap-1">
+                              <div className="flex justify-between items-start">
+                                <span className="text-[10px] font-black text-slate-900 uppercase leading-none">
+                                  {log.old_status} <span className="text-slate-400 mx-1">→</span> {log.new_status}
+                                </span>
+                                <span className="text-[8px] text-slate-400 font-bold whitespace-nowrap">
+                                  {formatEthiopianDate(log.createdAt)}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-600 font-medium leading-tight">
+                                {log.comment}
+                              </p>
+                              <div className="flex items-center gap-1.5 mt-1">
+                                <div className="w-4 h-4 rounded bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-500">
+                                  {log.User?.username?.[0].toUpperCase() || "U"}
+                                </div>
+                                <span className="text-[9px] text-emerald-600 font-black uppercase tracking-tight">
+                                  {log.changed_by_name || log.User?.username}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-6 opacity-30">
+                          <History size={24} className="mx-auto mb-2" />
+                          <p className="text-[9px] font-black uppercase tracking-widest">No activity history</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </InfoCard>
 
-                <InfoCard title={canUpdateStatus ? "Decision Management" : "View Access"}>
-                   {canUpdateStatus ? (
-                    <div className="space-y-4">
-                        <select 
-                          value={selectedStatus} 
+                <InfoCard title={canUpdateStatus ? "Administrative Actions" : "Access Restrictions"}>
+                  {canUpdateStatus ? (
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Change Status To:</label>
+                        <select
+                          value={selectedStatus}
                           onChange={(e) => setSelectedStatus(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl text-sm font-black outline-none focus:border-emerald-500"
+                          className="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl text-sm font-black outline-none focus:border-emerald-500 cursor-pointer appearance-none transition-all"
                         >
-                          {Object.keys(statusConfig).map(k => (
-                            <option key={k} value={k}>{statusConfig[k].label}</option>
+                          {filteredStatusKeys.map(k => (
+                            <option key={k} value={k}>
+                              {statusConfig[k].label} {k === complaint?.status ? "(CURRENT)" : ""}
+                            </option>
                           ))}
                         </select>
-                        <textarea 
-                          value={comment}
-                          onChange={(e) => setComment(e.target.value)}
-                          className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-medium border border-slate-200 min-h-[100px] outline-none"
-                          placeholder="Internal remarks..."
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Case Remark / Decision:</label>
+                        <textarea
+                          value={statusComment}
+                          onChange={(e) => setStatusComment(e.target.value)}
+                          className="w-full bg-slate-50 p-4 rounded-2xl text-sm font-medium border-2 border-slate-100 min-h-[120px] outline-none focus:border-emerald-500 transition-all"
+                          placeholder="Why is this status being updated?"
                         />
-                        <button 
-                          onClick={handleStatusUpdate}
-                          disabled={isUpdating}
-                          className="w-full bg-slate-900 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-widest text-[10px] hover:bg-emerald-600 transition-all disabled:opacity-50"
-                        >
-                          {isUpdating ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />} 
-                          Update Status
-                        </button>
+                      </div>
+
+                      <button
+                        onClick={handleStatusUpdate}
+                        disabled={isUpdating || (selectedStatus === complaint?.status && !statusComment.trim())}
+                        className="w-full bg-emerald-600 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 uppercase tracking-widest text-[11px] hover:bg-emerald-700 transition-all shadow-xl disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        {isUpdating ? <Loader2 className="animate-spin" size={18} /> : <ShieldCheck size={18} />} Save Resolution
+                      </button>
                     </div>
-                   ) : (
-                    <div className="text-center p-6 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                      <Lock size={16} className="mx-auto text-slate-400 mb-2" />
-                      <p className="text-[10px] font-black text-slate-400 uppercase">Read Only Mode</p>
+                  ) : (
+                    <div className="text-center p-8 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+                      <Lock size={20} className="mx-auto text-slate-300 mb-2" />
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        {userRole === "MANAGER" ? "Read-only access to status" : "Unauthorized to modify"}
+                      </p>
                     </div>
-                   )}
+                  )}
+                </InfoCard>
+
+                <InfoCard title="Attachments">
+                  <div className="space-y-3">
+                    {complaint.Attachments?.length > 0 ? complaint.Attachments.map(file => {
+                      const fileDisplay = getFileDisplay(file.file_type);
+                      return (
+                        <div key={file.id} className="group flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-emerald-500 transition-all">
+                          <div className="flex items-center gap-3 overflow-hidden">
+                            <div className="p-2 bg-slate-50 rounded-lg">{fileDisplay.icon}</div>
+                            <div className="flex flex-col overflow-hidden">
+                              <span className="text-[10px] font-black text-slate-900 truncate uppercase">{file.original_name || "File"}</span>
+                              <span className="text-[8px] text-slate-400 font-bold uppercase">{fileDisplay.label}</span>
+                            </div>
+                          </div>
+                          <button onClick={() => file.file_path && window.open(file.file_path, "_blank")} className="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
+                            <ExternalLink size={14} />
+                          </button>
+                        </div>
+                      );
+                    }) : (
+                      <p className="text-[10px] font-bold text-slate-300 uppercase text-center py-4">No files uploaded</p>
+                    )}
+                  </div>
                 </InfoCard>
               </div>
             </div>

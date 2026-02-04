@@ -1,97 +1,110 @@
 import { APi } from "./CenteralAPI";
 
-const complaintApi = APi.injectEndpoints({
+export const complaintApi = APi.injectEndpoints({
   endpoints: (builder) => ({
-  
     getComplaintById: builder.query({
       query: (id) => `/api/staff/details/${id}`,
       providesTags: (result, error, id) => [{ type: 'Complaints', id }],
-    
       transformResponse: (res) => res || null,
     }),
 
-    // PATCH /api/staff/update-status/:id
+    getComplaintHistory: builder.query({
+      query: (id) => `/api/workflow/complaints/${id}/history`,
+      providesTags: (result, error, id) => [{ type: 'ComplaintHistory', id }],
+    }),
+
     updateComplaintStatus: builder.mutation({
-      query: ({ id, ...patch }) => ({
-        url: `/api/workflow/status/${id}`, 
+      query: ({ id, status, comment }) => ({
+        url: `/api/workflow/status/${id}`,
         method: 'PATCH',
-        body: patch, 
+        body: { status, comment },
       }),
-      // Invalidates specific ID to refresh the detail page and Dashboard to update totals
       invalidatesTags: (result, error, { id }) => [
-        { type: 'Complaints', id }, 
-        'Complaints', 
-        'Dashboard'
+        { type: "Complaints", id },
+        { type: "ComplaintHistory", id },
+        "Complaints",
+        "Dashboard",
       ],
     }),
 
-    // GET /api/staff/list
     getComplaints: builder.query({
       query: (params) => ({
-        url: '/api/staff/list', 
+        url: '/api/staff/list',
         method: 'GET',
-        params: params, 
+        params: params,
       }),
       providesTags: ['Complaints'],
-      // Unwraps the nested results array common in your backend responses
-      transformResponse: (res) => res ,
+      transformResponse: (res) => res,
     }),
-    
 
-    // GET /api/staff/unassigned
     getUnassignedComplaints: builder.query({
       query: (params) => ({
-        url: '/staff/unassigned',
+        url: '/api/staff/unassigned', // Added /api/ for consistency
         method: 'GET',
         params: params,
       }),
       providesTags: ['Complaints'],
       transformResponse: (res) => res || [],
     }),
-        // GET /api/staff/list
+
     getComplaintsDashboard: builder.query({
       query: (params) => ({
-        url: `/api/dashboard/${params}`, 
+        url: `/api/dashboard/${params}`,
         method: 'GET',
-        params: params, 
+        params: params,
       }),
       providesTags: ['Complaints'],
-      // Unwraps the nested results array common in your backend responses
-      transformResponse: (res) => res ,
+      transformResponse: (res) => res,
     }),
+
     getComplaintsList: builder.query({
       query: (params) => ({
-        url: `api/staff/list${params}`, 
+        url: `/api/staff/list`, // Removed ${params} from URL since they are passed in params object
         method: 'GET',
-        params: params, 
+        params: params,
       }),
       providesTags: ['Complaints'],
-   
-      transformResponse: (res) => res ,
+      transformResponse: (res) => res,
     }),
-   getComplaintsbyCatagory: builder.query({
-  query: ({ role, type }) => ({
-    // Fixed the slashes and formatting
-    url: `/api/dashboard/${role}/list/`, 
-    method: 'GET',
-    // Using the 'params' object is the cleanest way to handle ?type=value
-    params: { type: type }, 
-  }),
-  providesTags: ['Complaints'],
-  transformResponse: (res) => res,
-}),
-  }),
- 
 
+    getComplaintsbyCatagory: builder.query({
+      query: ({ role, type }) => ({
+        url: `/api/dashboard/${role}/list/`,
+        method: 'GET',
+        params: { type: type },
+      }),
+      providesTags: ['Complaints'],
+      transformResponse: (res) => res,
+    }),
+
+    getInternalNotes: builder.query({
+      query: ({ complaintId }) => `/api/workflow/complaints/${complaintId}/notes`,
+      providesTags: (result) =>
+        result
+          ? [...result.map((note) => ({ type: "InternalNote", id: note.id })), { type: 'InternalNote', id: 'LIST' }]
+          : [{ type: 'InternalNote', id: 'LIST' }],
+    }),
+
+    createInternalNote: builder.mutation({
+      query: ({ complaintId, note }) => ({
+        url: `/api/workflow/notes/${complaintId}`,
+        method: "POST",
+        body: { note }
+      }),
+      invalidatesTags: [{ type: 'InternalNote', id: 'LIST' }],
+    }),
+  }),
 });
 
-export const { 
-  useGetComplaintByIdQuery, 
-  useGetComplaintsQuery, 
-  useGetUnassignedComplaintsQuery, 
-  useUpdateComplaintStatusMutation ,
- useGetComplaintsDashboardQuery,
- useGetComplaintsListQuery,
-useGetComplaintsbyCatagoryQuery
- 
+export const {
+  useGetComplaintByIdQuery,
+  useGetComplaintHistoryQuery, // Added this export for you
+  useGetComplaintsQuery,
+  useGetUnassignedComplaintsQuery,
+  useUpdateComplaintStatusMutation,
+  useGetComplaintsDashboardQuery,
+  useGetComplaintsListQuery,
+  useGetComplaintsbyCatagoryQuery,
+  useGetInternalNotesQuery,
+  useCreateInternalNoteMutation
 } = complaintApi;

@@ -39,6 +39,10 @@ const OfficerPage1 = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  useEffect(()=>{
+
+console.log(CompileList);
+  },[CompileList])
 
   // ✅ ADD 401 ERROR REDIRECT (ONLY ADDITION)
   useEffect(() => {
@@ -71,18 +75,13 @@ const OfficerPage1 = () => {
               
               {/* Left Side: Stats Cards */}
               <div className="xl:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <StatCard title={t.statAssigned} count={CompileList?.assigned} icon={ClipboardList} type="assigned" />
-                <StatCard title={t.statProgress} count={CompileList?.inProgress} icon={Clock} type="in_progress" />
-                <StatCard title={t.statResolved} count={CompileList?.resolved} icon={CheckCircle} type="resolved" />
-                <StatCard title={t.statRejected} count={CompileList?.rejected} icon={XCircle} type="rejected" />
-                
-                <div className="sm:col-span-2 bg-rose-50 border border-rose-100 p-4 rounded-2xl flex items-center justify-between">
-                   <div className="flex items-center gap-3">
-                      <AlertCircle className="text-rose-500" />
-                      <span className="font-bold text-rose-700 uppercase text-xs tracking-widest">{t.statOverdue}</span>
-                   </div>
-                   <span className="text-2xl font-black text-rose-700">{CompileList?.overdue}</span>
-                </div>
+              <StatCard title={t.statAssigned} count={CompileList?.assigned} icon={ClipboardList} type="assigned" />
+<StatCard title={t.statProgress} count={CompileList?.inProgress} icon={Clock} type="in_progress" />
+<StatCard title={t.statResolved} count={CompileList?.resolved} icon={CheckCircle} type="resolved" />
+<StatCard title={t.statRejected} count={CompileList?.rejected} icon={XCircle} type="rejected" />
+
+{/* Changed from custom div to StatCard */}
+<StatCard title={t.statOverdue} count={CompileList?.overdue} icon={AlertCircle} type="overdue" />
               </div>
 
               {/* Right Side: Visual Graph */}
