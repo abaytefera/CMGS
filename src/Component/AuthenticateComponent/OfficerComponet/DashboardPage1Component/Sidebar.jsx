@@ -49,7 +49,7 @@ const Sidebar = () => {
     { icon: FolderTree, label: "Categories", url:"/CatagoryMg", visible: role === 'ADMIN' },
     { icon: Building2, label: "Department", url:"/DepartmentMg", visible: role === 'ADMIN' },
     { icon: Database, label: "Total Compilation", url: "/Complaintlist/supervisor/list/", visible: role === 'SUPERVISOR' },
-    { icon: ListTodo, label: "Not Assigned", url: "/NotAssignComplainList/supervisor/unassigned", visible: role === 'SUPERVISOR' },
+    { icon: ListTodo, label: "Not Assigned", url: "/Complaintlist/supervisor/unassigned", visible: role === 'SUPERVISOR' },
     { icon: XCircle, label: "Rejected", url: "/Complaintlist/supervisor/rejected", visible: role === 'SUPERVISOR' },
     { icon: CheckCircle2, label: "Resolved", url: "/Complaintlist/supervisor/resolved", visible: role === 'SUPERVISOR' },
  
