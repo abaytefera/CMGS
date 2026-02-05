@@ -26,7 +26,7 @@ const AssignComplaintPage = () => {
   const { data: allUsers, isLoading: loadingUsers } = useGetUsersQuery();
 
   const [officerId, setOfficerId] = useState("");
-  const [priority, setPriority] = useState("Medium");
+  const [priority, setPriority] = useState("MEDIUM");
   
   // 1. AUTOMATICALLY START FROM TODAY
   const [startDate, setStartDate] = useState(new Date()); 

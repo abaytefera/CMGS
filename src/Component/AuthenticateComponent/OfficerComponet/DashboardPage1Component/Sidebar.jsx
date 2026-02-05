@@ -53,7 +53,7 @@ const Sidebar = () => {
     { icon: XCircle, label: "Rejected", url: "/Complaintlist/supervisor/rejected", visible: role === 'SUPERVISOR' },
     { icon: CheckCircle2, label: "Resolved", url: "/Complaintlist/supervisor/resolved", visible: role === 'SUPERVISOR' },
  
-    { icon: UserCheck, label: "Active Officer", url: "", visible: role === 'SUPERVISOR' },
+    { icon: UserCheck, label: "Active Officer", url: "/userMg", visible: role === 'SUPERVISOR' },
     { icon: Briefcase, label: "Assigned", url: "/Complaintlist/officer/assigned", visible: role === 'OFFICER' },
     { icon: PlayCircle, label: "In Progress", url: "/Complaintlist/officer/in_progress", visible: role === 'OFFICER' },
     { icon: AlertTriangle, label: "Overdue", url: "/Complaintlist/officer/overdue", visible: role === 'OFFICER' },
