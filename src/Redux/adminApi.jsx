@@ -19,7 +19,15 @@ export const adminApi = APi.injectEndpoints({
       // Unwrapping the 'data' array for the activity feed
       transformResponse: (response) => response?.data || [],
     }),
+    getDepartmentWithCatagory:builder.query({
+
+      query: () => '/api/departments/categories',
+      providesTags: ['AdminStats', 'Dashboard'],
+      // Unwrapping the 'data' array for the activity feed
+      transformResponse: (response) => response || [],
+    }),
+  
   }),
 });
 
-export const { useGetAdminStatsQuery, useGetSystemActivityQuery } = adminApi;
+export const { useGetAdminStatsQuery, useGetSystemActivityQuery ,useGetDepartmentWithCatagoryQuery} = adminApi;

@@ -16,6 +16,8 @@ import AdminStats from '../../../Component/AuthenticateComponent/AdminDashboardC
 import SystemSummary from '../../../Component/AuthenticateComponent/AdminDashboardComponent/SystemSummary';
 import AdminDashboardChart from '../../../Component/AuthenticateComponent/AdminDashboardComponent/AdminDashboardChart';
 import { logout } from '../../../Redux/auth';
+import DepartmentCircularChart from '../../../Component/AuthenticateComponent/AdminDashboardComponent/DepartmentCatagory';
+
 const AdminDashboard = () => {
   const { Language } = useSelector((state) => state.webState || {});
   const navigate = useNavigate();
@@ -78,7 +80,7 @@ const AdminDashboard = () => {
 
             {/* Page Header */}
             <div className="mb-10">
-              <h1 className="text-4xl font-black text-gray-900 tracking-tight capitalize">
+              <h1 className="text-4xl font-black text-green-600 tracking-tight capitalize">
                 {t.title}
               </h1>
               <p className="text-gray-500 font-bold text-[10px] uppercase tracking-[0.2em] mt-2 flex items-center gap-3">
@@ -87,18 +89,23 @@ const AdminDashboard = () => {
               </p>
             </div>
 
-            {/* Statistics */}
-            <AdminStats CompileList={CompileList} />
 
-            {/* Chart & Summary */}
+ {/* Chart & Summary */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mt-10 items-start">
-              <div className="xl:col-span-2 h-full">
+             
+                    <AdminStats CompileList={CompileList} />
+                    <div className="xl:col-span-2 h-full">
                 <AdminDashboardChart data={CompileList} language={Language} />
-              </div>
-              <div className="xl:col-span-1 h-full">
+              </div> 
+            </div>
+
+
+            {/* Statistics */}
+      
+< DepartmentCircularChart ></DepartmentCircularChart>
+           <div className="xl:col-span-1 mt-10 h-full">
                 <SystemSummary catagory={catagory?.length} dep={dep?.length} />
               </div>
-            </div>
 
             
             
