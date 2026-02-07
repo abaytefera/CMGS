@@ -66,7 +66,7 @@ const SystemSettings = () => {
             
             {/* Header Section */}
             <div className="mb-12">
-              <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+              <h1 className="text-4xl font-black text-slate-900 tracking-tighter  leading-none">
                 System <span className="text-emerald-600">Settings</span>
               </h1>
               <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px] mt-3 ml-1">

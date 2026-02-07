@@ -14,14 +14,17 @@ import CategoryForm from '../../../Component/AuthenticateComponent/CategoryManag
 import CategoryTable from '../../../Component/AuthenticateComponent/CategoryManagementComponent/CategoryTable';
 import AuthFooter from '../../../Component/AuthenticateComponent/AuthFooter';
 
-import { Loader2, Database, Layers, Plus, X } from 'lucide-react';
+import { Loader2, Plus, X } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../../Redux/auth';
+
 const CategoryManagement = () => {
   const [editingCat, setEditingCat] = useState(null);
   const [showForm, setShowForm] = useState(false);
+
   const navigate = useNavigate();
-const Dispath=useDispatch()
+  const dispatch = useDispatch();
+
   /* ===================== RTK QUERY ===================== */
   const {
     data: categories = [],
@@ -38,20 +41,17 @@ const Dispath=useDispatch()
 
   const { data: departments, error: dError } = useGetDepartmentsQuery();
 
-  /* ===================== 401 REDIRECT (ONLY ADDITION) ===================== */
+  /* ===================== 401 REDIRECT ===================== */
   useEffect(() => {
     const errors = [cError, createError, updateError, dError];
-
-    const isUnauthorized = errors.some(
-      (err) => err?.status === 401
-    );
+    const isUnauthorized = errors.some((err) => err?.status === 401);
 
     if (isUnauthorized) {
-     localStorage.removeItem('authToken');
-                     Dispath(logout())
+      localStorage.removeItem('authToken');
+      dispatch(logout());
       navigate('/login', { replace: true });
     }
-  }, [cError, createError, updateError, dError, navigate]);
+  }, [cError, createError, updateError, dError, dispatch, navigate]);
 
   /* ===================== SAVE ===================== */
   const handleSave = async (payload) => {
@@ -75,10 +75,9 @@ const Dispath=useDispatch()
       setEditingCat(null);
       setShowForm(false);
     } catch (err) {
-      toast.error(
-        err?.data?.message || 'Failed to save category',
-        { id: toastId }
-      );
+      toast.error(err?.data?.message || 'Failed to save category', {
+        id: toastId,
+      });
     }
   };
 
@@ -109,15 +108,15 @@ const Dispath=useDispatch()
       <div className="flex-1 flex flex-col min-w-0">
         <AuthHeader True />
 
-        <main className="flex-1 pt-32 px-6 lg:px-10 pb-20 bg-slate-50/50">
+        <main className="flex-1 pt-20 px-6 lg:px-10 pb-20 bg-slate-50/50">
           <div className="max-w-5xl mx-auto flex flex-col gap-10">
-
             {/* HEADER */}
             <header className="text-left">
               <h1 className="text-2xl relative top-10 font-black capitalize">
                 Category <span className="text-emerald-600">Management</span>
               </h1>
             </header>
+<div className='relative max-sm:space-y-4 md:bottom-10'>
 
             {/* REGISTER BUTTON */}
             <div className="flex justify-end">
@@ -126,7 +125,7 @@ const Dispath=useDispatch()
                   setEditingCat(null);
                   setShowForm(true);
                 }}
-                className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-black rounded-full hover:bg-emerald-700 transition"
+                className="flex items-center  gap-2 px-6 py-3 bg-emerald-600 text-white font-black rounded-full hover:bg-emerald-700 transition"
               >
                 <Plus size={16} />
                 Register Category
@@ -135,8 +134,11 @@ const Dispath=useDispatch()
 
             {/* TABLE */}
             {isLoading ? (
-              <div className="flex flex-col items-center py-20 bg-white rounded-3xl border">
-                <Loader2 className="animate-spin text-emerald-600 mb-3" size={40} />
+              <div className="flex flex-col items-center relative bottom-10 py-20 bg-white rounded-3xl border">
+                <Loader2
+                  className="animate-spin text-emerald-600 mb-3"
+                  size={40}
+                />
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                   Loading Categories...
                 </span>
@@ -157,6 +159,7 @@ const Dispath=useDispatch()
               />
             )}
           </div>
+          </div>
         </main>
       </div>
 
@@ -164,8 +167,7 @@ const Dispath=useDispatch()
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="relative w-full max-w-2xl mx-4 rounded-[3rem] p-4">
-
-            {/* CLOSE */}
+            {/* CLOSE BUTTON */}
             <button
               onClick={() => {
                 setShowForm(false);

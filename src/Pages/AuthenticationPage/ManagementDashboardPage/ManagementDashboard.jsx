@@ -14,8 +14,8 @@ import Sidebar from '../../../Component/AuthenticateComponent/OfficerComponet/Da
 import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import TrendChart from '../../../Component/AuthenticateComponent/ManagementDashboardComponent/TrendChart';
 import ResolutionPie from '../../../Component/AuthenticateComponent/ManagementDashboardComponent/ResolutionPie';
-import StatCard from '../../../Component/AuthenticateComponent/ManagementDashboardComponent/StatCard';
 import DepartmentCircularChart from '../../../Component/AuthenticateComponent/AdminDashboardComponent/DepartmentCatagory';
+import StatCard from './StatCard';
 
 const ManagementDashboard = () => {
   const navigate = useNavigate();
@@ -39,17 +39,20 @@ const ManagementDashboard = () => {
 
   const totalComplaints = CompileList?.summary?.total ?? stats?.total ?? 0;
   const slaCompliance = `${CompileList?.percentage ?? stats?.sla ?? 0}%`;
+  const userSatisfaction = CompileList?.satisfaction?.averageSatisfaction ?? 0;
 
-  // Correct resolution data for pie with gradient colors
+  // Card definitions
+  const cards = [
+    { title: "Complaints", value: totalComplaints, icon: Activity, gradient: 'bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-500', onClick: () => navigate("/Complaintlist/admin/list/") },
+    { title: "SLA Compliance", value: slaCompliance, icon: ShieldCheck, gradient: 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-500', onClick: () => {} },
+    { title: "User Satisfaction", value: `${userSatisfaction}%`, icon: Heart, gradient: 'bg-gradient-to-br from-rose-400 via-rose-500 to-pink-500', onClick: () => {} },
+  ];
+
   const resolutionData = [
     { name: 'Resolved', value: CompileList?.summary?.resolved ?? 0, colorStart: '#34d399', colorEnd: '#10b981' },
     { name: 'Closed', value: CompileList?.summary?.closed ?? 0, colorStart: '#60a5fa', colorEnd: '#3b82f6' },
     { name: 'Rejected', value: CompileList?.summary?.rejected ?? 0, colorStart: '#f87171', colorEnd: '#ef4444' },
     { name: 'In Progress', value: CompileList?.summary?.inprogress ?? 0, colorStart: '#facc15', colorEnd: '#f59e0b' },
-    { name: 'Under Review', value: CompileList?.summary?.underReview ?? 0, colorStart: '#c084fc', colorEnd: '#8b5cf6' },
-    { name: 'Assigned', value: CompileList?.summary?.assigned ?? 0, colorStart: '#2dd4bf', colorEnd: '#06b6d4' },
-    { name: 'Submitted', value: CompileList?.summary?.submitted ?? 0, colorStart: '#fb923c', colorEnd: '#f97316' },
-    { name: 'Unresolved', value: CompileList?.summary?.unresolved ?? 0, colorStart: '#93c5fd', colorEnd: '#3b82f6' },
   ];
 
   if (statsLoading || chartsLoading || isLoadingCompile) {
@@ -68,59 +71,48 @@ const ManagementDashboard = () => {
         <main className="flex-1 pb-40 pt-32 px-6 lg:px-10 overflow-y-auto bg-slate-50/50">
           <div className="max-w-7xl mx-auto space-y-10">
 
-            {/* Complaint Trends */}
-            <div className="bg-white border border-slate-200 p-8 rounded-[3rem] shadow-sm">
-              <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em] mb-2">
-                Complaint Trends
-              </h3>
-              <p className="text-[10px] text-slate-400 font-bold uppercase mb-6">
-                Weekly incoming vs resolution volume
-              </p>
-              <TrendChart />
+            {/* ================= TOP CARDS ================= */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+              {cards.map((card, i) => (
+                <StatCard
+                  key={i}
+                  title={card.title}
+                  value={card.value}
+                  icon={card.icon}
+                  gradient={card.gradient}
+                  onClick={card.onClick}
+                  wave={i % 2 === 0 ? 'up' : 'down'}
+                  delay={i * 0.2}
+                />
+              ))}
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <StatCard title="Complaints" value={totalComplaints} trend={stats?.trend || 0} icon={Activity} colorClass="bg-blue-600" onClick={() => navigate("/Complaintlist/admin/list/")} />
-              <StatCard title="SLA Compliance" value={slaCompliance} trend={stats?.slaTrend || 0} icon={ShieldCheck} colorClass="bg-emerald-600" />
-            </div>
-
-            {/* User Satisfaction */}
-            <div className="bg-white border border-slate-200 rounded-[2.5rem] p-6 flex items-center justify-between shadow-sm">
-              <div>
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">User Satisfaction</h4>
-                <p className="text-xl font-black text-slate-800 italic mt-1 uppercase">{CompileList?.satisfaction?.averageSatisfaction ?? "No Feedback"}%</p>
-                <div className="flex gap-2 mt-4">
-                  <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-[9px] font-black rounded-lg uppercase border border-emerald-200">
-                    {CompileList?.percentage === 100 ? 'Excellent' : 'Stable'}
-                  </span>
-                </div>
-              </div>
-              <div className="h-16 w-16 opacity-20">
-                <Heart className="text-rose-600 w-full h-full" fill="currentColor" />
-              </div>
-            </div>
-
-            {/* Resolution Status */}
+            {/* ================= TREND CHART LEFT & PIE CHART RIGHT ================= */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 bg-white border border-slate-200 p-8 rounded-[3rem] shadow-sm flex flex-col items-center">
-                <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em] mb-10 w-full">Resolution Status</h3>
-                <ResolutionPie data={resolutionData} />
-                <div className="w-full mt-8 space-y-4">
-                  {resolutionData.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center text-[10px] font-black uppercase text-slate-600">
-                      <span className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded" style={{ background: `linear-gradient(to right, ${item.colorStart}, ${item.colorEnd})` }} />
-                        {item.name}
-                      </span>
-                      <span className="text-slate-900 font-bold">{item.value}</span>
-                    </div>
-                  ))}
+              {/* Trend Chart */}
+              <div className="lg:col-span-2 bg-white border border-slate-200 p-8 rounded-[3rem] shadow-sm">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em] mb-2">
+                  Complaint Trends
+                </h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase mb-6">
+                  Weekly incoming vs resolution volume
+                </p>
+                <TrendChart />
+              </div>
+
+              {/* Pie Chart */}
+              <div className="bg-white border border-slate-200 p-8 rounded-[3rem] shadow-sm">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-[0.2em] mb-6">
+                  Resolution Status
+                </h3>
+                <div className="h-[300px]">
+                  <ResolutionPie data={resolutionData} />
                 </div>
               </div>
             </div>
 
             <DepartmentCircularChart />
+
           </div>
         </main>
       </div>

@@ -44,10 +44,7 @@ const DepartmentPage = () => {
     error: userError // ✅ ADDED
   } = useGetUsersQuery();
 
-  useEffect(() => {
-    console.log("update info");
-    console.log(user);
-  }, [user]);
+ 
 
   const departments = departmentsData || [];
 const Dispath=useDispatch()
@@ -139,13 +136,13 @@ const Dispath=useDispatch()
       <div className="flex-1 flex flex-col min-w-0">
         <AuthHeader True={true} />
 
-        <main className="flex-1 pt-32 px-6 lg:px-10 pb-20">
+        <main className="flex-1 pt-30 px-6 lg:px-10 pb-20">
           <div className="max-w-5xl mx-auto">
 
             <h1 className="text-2xl relative bottom-2 font-black capitalize">
               Department <span className="text-emerald-600">Management</span>
             </h1>
-
+<div className='relative md:bottom-18'>
             {/* REGISTER BUTTON */}
             <div className="flex justify-end mb-6">
               <button
@@ -175,7 +172,9 @@ const Dispath=useDispatch()
                 onToggleStatus={handleToggleStatus}
               />
             )}
+        
           </div>
+            </div>
         </main>
       </div>
 

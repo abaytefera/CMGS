@@ -57,7 +57,7 @@ const CategoryForm = ({ editingCat, departments, onSave, onCancel }) => {
       className="bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-2xl shadow-slate-200/60 sticky top-32 transition-all"
     >
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-xl font-black text-slate-900 uppercase italic flex items-center gap-2 tracking-tight">
+        <h2 className="text-xl font-black text-green-600 capitalize  items-center gap-2 tracking-tight">
           <Layers className="text-emerald-500" size={24} />
           {editingCat ?  'Edit Category' : 'Category Register'}
         </h2>

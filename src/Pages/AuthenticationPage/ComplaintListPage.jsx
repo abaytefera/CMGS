@@ -6,7 +6,6 @@ import { logout } from '../../Redux/auth';
 import { useGetComplaintsbyCatagoryQuery } from '../../Redux/complaintApi';
 import Sidebar from '../../Component/AuthenticateComponent/OfficerComponet/DashboardPage1Component/Sidebar';
 import ComplaintRow from '../../Component/AuthenticateComponent/ComplaintListPageComponent/ComplaintRow';
-import AuthFooter from '../../Component/AuthenticateComponent/AuthFooter';
 import AuthHeader from '../../Component/AuthenticateComponent/AuthHeader';
 
 const ComplaintListPage = () => {
@@ -15,7 +14,6 @@ const ComplaintListPage = () => {
   const { Language } = useSelector((state) => state.webState);
   const { user } = useSelector((state) => state.auth);
 
-  // Role Helpers
   const isAdmin = user?.role === "ADMIN";
   const isOfficer = user?.role === "OFFICER";
 
@@ -38,40 +36,49 @@ const ComplaintListPage = () => {
     }
   }, [error, navigate, dispatch]);
 
-  const filteredComplaints = useMemo(() => {
-    let list = Array.isArray(TotalCompile) ? [...TotalCompile] : [];
-    list = list.filter(item => item !== null && typeof item === 'object');
+  // Dynamic labels for filterType
+  const filterLabels = {
+    TOTAL: Language === "AMH" ? "ሁሉም" : "Total",
+    ACTIVE: Language === "AMH" ? "ንቁ" : "Active",
+    IN_PROGRESS: Language === "AMH" ? "በሂደት ላይ" : "In Progress",
+    OVERDUE: Language === "AMH" ? "የተዘግደ" : "Overdue",
+    RESOLVED: Language === "AMH" ? "የተፈታ" : "Resolved",
+    REJECTED: Language === "AMH" ? "የተከለከለ" : "Rejected",
+  };
 
-    if (isOfficer) {
-      switch (filterType) {
-        case "IN_PROGRESS":
-          list = list.filter(item => item?.status?.toUpperCase() === "IN_PROGRESS");
-          break;
-        case "RESOLVED":
-          list = list.filter(item => item?.status?.toUpperCase() === "RESOLVED");
-          break;
-        case "REJECTED":
-          list = list.filter(item => item?.status?.toUpperCase() === "REJECTED");
-          break;
-        case "OVERDUE":
-          const threeDaysAgo = new Date();
-          threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-          list = list.filter(item => {
-            const status = item?.status?.toUpperCase() || "";
-            const createdDate = item?.createdAt ? new Date(item.createdAt) : null;
-            return (
-              !['RESOLVED', 'REJECTED', 'CLOSED'].includes(status) &&
-              createdDate && createdDate < threeDaysAgo
-            );
-          });
-          break;
-        default:
-          break;
-      }
-    } else if (isAdmin && filterType === "ACTIVE") {
+  // Filtered complaints
+  const filteredComplaints = useMemo(() => {
+    if (!Array.isArray(TotalCompile)) return [];
+
+    let list = [...TotalCompile].filter(item => item && typeof item === 'object');
+
+    // Filter based on role and filterType
+    if (filterType === "TOTAL") {
+      // TOTAL = all complaints
+      list = list;
+    } else if (filterType === "ACTIVE") {
+      // ACTIVE = not resolved/rejected/closed
       list = list.filter(item => !['RESOLVED', 'REJECTED', 'CLOSED'].includes(item?.status?.toUpperCase()));
+    } else if (filterType === "IN_PROGRESS") {
+      list = list.filter(item => item?.status?.toUpperCase() === "IN_PROGRESS");
+    } else if (filterType === "RESOLVED") {
+      list = list.filter(item => item?.status?.toUpperCase() === "RESOLVED");
+    } else if (filterType === "REJECTED") {
+      list = list.filter(item => item?.status?.toUpperCase() === "REJECTED");
+    } else if (filterType === "OVERDUE") {
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+      list = list.filter(item => {
+        const status = item?.status?.toUpperCase() || "";
+        const createdDate = item?.createdAt ? new Date(item.createdAt) : null;
+        return (
+          !['RESOLVED', 'REJECTED', 'CLOSED'].includes(status) &&
+          createdDate && createdDate < threeDaysAgo
+        );
+      });
     }
 
+    // Search filter
     if (searchTerm) {
       const lowerSearch = searchTerm.toLowerCase();
       list = list.filter(item =>
@@ -81,9 +88,8 @@ const ComplaintListPage = () => {
     }
 
     return list;
-  }, [TotalCompile, filterType, searchTerm, isOfficer, isAdmin]);
+  }, [TotalCompile, filterType, searchTerm]);
 
-  // Prevent crash if user is null during auth transition
   if (!user) return null;
 
   return (
@@ -93,51 +99,41 @@ const ComplaintListPage = () => {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <AuthHeader True={true} />
 
-        <main className="flex-grow pt-32 px-6 lg:px-10 overflow-y-auto bg-slate-50/50">
+        <main className="flex-grow pt-20 px-6 lg:px-10 overflow-y-auto bg-slate-50/50">
           <div className="max-w-7xl mx-auto">
 
+            {/* ===== PAGE HEADER ===== */}
+            <header className="text-left mb-10">
+              <h1 className="text-2xl relative top-10 font-black capitalize">
+                Complaints <span className="text-emerald-600">{filterLabels[filterType] || filterType}</span>
+              </h1>
+            </header>
+
+            {/* ===== FILTER BUTTONS & SEARCH ===== */}
             <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
               <div>
                 <div className="flex flex-wrap gap-2 mt-6">
-                  {isOfficer && (
-                    <>
-                      <button
-                        onClick={() => setFilterType("IN_PROGRESS")}
-                        className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
-                          filterType === "IN_PROGRESS" ? "bg-amber-500 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
-                        }`}
-                      >
-                        <PlayCircle size={14} /> In Progress
-                      </button>
-
-                      <button
-                        onClick={() => setFilterType("OVERDUE")}
-                        className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
-                          filterType === "OVERDUE" ? "bg-rose-500 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
-                        }`}
-                      >
-                        <AlertTriangle size={14} /> Overdue
-                      </button>
-
-                      <button
-                        onClick={() => setFilterType("RESOLVED")}
-                        className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
-                          filterType === "RESOLVED" ? "bg-emerald-600 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
-                        }`}
-                      >
-                        <CheckCircle size={14} /> Resolved
-                      </button>
-
-                      <button
-                        onClick={() => setFilterType("REJECTED")}
-                        className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
-                          filterType === "REJECTED" ? "bg-slate-600 text-white shadow-lg" : "bg-white text-slate-400 border-slate-200"
-                        }`}
-                      >
-                        <XCircle size={14} /> Rejected
-                      </button>
-                    </>
-                  )}
+                  {["TOTAL", "ACTIVE", "IN_PROGRESS", "OVERDUE", "RESOLVED", "REJECTED"].map((key) => (
+                    <button
+                      key={key}
+                      onClick={() => setFilterType(key)}
+                      className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 ${
+                        filterType === key
+                          ? key === "IN_PROGRESS" ? "bg-amber-500 text-white shadow-lg"
+                          : key === "OVERDUE" ? "bg-rose-500 text-white shadow-lg"
+                          : key === "RESOLVED" ? "bg-emerald-600 text-white shadow-lg"
+                          : key === "REJECTED" ? "bg-slate-600 text-white shadow-lg"
+                          : "bg-emerald-600 text-white shadow-lg"
+                          : "bg-white text-slate-400 border-slate-200"
+                      }`}
+                    >
+                      {key === "IN_PROGRESS" && <PlayCircle size={14} />}
+                      {key === "OVERDUE" && <AlertTriangle size={14} />}
+                      {key === "RESOLVED" && <CheckCircle size={14} />}
+                      {key === "REJECTED" && <XCircle size={14} />}
+                      {filterLabels[key]}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -147,17 +143,18 @@ const ComplaintListPage = () => {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search tracking ID..."
+                  placeholder={Language === "AMH" ? "መከታተያ መለያ ፈልግ..." : "Search tracking ID..."}
                   className="w-full bg-white border border-slate-200 py-3.5 pl-12 pr-4 rounded-2xl outline-none text-sm"
                 />
               </div>
             </div>
 
+            {/* ===== TABLE ===== */}
             <div className="bg-white border border-slate-200 rounded-[2.5rem] shadow-sm overflow-hidden mb-10">
               <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
                 <ListFilter className="text-emerald-600" size={18} />
                 <span className="text-xs font-black text-slate-800 uppercase tracking-widest italic">
-                  Showing: {filterType.replace('_', ' ')} ({filteredComplaints.length})
+                  {Language === "AMH" ? "በመሰረት እየተደረገ" : "Showing"}: {filterLabels[filterType] || filterType} ({filteredComplaints.length})
                 </span>
               </div>
 
@@ -172,7 +169,6 @@ const ComplaintListPage = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {/* TABLE ONLY LOADING LOGIC */}
                     {isLoading || isFetching ? (
                       <tr>
                         <td colSpan="4" className="px-8 py-24 text-center">
@@ -191,7 +187,7 @@ const ComplaintListPage = () => {
                     ) : (
                       <tr>
                         <td colSpan="4" className="px-8 py-20 text-center text-slate-400 uppercase font-black text-[10px] tracking-widest">
-                          No Records Found
+                          {Language === "AMH" ? "መዝግቦች አልተገኙም" : "No Records Found"}
                         </td>
                       </tr>
                     )}
@@ -199,6 +195,7 @@ const ComplaintListPage = () => {
                 </table>
               </div>
             </div>
+
           </div>
         </main>
       </div>

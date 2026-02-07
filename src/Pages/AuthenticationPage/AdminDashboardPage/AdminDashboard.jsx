@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
-import { Loader2, ExternalLink, AlertTriangle, Shield } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 // API Hooks
 import { useGetAdminStatsQuery, useGetSystemActivityQuery } from '../../../Redux/adminApi';
@@ -15,16 +15,18 @@ import AuthHeader from '../../../Component/AuthenticateComponent/AuthHeader';
 import AdminStats from '../../../Component/AuthenticateComponent/AdminDashboardComponent/AdminStats';
 import SystemSummary from '../../../Component/AuthenticateComponent/AdminDashboardComponent/SystemSummary';
 import AdminDashboardChart from '../../../Component/AuthenticateComponent/AdminDashboardComponent/AdminDashboardChart';
-import { logout } from '../../../Redux/auth';
 import DepartmentCircularChart from '../../../Component/AuthenticateComponent/AdminDashboardComponent/DepartmentCatagory';
+
+// Redux
+import { logout } from '../../../Redux/auth';
 
 const AdminDashboard = () => {
   const { Language } = useSelector((state) => state.webState || {});
   const navigate = useNavigate();
-  const Dispath=useDispatch()
+  const dispatch = useDispatch();
 
-  const { data: stats, isLoading: sLoading, error: sError } = useGetAdminStatsQuery();
-  const { data: activities, isLoading: aLoading, error: aError } = useGetSystemActivityQuery();
+
+
   const { data: dep, isLoading: dLoading, error: dError } = useGetDepartmentsQuery();
   const { data: catagory, isLoading: cLoading, error: cError } = useGetCategoriesQuery();
   const {
@@ -33,53 +35,55 @@ const AdminDashboard = () => {
     error: clError,
   } = useGetComplaintsDashboardQuery('admin');
 
+  // Scroll top on load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // ✅ ONLY ADDITION: 401 REDIRECT LOGIC
+  // Handle 401 Unauthorized
   useEffect(() => {
-    const errors = [sError, aError, dError, cError, clError];
-
-    const isUnauthorized = errors.some(
-      (err) => err?.status === 401
-    );
+    const errors = [ dError, cError, clError];
+    const isUnauthorized = errors.some(err => err?.status === 401);
 
     if (isUnauthorized) {
-            localStorage.removeItem('authToken');
-                                Dispath(logout())
+      localStorage.removeItem('authToken');
+      dispatch(logout());
       navigate('/login', { replace: true });
     }
-  }, [sError, aError, dError, cError, clError, navigate]);
+  }, [  dError, cError, clError, dispatch, navigate]);
 
-  const isLoading = sLoading || aLoading || dLoading || cLoading || clLoading;
+  const isLoading =
+   dLoading || cLoading || clLoading;
 
   const t = {
     title: Language === "AMH" ? "የአስተዳዳሪ ዳሽቦርድ" : "Admin Dashboard",
-    subtitle: Language === "AMH" ? "የአካባቢ ጥበቃ ባለሥልጣን አጠቃላይ እይታ" : "EPA Global System Overview",
-    recentActivity: Language === "AMH" ? "የቅርብ ጊዜ እንቅስቃሴዎች" : "Recent System Activity",
-    overdue: Language === "AMH" ? "ጊዜ ያለፈበት" : "Overdue",
-    pending: Language === "AMH" ? "በሂደት ላይ" : "In Progress",
+    subtitle:
+      Language === "AMH"
+        ? "የአካባቢ ጥበቃ ባለሥልጣን አጠቃላይ እይታ"
+        : "EPA Global System Overview",
   };
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
-      <Loader2 className="animate-spin text-emerald-600" size={48} />
-    </div>
-  );
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="animate-spin text-emerald-600" size={48} />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50/40">
+    <div className="flex h-screen overflow-x-hidden bg-gray-50/40">
       <Sidebar role="admin" />
 
-      <div className="flex-1 flex flex-col min-w-0 h-full relative">
+      <div className="flex-1 flex flex-col min-w-0 h-full">
         <AuthHeader True={true} />
 
-        <main className="flex-1 overflow-y-auto pt-32 px-6 lg:px-10 pb-24 space-y-8 scroll-smooth">
+        <main className="flex-1 overflow-y-auto pt-32 px-6 lg:px-10 pb-24 space-y-10">
           <div className="max-w-7xl mx-auto">
 
-            {/* Page Header */}
-            <div className="mb-10">
+            {/* ================= PAGE HEADER ================= */}
+            <div>
               <h1 className="text-4xl font-black text-green-600 tracking-tight capitalize">
                 {t.title}
               </h1>
@@ -89,26 +93,36 @@ const AdminDashboard = () => {
               </p>
             </div>
 
-
- {/* Chart & Summary */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mt-10 items-start">
-             
-                    <AdminStats CompileList={CompileList} />
-                    <div className="xl:col-span-2 h-full">
-                <AdminDashboardChart data={CompileList} language={Language} />
-              </div> 
+            {/* ================= TOP CARDS ================= */}
+            <div className="mt-10">
+              <AdminStats CompileList={CompileList} />
             </div>
 
+            {/* ================= CHART + SUMMARY ================= */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start mt-12">
 
-            {/* Statistics */}
-      
-< DepartmentCircularChart ></DepartmentCircularChart>
-           <div className="xl:col-span-1 mt-10 h-full">
-                <SystemSummary catagory={catagory?.length} dep={dep?.length} />
+              {/* LEFT: MAIN DASHBOARD CHART */}
+              <div className="xl:col-span-2 bg-white rounded-[3rem] p-8 shadow-sm ">
+                <AdminDashboardChart
+                  data={CompileList}
+                  language={Language}
+                />
               </div>
 
-            
-            
+              {/* RIGHT: SYSTEM SUMMARY */}
+              <div className="bg-white rounded-[3rem] p-8 shadow-sm  h-fit">
+                <SystemSummary
+                  catagory={catagory?.length}
+                  dep={dep?.length}
+                />
+              </div>
+
+            </div>
+
+            {/* ================= DEPARTMENT / CATEGORY ================= */}
+            <div className="mt-12">
+              <DepartmentCircularChart />
+            </div>
 
           </div>
         </main>

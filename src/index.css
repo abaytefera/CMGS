@@ -6,3 +6,38 @@
   /* This defines the 'sans' variable which is the default for Tailwind v4 */
   --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
 }
+@keyframes waveUp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes waveDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+
+.animate-wave-up {
+  animation: waveUp 3.5s ease-in-out infinite;
+}
+
+.animate-wave-down {
+  animation: waveDown 3.5s ease-in-out infinite;
+}
+
+@keyframes waveUp {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes waveDown {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.animate-wave-up {
+  animation: waveUp 3s ease-in-out infinite;
+}
+
+.animate-wave-down {
+  animation: waveDown 3s ease-in-out infinite;
+}
