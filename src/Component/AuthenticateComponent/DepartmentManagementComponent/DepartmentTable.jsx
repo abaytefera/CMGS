@@ -98,7 +98,7 @@ const DepartmentTable = ({ data = [], onEdit, onToggleStatus }) => {
                     <div className={`p-3 rounded-2xl transition-colors ${dept.is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400'}`}>
                       <Building2 size={22} />
                     </div>
-                    <span className={`font-bold text-sm uppercase tracking-tight ${dept.is_active ? "text-slate-800" : "text-slate-400"}`}>
+                    <span className={`font-bold text-sm capitalize tracking-tight ${dept.is_active ? "text-slate-800" : "text-slate-400"}`}>
                       {dept.name}
                     </span>
                   </div>
