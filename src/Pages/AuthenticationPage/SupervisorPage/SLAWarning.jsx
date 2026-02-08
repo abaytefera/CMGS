@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from "react-redux";
 import { ArrowRight } from 'lucide-react';
 
-const SLAWarning = ({ title, count, icon: Icon, wave = 'up' }) => {
+const SLAWarning = ({ title, count, icon: Icon,onClick, wave = 'up' }) => {
   const { Language } = useSelector((state) => state.webState);
 
   const gradientStyles = {
@@ -20,7 +20,7 @@ const SLAWarning = ({ title, count, icon: Icon, wave = 'up' }) => {
   const waveClass = wave === 'up' ? 'animate-wave-up' : 'animate-wave-down';
 
   return (
-    <div className={`
+    <div onClick={onClick} className={`
       relative overflow-hidden rounded-3xl p-6 shadow-lg cursor-pointer
       ${cardStyle} ${waveClass}
       hover:scale-[1.03] transition-transform duration-300

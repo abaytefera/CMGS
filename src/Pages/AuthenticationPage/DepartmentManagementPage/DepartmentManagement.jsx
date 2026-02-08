@@ -142,29 +142,34 @@ const Dispath=useDispatch()
             <h1 className="text-2xl relative bottom-2 font-black capitalize">
               Department <span className="text-emerald-600">Management</span>
             </h1>
-<div className='relative md:bottom-18'>
+<div className={`relative ${ isLoading &&("space-y-20 max-sm:space-y-20  ")} max-sm:space-y-4 md:bottom-10`}>
+  
             {/* REGISTER BUTTON */}
-            <div className="flex justify-end mb-6">
-              <button
-                onClick={() => {
-                  setEditingDept(null);
-                  setShowForm(true);
-                }}
-                className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-black rounded-full hover:bg-emerald-700 transition"
-              >
-                <Plus size={16} />
-                Register Department
-              </button>
-            </div>
+           
+            <div className="flex justify-end">
+                          <button
+                            onClick={() => {
+                             setEditingDept(null);
+                               setShowForm(true);
+                            }}
+                            className="flex items-center  gap-2 px-6 py-3 bg-emerald-600 text-white font-black rounded-full hover:bg-emerald-700 transition"
+                          >
+                            <Plus size={16} />
+                            Register Category
+                          </button>
+                        </div>
 
             {/* TABLE */}
             {isLoading ? (
-              <div className="flex flex-col items-center py-20 gap-4">
-                <Loader2 className="animate-spin text-emerald-600" size={40} />
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  Loading Records...
-                </span>
-              </div>
+              <div className="flex flex-col items-center relative bottom-10 py-20 bg-white rounded-3xl border">
+                              <Loader2
+                                className="animate-spin text-emerald-600 mb-3"
+                                size={40}
+                              />
+                              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                Loading Department...
+                              </span>
+                            </div>
             ) : (
               <DepartmentTable 
                 data={departments} 

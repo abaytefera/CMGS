@@ -25,7 +25,7 @@ const SupervisorDashboard = () => {
   const { Language } = useSelector((state) => state.webState);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+const {user, isloading, error } = useSelector((state) => state.auth);
   const { isLoading: statsLoading, error: statsError } = useGetSupervisorStatsQuery();
   const { data: CompileList, isLoading: listLoading, error: listError } =
     useGetComplaintsDashboardQuery('supervisor');
@@ -89,11 +89,11 @@ const SupervisorDashboard = () => {
 
   // Cards list
   const cards = [
-    { title: 'Total', count: CompileList?.totalComplaints, icon: BarChart3 },
-    { title: t.notAssigned, count: CompileList?.notAssigned, icon: UserPlus },
-    { title: t.resolved, count: CompileList?.resolved, icon: CheckCircle2 },
-    { title: t.rejected, count: CompileList?.rejected, icon: XCircle },
-    { title: 'Active Officers', count: CompileList?.activeOfficers, icon: Users },
+    { title: 'Total', count: CompileList?.totalComplaints, icon: BarChart3 ,type:"list"},
+    { title: t.notAssigned, count: CompileList?.notAssigned, icon: UserPlus ,type:"unassigned"},
+    { title: t.resolved, count: CompileList?.resolved, icon: CheckCircle2,type:"resolved" },
+    { title: t.rejected, count: CompileList?.rejected, icon: XCircle ,type:"rejected"},
+    { title: 'Active Officers', count: CompileList?.activeOfficers, icon: Users,type:"user" },
   ];
 
   return (
@@ -114,6 +114,13 @@ const SupervisorDashboard = () => {
                   title={card.title}
                   count={card.count}
                   icon={card.icon}
+                 onClick={()=>{
+                     if(card.type!=="user"){
+                    navigate(`/Complaintlist/${user?.role}/${card.type}`)
+                    }else{
+                      navigate("/userMg")
+                    }
+                  }}
                   wave={i % 2 === 0 ? 'up' : 'down'} // Alternating wave
                 />
               ))}

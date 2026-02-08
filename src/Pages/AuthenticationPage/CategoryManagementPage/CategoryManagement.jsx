@@ -116,7 +116,7 @@ const CategoryManagement = () => {
                 Category <span className="text-emerald-600">Management</span>
               </h1>
             </header>
-<div className='relative max-sm:space-y-4 md:bottom-10'>
+<div className={`relative ${ isLoading &&("space-y-20 max-sm:space-y-20  ")} max-sm:space-y-4 md:bottom-10`}>
 
             {/* REGISTER BUTTON */}
             <div className="flex justify-end">

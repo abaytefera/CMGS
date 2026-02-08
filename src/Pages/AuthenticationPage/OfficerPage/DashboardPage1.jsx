@@ -19,6 +19,7 @@ const OfficerPage1 = () => {
   const { Language } = useSelector((state) => state.webState);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const {user, isloading, error } = useSelector((state) => state.auth);
 
   const { isLoading: isLoadingStats, error: statsError } = useGetOfficerStatsQuery();
   const { data: CompileList, isLoading: isLoadingCompiletask, error: compileError } =
@@ -82,6 +83,11 @@ const OfficerPage1 = () => {
                   count={card.count}
                   icon={card.icon}
                   type={card.type}
+                  onClick={()=>{
+                   
+                    navigate(`/Complaintlist/${user?.role}/${card.type}`)
+                  
+                  }}
                   wave={i % 2 === 0 ? 'up' : 'down'} // wave up/down alternate
                   delay={i * 0.2} // stagger animation
                 />

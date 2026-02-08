@@ -11,6 +11,7 @@ const gradients = {
   overdue: "bg-gradient-to-br from-purple-600 to-fuchsia-700",
 };
 
+
 const StatCard = ({
   title,
   count,
@@ -21,7 +22,7 @@ const StatCard = ({
   delay = 0,
 }) => {
   const yAnim = wave === "up" ? [0, -6, 0] : [0, 6, 0];
-
+console.log(type)
   return (
     <motion.div
       onClick={onClick}

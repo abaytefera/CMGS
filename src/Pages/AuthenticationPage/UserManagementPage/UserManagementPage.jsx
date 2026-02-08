@@ -96,11 +96,11 @@ const UserManagementPage = () => {
               </h1>
             </header>
 
-            <div className="relative max-sm:space-y-4 md:bottom-10">
+            <div className={`relative ${(!isAdmin && isLoading )  && "top-15"} ${(!isAdmin )  && "top-10"} ${ isLoading &&("space-y-20 max-sm:space-y-20  ")} max-sm:space-y-4 md:bottom-10 `}>
 
               {/* REGISTER BUTTON */}
               {isAdmin && (
-                <div className="flex justify-end">
+                <div className={`flex  justify-end`}>
                   <button
                     onClick={() => { setEditingUser(null); setShowUserForm(true); }}
                     className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-black rounded-full hover:bg-emerald-700 transition"
